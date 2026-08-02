@@ -14,6 +14,7 @@
             --card-bg: #1e293b;
             --accent-primary: #3b82f6;
             --accent-success: #10b981;
+            --accent-edit: #eab308;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --error: #ef4444;
@@ -51,12 +52,12 @@
             border: 1px solid #334155; background: #0f172a; color: white;
             font-size: 1rem;
         }
-        button {
+        button.btn-submit {
             width: 100%; padding: 0.75rem; border-radius: 6px; border: none;
             background: var(--accent-primary); color: white; font-size: 1rem;
             font-weight: 600; cursor: pointer; transition: background 0.2s;
         }
-        button:hover { background: #2563eb; }
+        button.btn-submit:hover { background: #2563eb; }
         
         #error-msg { color: var(--error); font-size: 0.9rem; margin-top: 0.5rem; display: none; }
 
@@ -65,12 +66,26 @@
         .log-item {
             background: #0f172a; padding: 1rem; border-radius: 8px;
             margin-bottom: 1rem; border-left: 4px solid var(--accent-primary);
+            position: relative;
         }
-        .log-meta { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;}
+        .log-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-muted); margin-top: 0.75rem;}
         .tag { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
         .tag-p { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
         .tag-c { background: rgba(16, 185, 129, 0.2); color: #34d399; }
         .tag-m { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+
+        .btn-edit {
+            background-color: var(--accent-edit);
+            color: #000;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-edit:hover { background-color: #ca8a04; }
     </style>
 </head>
 <body>
@@ -108,6 +123,11 @@
                         <option value="Math">Mathematics</option>
                     </select>
                 </div>
+                <!-- Added Study Hours Field -->
+                <div class="form-group">
+                    <label for="studyHours">Study Hours</label>
+                    <input type="number" id="studyHours" step="0.5" min="0.5" max="24" placeholder="e.g., 2.5" required>
+                </div>
                 <div class="form-group">
                     <label for="topic">Topic/Chapter Name</label>
                     <input type="text" id="topic" placeholder="e.g., Kinematics, Mole Concept" required>
@@ -116,7 +136,7 @@
                     <label for="details">What did you accomplish?</label>
                     <input type="text" id="details" placeholder="e.g., Solved 30 HC Verma questions" required>
                 </div>
-                <button type="submit">Publish Update</button>
+                <button type="submit" class="btn-submit">Publish Update</button>
             </form>
         </div>
 
@@ -130,7 +150,7 @@
     </div>
 </div>
 
-<script type="module">
+<script>
     // 🔐 Global Group Password Security
     const GROUP_PASSWORD = "4"; 
 
@@ -146,6 +166,7 @@
             throw new Error("Unauthorized access stopped.");
         }
     }
+
     // 🔐 Password keys Mapping
     const credentials = {
         "Pranay": "4440",
@@ -154,15 +175,14 @@
         "Aayush": "2340"
     };
 
-    // 🔥 YOUR FIREBASE CONFIGURATION GOES HERE
-    // (Follow Step 1 below to get these keys from console.firebase.google.com)
+    // 🔥 FIREBASE CONFIGURATION
     const firebaseConfig = {
         apiKey: "AIzaSyAB6FbsDLh4xq6ikvsSFFrDLYFVDaYB978",
-  authDomain: "jee-tracker-6b67d.firebaseapp.com",
-  projectId: "jee-tracker-6b67d",
-  storageBucket: "jee-tracker-6b67d.firebasestorage.app",
-  messagingSenderId: "14514591368",
-  appId: "1:14514591368:web:9e72203c576dfaa5e9713d"
+        authDomain: "jee-tracker-6b67d.firebaseapp.com",
+        projectId: "jee-tracker-6b67d",
+        storageBucket: "jee-tracker-6b67d.firebasestorage.app",
+        messagingSenderId: "14514591368",
+        appId: "1:14514591368:web:9e72203c576dfaa5e9713d"
     };
 
     // Initialize Firebase
@@ -172,6 +192,38 @@
     const form = document.getElementById('trackerForm');
     const feedContainer = document.getElementById('feedContainer');
     const errorMsg = document.getElementById('error-msg');
+
+    // ✏️ EDIT LOG FUNCTION (Global so onclick works)
+    window.editLog = async function(docId, studentName, oldHours, oldTopic, oldDetails) {
+        let enteredPin = prompt(`🔐 Enter PIN for ${studentName} to edit this entry:`);
+        
+        if (credentials[studentName] !== enteredPin) {
+            alert("❌ Incorrect PIN! Access Denied.");
+            return;
+        }
+
+        let newHours = prompt("✏️ Enter updated study hours:", oldHours);
+        if (newHours === null) return;
+
+        let newTopic = prompt("✏️ Enter updated Topic/Chapter:", oldTopic);
+        if (newTopic === null) return;
+
+        let newDetails = prompt("✏️ Enter updated Accomplishment details:", oldDetails);
+        if (newDetails === null) return;
+
+        try {
+            await db.collection("jee_logs").doc(docId).update({
+                studyHours: parseFloat(newHours),
+                topic: newTopic,
+                details: newDetails,
+                editedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            alert("✅ Log updated successfully!");
+        } catch (error) {
+            console.error("Error updating log: ", error);
+            alert("❌ Failed to update log: " + error.message);
+        }
+    };
 
     // 🔄 Fetch and Listen to live data changes
     db.collection("jee_logs")
@@ -183,8 +235,10 @@
               return;
           }
           
-          snapshot.forEach((doc) => {
-              const log = doc.data();
+          snapshot.forEach((docSnap) => {
+              const log = docSnap.data();
+              const logId = docSnap.id;
+
               let tagClass = 'tag-p';
               if(log.subject === 'Chemistry') tagClass = 'tag-c';
               if(log.subject === 'Math') tagClass = 'tag-m';
@@ -194,17 +248,23 @@
                   month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
               }) : 'Just now';
 
+              const hoursDisplay = log.studyHours ? ` — <strong>${log.studyHours} hrs</strong>` : '';
+              const detailsDisplay = log.details || log.accomplishment || '';
+
               const logElement = document.createElement('div');
               logElement.className = 'log-item';
               logElement.innerHTML = `
                   <div style="display: flex; justify-content: space-between; align-items: center;">
-                      <strong style="color: var(--accent-primary); font-size: 1.1rem;">${log.student}</strong>
+                      <strong style="color: var(--accent-primary); font-size: 1.1rem;">${log.student}${hoursDisplay}</strong>
                       <span class="tag ${tagClass}">${log.subject}</span>
                   </div>
-                  <p style="margin: 0.5rem 0; font-weight: 500;">${log.topic}</p>
-                  <p style="color: var(--text-muted); font-size: 0.95rem;">${log.details}</p>
+                  <p style="margin: 0.5rem 0; font-weight: 500;">📖 ${log.topic}</p>
+                  <p style="color: var(--text-muted); font-size: 0.95rem;">✅ ${detailsDisplay}</p>
                   <div class="log-meta">
                       <span>🕒 ${formattedTime}</span>
+                      <button class="btn-edit" onclick="editLog('${logId}', '${log.student}', '${log.studyHours || 0}', '${log.topic.replace(/'/g, "\\'")}', '${detailsDisplay.replace(/'/g, "\\'")}')">
+                          ✏️ Edit
+                      </button>
                   </div>
               `;
               feedContainer.appendChild(logElement);
@@ -229,6 +289,7 @@
         }
 
         const subject = document.getElementById('subject').value;
+        const studyHours = parseFloat(document.getElementById('studyHours').value);
         const topic = document.getElementById('topic').value;
         const details = document.getElementById('details').value;
 
@@ -237,6 +298,7 @@
             await db.collection("jee_logs").add({
                 student: student,
                 subject: subject,
+                studyHours: studyHours,
                 topic: topic,
                 details: details,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -244,6 +306,7 @@
 
             // Clear just the fields, leave student name selection
             document.getElementById('password').value = '';
+            document.getElementById('studyHours').value = '';
             document.getElementById('topic').value = '';
             document.getElementById('details').value = '';
         } catch (error) {
