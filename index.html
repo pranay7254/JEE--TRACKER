@@ -11,36 +11,50 @@
     <style>
         :root {
             --bg-dark: #0f172a;
-            --card-bg: #1e293b;
-            --accent-primary: #3b82f6;
-            --accent-success: #10b981;
+            --card-bg: rgba(30, 41, 59, 0.92); 
+            --accent-primary: #38bdf8;
+            --accent-saffron: #f97316;
+            --accent-green: #10b981;
             --accent-edit: #eab308;
+            --accent-delete: #ef4444;
             --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --text-muted: #cbd5e1;
             --error: #ef4444;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        /* 🇮🇳 Tricolour Background */
         body { 
             font-family: system-ui, -apple-system, sans-serif; 
-            background-color: var(--bg-dark); 
+            background: linear-gradient(180deg, #7c2d12 0%, #0f172a 50%, #064e3b 100%); 
+            background-attachment: fixed;
+            min-height: 100vh;
             color: var(--text-main);
             padding: 2rem;
         }
 
         .container { max-width: 1200px; margin: 0 auto; }
         header { text-align: center; margin-bottom: 2rem; }
-        h1 { font-size: 2.5rem; color: var(--accent-primary); }
+        h1 { 
+            font-size: 2.5rem; 
+            background: linear-gradient(90deg, #fb923c, #f8fafc, #4ade80);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
         
         .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; }
         @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
 
         .card { 
             background: var(--card-bg); 
-            border-radius: 12px; 
+            border-radius: 14px; 
             padding: 1.5rem; 
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4); 
             height: fit-content;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.08);
         }
 
         h2 { font-size: 1.25rem; margin-bottom: 1rem; color: var(--text-main); }
@@ -48,16 +62,16 @@
         .form-group { margin-bottom: 1.25rem; }
         label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); }
         select, input {
-            width: 100%; padding: 0.75rem; border-radius: 6px;
+            width: 100%; padding: 0.75rem; border-radius: 8px;
             border: 1px solid #334155; background: #0f172a; color: white;
             font-size: 1rem;
         }
         button.btn-submit {
-            width: 100%; padding: 0.75rem; border-radius: 6px; border: none;
-            background: var(--accent-primary); color: white; font-size: 1rem;
-            font-weight: 600; cursor: pointer; transition: background 0.2s;
+            width: 100%; padding: 0.85rem; border-radius: 8px; border: none;
+            background: linear-gradient(90deg, #ea580c, #16a34a); color: white; font-size: 1rem;
+            font-weight: 700; cursor: pointer; transition: opacity 0.2s;
         }
-        button.btn-submit:hover { background: #2563eb; }
+        button.btn-submit:hover { opacity: 0.9; }
         
         #error-msg { color: var(--error); font-size: 0.9rem; margin-top: 0.5rem; display: none; }
 
@@ -65,14 +79,16 @@
         .feed-box { max-height: 600px; overflow-y: auto; padding-right: 0.5rem; }
         .log-item {
             background: #0f172a; padding: 1rem; border-radius: 8px;
-            margin-bottom: 1rem; border-left: 4px solid var(--accent-primary);
-            position: relative;
+            margin-bottom: 1rem; border-left: 4px solid var(--accent-saffron);
+            border-right: 1px solid rgba(255,255,255,0.05);
         }
         .log-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-muted); margin-top: 0.75rem;}
+        .action-btns { display: flex; gap: 6px; }
+        
         .tag { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
-        .tag-p { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .tag-p { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
         .tag-c { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-        .tag-m { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .tag-m { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
 
         .btn-edit {
             background-color: var(--accent-edit);
@@ -83,9 +99,18 @@
             font-size: 0.8rem;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.2s;
         }
-        .btn-edit:hover { background-color: #ca8a04; }
+        
+        .btn-delete {
+            background-color: var(--accent-delete);
+            color: #fff;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -123,7 +148,6 @@
                         <option value="Math">Mathematics</option>
                     </select>
                 </div>
-                <!-- Added Study Hours Field -->
                 <div class="form-group">
                     <label for="studyHours">Study Hours</label>
                     <input type="number" id="studyHours" step="0.5" min="0.5" max="24" placeholder="e.g., 2.5" required>
@@ -193,7 +217,7 @@
     const feedContainer = document.getElementById('feedContainer');
     const errorMsg = document.getElementById('error-msg');
 
-    // ✏️ EDIT LOG FUNCTION (Global so onclick works)
+    // ✏️ EDIT LOG FUNCTION
     window.editLog = async function(docId, studentName, oldHours, oldTopic, oldDetails) {
         let enteredPin = prompt(`🔐 Enter PIN for ${studentName} to edit this entry:`);
         
@@ -225,6 +249,26 @@
         }
     };
 
+    // 🗑️ DELETE LOG FUNCTION
+    window.deleteLog = async function(docId, studentName) {
+        let enteredPin = prompt(`🔐 Enter PIN for ${studentName} to delete this entry:`);
+        
+        if (credentials[studentName] !== enteredPin) {
+            alert("❌ Incorrect PIN! Access Denied.");
+            return;
+        }
+
+        if (confirm("⚠️ Are you sure you want to permanently delete this log?")) {
+            try {
+                await db.collection("jee_logs").doc(docId).delete();
+                alert("🗑️ Log deleted successfully!");
+            } catch (error) {
+                console.error("Error deleting log: ", error);
+                alert("❌ Failed to delete log: " + error.message);
+            }
+        }
+    };
+
     // 🔄 Fetch and Listen to live data changes
     db.collection("jee_logs")
       .orderBy("timestamp", "desc")
@@ -243,7 +287,6 @@
               if(log.subject === 'Chemistry') tagClass = 'tag-c';
               if(log.subject === 'Math') tagClass = 'tag-m';
 
-              // Convert timestamp safely
               const formattedTime = log.timestamp ? new Date(log.timestamp.seconds * 1000).toLocaleString([], { 
                   month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
               }) : 'Just now';
@@ -255,16 +298,21 @@
               logElement.className = 'log-item';
               logElement.innerHTML = `
                   <div style="display: flex; justify-content: space-between; align-items: center;">
-                      <strong style="color: var(--accent-primary); font-size: 1.1rem;">${log.student}${hoursDisplay}</strong>
-                      <span class="tag ${tagClass}">${log.subject}</span>
+                      <strong style="color: #38bdf8; font-size: 1.1rem;">${log.student}${hoursDisplay}</strong>
+                      <span class="tag ${tagClass}">${log.subject || 'General'}</span>
                   </div>
                   <p style="margin: 0.5rem 0; font-weight: 500;">📖 ${log.topic}</p>
                   <p style="color: var(--text-muted); font-size: 0.95rem;">✅ ${detailsDisplay}</p>
                   <div class="log-meta">
                       <span>🕒 ${formattedTime}</span>
-                      <button class="btn-edit" onclick="editLog('${logId}', '${log.student}', '${log.studyHours || 0}', '${log.topic.replace(/'/g, "\\'")}', '${detailsDisplay.replace(/'/g, "\\'")}')">
-                          ✏️ Edit
-                      </button>
+                      <div class="action-btns">
+                          <button class="btn-edit" onclick="editLog('${logId}', '${log.student}', '${log.studyHours || 0}', '${(log.topic || '').replace(/'/g, "\\'")}', '${detailsDisplay.replace(/'/g, "\\'")}')">
+                              ✏️ Edit
+                          </button>
+                          <button class="btn-delete" onclick="deleteLog('${logId}', '${log.student}')">
+                              🗑️ Delete
+                          </button>
+                      </div>
                   </div>
               `;
               feedContainer.appendChild(logElement);
@@ -274,7 +322,7 @@
           feedContainer.innerHTML = '<p style="color: var(--error);">Failed to connect. Make sure Firebase config is correct!</p>';
       });
 
-    // 📥 Form Submission with Password Verification
+    // 📥 Form Submission
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         errorMsg.style.display = 'none';
@@ -282,7 +330,6 @@
         const student = document.getElementById('student').value;
         const enteredPassword = document.getElementById('password').value;
 
-        // Verify password
         if (credentials[student] !== enteredPassword) {
             errorMsg.style.display = 'block';
             return;
@@ -294,7 +341,6 @@
         const details = document.getElementById('details').value;
 
         try {
-            // Write data securely to Cloud Firestore
             await db.collection("jee_logs").add({
                 student: student,
                 subject: subject,
@@ -304,7 +350,6 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            // Clear just the fields, leave student name selection
             document.getElementById('password').value = '';
             document.getElementById('studyHours').value = '';
             document.getElementById('topic').value = '';
