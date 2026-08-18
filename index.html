@@ -35,7 +35,7 @@
         }
 
         .container { max-width: 1200px; margin: 0 auto; }
-        header { text-align: center; margin-bottom: 2rem; }
+        header { text-align: center; margin-bottom: 1.5rem; }
         h1 { 
             font-size: 2.5rem; 
             background: linear-gradient(90deg, #fb923c, #f8fafc, #4ade80);
@@ -44,16 +44,52 @@
             font-weight: 800;
         }
 
-        .visit-badge {
-            display: inline-block;
-            margin-top: 0.75rem;
-            background: rgba(15, 23, 42, 0.7);
+        .user-status-bar {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        /* 👥 Member Presence Grid */
+        .presence-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .presence-card {
+            background: rgba(15, 23, 42, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
+            border-radius: 10px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .presence-name {
+            font-weight: 700;
+            font-size: 0.95rem;
             color: #38bdf8;
-            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        .presence-time {
+            font-size: 0.75rem;
+            color: #94a3b8;
         }
         
         .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; }
@@ -84,8 +120,6 @@
             font-weight: 700; cursor: pointer; transition: opacity 0.2s;
         }
         button.btn-submit:hover { opacity: 0.9; }
-        
-        #error-msg { color: var(--error); font-size: 0.9rem; margin-top: 0.5rem; display: none; }
 
         /* Dashboard Feed styling */
         .feed-box { max-height: 600px; overflow-y: auto; padding-right: 0.5rem; }
@@ -131,10 +165,31 @@
     <header>
         <h1>🎯 JEE Target Tracker</h1>
         <p style="color: var(--text-muted); margin-top: 0.5rem;">Class 11 Daily Log Dashboard</p>
-        <div class="visit-badge">
-            👁️ Today's Opens: <span id="visitCount">...</span>
-        </div>
     </header>
+
+    <div class="user-status-bar">
+        Welcome back, <strong id="currentIdentifiedUser" style="color: #38bdf8;">Authenticating...</strong>
+    </div>
+
+    <!-- 🟢 Individual Member Status Grid -->
+    <div class="presence-container">
+        <div class="presence-card">
+            <span class="presence-name"><span class="pulse-dot"></span> Pranay</span>
+            <span class="presence-time" id="status-Pranay">Checking...</span>
+        </div>
+        <div class="presence-card">
+            <span class="presence-name"><span class="pulse-dot"></span> Abhigyan</span>
+            <span class="presence-time" id="status-Abhigyan">Checking...</span>
+        </div>
+        <div class="presence-card">
+            <span class="presence-name"><span class="pulse-dot"></span> Pranjal</span>
+            <span class="presence-time" id="status-Pranjal">Checking...</span>
+        </div>
+        <div class="presence-card">
+            <span class="presence-name"><span class="pulse-dot"></span> Aayush</span>
+            <span class="presence-time" id="status-Aayush">Checking...</span>
+        </div>
+    </div>
 
     <div class="grid">
         <!-- Input Form -->
@@ -142,18 +197,8 @@
             <h2>Log Your Work</h2>
             <form id="trackerForm">
                 <div class="form-group">
-                    <label for="student">Who are you?</label>
-                    <select id="student" required>
-                        <option value="Pranay">Pranay</option>
-                        <option value="Abhigyan">Abhigyan</option>
-                        <option value="Pranjal">Pranjal</option>
-                        <option value="Aayush">Aayush</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="password">Enter Your Pin/Password</label>
-                    <input type="password" id="password" placeholder="••••" required autocomplete="current-password">
-                    <div id="error-msg">❌ Incorrect password. Access denied.</div>
+                    <label for="student">Logged in User</label>
+                    <input type="text" id="student" readonly style="background: #1e293b; color: #38bdf8; font-weight: bold; cursor: not-allowed;">
                 </div>
                 <div class="form-group">
                     <label for="subject">Subject</label>
@@ -190,24 +235,15 @@
 </div>
 
 <script>
-    // 🔐 Global Group Password Security
-    const GROUP_PASSWORD = "4"; 
+    // 🔐 PIN Credentials Mapping (PIN to Name lookup)
+    const pinToUser = {
+        "4440": "Pranay",
+        "5670": "Abhigyan",
+        "3890": "Pranjal",
+        "2340": "Aayush"
+    };
 
-    let userAuth = sessionStorage.getItem("group_authenticated");
-
-    if (userAuth !== "true") {
-        let inputPassword = prompt("🔐 Enter Group Password to access JEE Tracker:");
-        if (inputPassword === GROUP_PASSWORD) {
-            sessionStorage.setItem("group_authenticated", "true");
-        } else {
-            alert("❌ Incorrect Password! Access Denied.");
-            document.body.innerHTML = "<div style='color:white; text-align:center; margin-top:20vh; font-family:sans-serif;'><h1>🔒 Access Denied</h1><p>Incorrect group password. Refresh the page to try again.</p></div>";
-            throw new Error("Unauthorized access stopped.");
-        }
-    }
-
-    // 🔐 Password keys Mapping
-    const credentials = {
+    const userToPin = {
         "Pranay": "4440",
         "Abhigyan": "5670",
         "Pranjal": "3890",
@@ -228,34 +264,60 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const form = document.getElementById('trackerForm');
-    const feedContainer = document.getElementById('feedContainer');
-    const errorMsg = document.getElementById('error-msg');
+    // 🔒 SECURE INDIVIDUAL LOGIN (Requires secret PIN to unlock the app)
+    let loggedInUser = sessionStorage.getItem("jee_authenticated_user");
 
-    // 📊 DAILY VISIT TRACKER
-    const todayDateKey = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
-    const statsDocRef = db.collection("site_stats").doc(todayDateKey);
+    if (!loggedInUser || !userToPin[loggedInUser]) {
+        let enteredPin = prompt("🔐 Enter your personal 4-digit PIN to login:");
+        
+        if (enteredPin && pinToUser[enteredPin]) {
+            loggedInUser = pinToUser[enteredPin];
+            sessionStorage.setItem("jee_authenticated_user", loggedInUser);
+        } else {
+            alert("❌ Incorrect PIN! Access Denied.");
+            document.body.innerHTML = "<div style='color:white; text-align:center; margin-top:20vh; font-family:sans-serif;'><h1>🔒 Access Denied</h1><p>Invalid PIN. Refresh the page to try again.</p></div>";
+            throw new Error("Unauthorized access stopped.");
+        }
+    }
 
-    // Atomically increment the open counter for today
-    statsDocRef.set({
-        opens: firebase.firestore.FieldValue.increment(1),
-        date: todayDateKey
+    // Set UI User Info
+    document.getElementById("currentIdentifiedUser").innerText = loggedInUser;
+    document.getElementById("student").value = loggedInUser;
+
+    // 🟢 Record this member's exact online time on open/refresh
+    db.collection("user_presence").doc(loggedInUser).set({
+        lastActive: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
-    // Listen to real-time daily open count
-    statsDocRef.onSnapshot((doc) => {
-        if (doc.exists && doc.data().opens) {
-            document.getElementById("visitCount").innerText = doc.data().opens;
-        } else {
-            document.getElementById("visitCount").innerText = "1";
-        }
+    const form = document.getElementById('trackerForm');
+    const feedContainer = document.getElementById('feedContainer');
+
+    // 🟢 Real-time Presence Listener
+    db.collection("user_presence").onSnapshot((snapshot) => {
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            const memberId = doc.id;
+            const statusEl = document.getElementById(`status-${memberId}`);
+            
+            if (statusEl && data.lastActive) {
+                const dateObj = data.lastActive.toDate();
+                statusEl.innerText = dateObj.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                }) + " (" + dateObj.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ")";
+            }
+        });
     });
 
-    // ✏️ EDIT LOG FUNCTION
+    // ✏️ EDIT LOG FUNCTION (Only owner can edit with their PIN)
     window.editLog = async function(docId, studentName, oldHours, oldTopic, oldDetails) {
-        let enteredPin = prompt(`🔐 Enter PIN for ${studentName} to edit this entry:`);
-        
-        if (credentials[studentName] !== enteredPin) {
+        if (studentName !== loggedInUser) {
+            alert(`❌ You cannot edit logs belonging to ${studentName}!`);
+            return;
+        }
+
+        let enteredPin = prompt(`🔐 Enter your PIN (${studentName}) to confirm edit:`);
+        if (userToPin[studentName] !== enteredPin) {
             alert("❌ Incorrect PIN! Access Denied.");
             return;
         }
@@ -283,11 +345,15 @@
         }
     };
 
-    // 🗑️ DELETE LOG FUNCTION
+    // 🗑️ DELETE LOG FUNCTION (Only owner can delete with their PIN)
     window.deleteLog = async function(docId, studentName) {
-        let enteredPin = prompt(`🔐 Enter PIN for ${studentName} to delete this entry:`);
-        
-        if (credentials[studentName] !== enteredPin) {
+        if (studentName !== loggedInUser) {
+            alert(`❌ You cannot delete logs belonging to ${studentName}!`);
+            return;
+        }
+
+        let enteredPin = prompt(`🔐 Enter your PIN (${studentName}) to confirm deletion:`);
+        if (userToPin[studentName] !== enteredPin) {
             alert("❌ Incorrect PIN! Access Denied.");
             return;
         }
@@ -359,16 +425,8 @@
     // 📥 Form Submission
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        errorMsg.style.display = 'none';
 
-        const student = document.getElementById('student').value;
-        const enteredPassword = document.getElementById('password').value;
-
-        if (credentials[student] !== enteredPassword) {
-            errorMsg.style.display = 'block';
-            return;
-        }
-
+        const student = loggedInUser;
         const subject = document.getElementById('subject').value;
         const studyHours = parseFloat(document.getElementById('studyHours').value);
         const topic = document.getElementById('topic').value;
@@ -384,10 +442,10 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            document.getElementById('password').value = '';
             document.getElementById('studyHours').value = '';
             document.getElementById('topic').value = '';
             document.getElementById('details').value = '';
+            alert("✅ Log published successfully!");
         } catch (error) {
             alert("Error uploading to cloud: " + error.message);
         }
