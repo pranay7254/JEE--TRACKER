@@ -309,7 +309,7 @@
             messaging.useServiceWorker(registration);
             Notification.requestPermission().then((permission) => {
                 if (permission === 'granted') {
-                    messaging.getToken().then((currentToken) => {
+                    messaging.getToken({ vapidkey: 'BMkFrIBnJGNhTmCTm0I01_cy7tmn6y4-iHodUfHCoy9SW8FXJZLrHt92u5lnqtoBVGvaDpHr7S9zileZgJyXE7I' }).then((currentToken) => {
                         if (currentToken && loggedInUser) {
                             db.collection("user_devices").doc(loggedInUser).set({
                                 token: currentToken,
