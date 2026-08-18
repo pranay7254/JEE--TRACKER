@@ -304,23 +304,27 @@
     }, { merge: true });
 
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./firebase-messaging-sw.js').then((registration) => {
-            const messaging = firebase.messaging();
-            messaging.useServiceWorker(registration);
-            Notification.requestPermission().then((permission) => {
-                if (permission === 'granted') {
-                    messaging.getToken({ vapidkey: 'BMkFrIBnJGNhTmCTm0I01_cy7tmn6y4-iHodUfHCoy9SW8FXJZLrHt92u5lnqtoBVGvaDpHr7S9zileZgJyXE7I' }).then((currentToken) => {
-                        if (currentToken && loggedInUser) {
-                            db.collection("user_devices").doc(loggedInUser).set({
-                                token: currentToken,
-                                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                            }, { merge: true });
-                        }
-                    }).catch((err) => console.log('Token fetch error:', err));
-                }
-            });
-        }).catch(err => console.log('SW registration error:', err));
-    }
+    navigator.serviceWorker.register('./firebase-messaging-sw.js').then((registration) => {
+        const messaging = firebase.messaging();
+        
+        Notification.requestPermission().then((permission) => {
+            if (permission === 'granted') {
+                messaging.getToken({
+                    serviceWorkerRegistration: registration,
+                    vapidKey: 'BMkFrIBnJGNhTmCTm0I01_cy7tmn6y4-iHodUfHCoy9SW8FXJZLrHt92u5lnqtoBVGvaDpHr7S9zileZgJyXE7I'
+                }).then((currentToken) => {
+                    if (currentToken && loggedInUser) {
+                        db.collection("user_devices").doc(loggedInUser).set({
+                            token: currentToken,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true });
+                        console.log("Device token successfully registered for:", loggedInUser);
+                    }
+                }).catch((err) => console.log('Token fetch error:', err));
+            }
+        });
+    }).catch(err => console.log('SW registration error:', err));
+}
 
     window.goToAdmin = function() {
         let pass = prompt("🔐 Enter Master Admin Password to continue:");
