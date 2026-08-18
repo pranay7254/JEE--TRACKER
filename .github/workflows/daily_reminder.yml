@@ -15,104 +15,76 @@ jobs:
         with:
           node-version: 18
 
+      - name: Install Firebase Admin
+        run: npm install firebase-admin
+
       - name: Trigger Combined Telegram + Web Push Alerts
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          FCM_SERVER_KEY: ${{ secrets.FCM_SERVER_KEY }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: |
           node -e '
           const https = require("https");
+          const admin = require("firebase-admin");
 
           async function checkAndAlert() {
             const botToken = process.env.TELEGRAM_BOT_TOKEN;
             const chatId = process.env.TELEGRAM_CHAT_ID;
-            const fcmKey = process.env.FCM_SERVER_KEY;
-            
+            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+
+            admin.initializeApp({
+              credential: admin.credential.cert(serviceAccount)
+            });
+
+            const db = admin.firestore();
             const yesterday = new Date(Date.now() - 86400000);
             const startOfYesterday = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 0, 0, 0);
 
-            const firebaseUrl = "https://firestore.googleapis.com/v1/projects/jee-tracker-6b67d/databases/(default)/documents/jee_logs";
-            
-            https.get(firebaseUrl, (res) => {
-              let rawData = "";
-              res.on("data", chunk => rawData += chunk);
-              res.on("end", async () => {
-                try {
-                  const data = JSON.parse(rawData);
-                  const docs = data.documents || [];
-                  const members = ["Pranay", "Abhigyan", "Pranjal", "Aayush"];
-                  const activeMembers = new Set();
-
-                  docs.forEach((doc) => {
-                    const fields = doc.fields;
-                    if (fields && fields.student && fields.timestamp) {
-                      const logTime = new Date(fields.timestamp.timestampValue);
-                      if (logTime >= startOfYesterday) {
-                        activeMembers.add(fields.student.stringValue);
-                      }
-                    }
-                  });
-
-                  const defaulters = members.filter(m => !activeMembers.has(m));
-
-                  if (defaulters.length > 0) {
-                    if (botToken && chatId) {
-                      const message = encodeURIComponent(
-                        "🚨 *JEE Tracker 6:00 AM Alert*\n\n" +
-                        "The following members *FAILED* to post their study log yesterday:\n" +
-                        defaulters.map(d => "❌ @" + d).join("\n") +
-                        "\n\n⚠️ Daily rule: Every member must log at least 1 study task daily!"
-                      );
-                      const tgUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`;
-                      https.get(tgUrl, () => console.log("Telegram alert sent."));
-                    }
-
-                    if (fcmKey) {
-                      defaulters.forEach((member) => {
-                        const deviceUrl = `https://firestore.googleapis.com/v1/projects/jee-tracker-6b67d/databases/(default)/documents/user_devices/${member}`;
-                        https.get(deviceUrl, (dRes) => {
-                          let dData = "";
-                          dRes.on("data", c => dData += c);
-                          dRes.on("end", () => {
-                            try {
-                              const devParsed = JSON.parse(dData);
-                              const token = devParsed.fields?.token?.stringValue;
-                              if (token) {
-                                const payload = JSON.stringify({
-                                  to: token,
-                                  notification: {
-                                    title: "⚠️ Missing Study Log!",
-                                    body: `Hey ${member}, you did not log your study hours yesterday. Update your log now!`
-                                  }
-                                });
-                                const fcmReq = https.request({
-                                  hostname: "fcm.googleapis.com",
-                                  path: "/fcm/send",
-                                  method: "POST",
-                                  headers: {
-                                    "Content-Type": "application/json",
-                                    "Authorization": `key=${fcmKey}`
-                                  }
-                                });
-                                fcmReq.write(payload);
-                                fcmReq.end();
-                              }
-                            } catch(err) {
-                              console.error("FCM error for " + member, err);
-                            }
-                          });
-                        });
-                      });
-                    }
-                  } else {
-                    console.log("All members posted yesterday. No alert required.");
-                  }
-                } catch (e) {
-                  console.error("Error processing data:", e);
-                }
-              });
+            const logsSnap = await db.collection("jee_logs").where("timestamp", ">=", startOfYesterday).get();
+            const activeMembers = new Set();
+            logsSnap.forEach(doc => {
+              const data = doc.data();
+              if (data.student) activeMembers.add(data.student);
             });
+
+            const members = ["Pranay", "Abhigyan", "Pranjal", "Aayush"];
+            const defaulters = members.filter(m => !activeMembers.has(m));
+
+            if (defaulters.length > 0) {
+              // 1. Telegram Group Notification
+              if (botToken && chatId) {
+                const message = encodeURIComponent(
+                  "🚨 *JEE Tracker 6:00 AM Alert*\n\n" +
+                  "The following members *FAILED* to post their study log yesterday:\n" +
+                  defaulters.map(d => "❌ @" + d).join("\n") +
+                  "\n\n⚠️ Daily rule: Every member must log at least 1 study task daily!"
+                );
+                const tgUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`;
+                https.get(tgUrl, () => console.log("Telegram alert sent."));
+              }
+
+              // 2. Direct Device Web Push via Modern Admin SDK
+              for (const member of defaulters) {
+                const devDoc = await db.collection("user_devices").doc(member).get();
+                if (devDoc.exists && devDoc.data().token) {
+                  try {
+                    await admin.messaging().send({
+                      token: devDoc.data().token,
+                      notification: {
+                        title: "⚠️ Missing Study Log!",
+                        body: `Hey ${member}, you did not log your study hours yesterday. Update your log now!`
+                      }
+                    });
+                    console.log("Push sent to " + member);
+                  } catch (err) {
+                    console.error("Push error for " + member, err);
+                  }
+                }
+              }
+            } else {
+              console.log("All members posted yesterday. No alert required.");
+            }
           }
 
           checkAndAlert();
