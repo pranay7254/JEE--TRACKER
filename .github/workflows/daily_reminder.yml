@@ -1,0 +1,119 @@
+name: Combined 6 AM Inactivity Check
+
+on:
+  schedule:
+    # 00:30 UTC = 6:00 AM IST
+    - cron: '30 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-and-alert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Trigger Combined Telegram + Web Push Alerts
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FCM_SERVER_KEY: ${{ secrets.FCM_SERVER_KEY }}
+        run: |
+          node -e '
+          const https = require("https");
+
+          async function checkAndAlert() {
+            const botToken = process.env.TELEGRAM_BOT_TOKEN;
+            const chatId = process.env.TELEGRAM_CHAT_ID;
+            const fcmKey = process.env.FCM_SERVER_KEY;
+            
+            const yesterday = new Date(Date.now() - 86400000);
+            const startOfYesterday = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 0, 0, 0);
+
+            const firebaseUrl = "https://firestore.googleapis.com/v1/projects/jee-tracker-6b67d/databases/(default)/documents/jee_logs";
+            
+            https.get(firebaseUrl, (res) => {
+              let rawData = "";
+              res.on("data", chunk => rawData += chunk);
+              res.on("end", async () => {
+                try {
+                  const data = JSON.parse(rawData);
+                  const docs = data.documents || [];
+                  const members = ["Pranay", "Abhigyan", "Pranjal", "Aayush"];
+                  const activeMembers = new Set();
+
+                  docs.forEach((doc) => {
+                    const fields = doc.fields;
+                    if (fields && fields.student && fields.timestamp) {
+                      const logTime = new Date(fields.timestamp.timestampValue);
+                      if (logTime >= startOfYesterday) {
+                        activeMembers.add(fields.student.stringValue);
+                      }
+                    }
+                  });
+
+                  const defaulters = members.filter(m => !activeMembers.has(m));
+
+                  if (defaulters.length > 0) {
+                    if (botToken && chatId) {
+                      const message = encodeURIComponent(
+                        "🚨 *JEE Tracker 6:00 AM Alert*\n\n" +
+                        "The following members *FAILED* to post their study log yesterday:\n" +
+                        defaulters.map(d => "❌ @" + d).join("\n") +
+                        "\n\n⚠️ Daily rule: Every member must log at least 1 study task daily!"
+                      );
+                      const tgUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`;
+                      https.get(tgUrl, () => console.log("Telegram alert sent."));
+                    }
+
+                    if (fcmKey) {
+                      defaulters.forEach((member) => {
+                        const deviceUrl = `https://firestore.googleapis.com/v1/projects/jee-tracker-6b67d/databases/(default)/documents/user_devices/${member}`;
+                        https.get(deviceUrl, (dRes) => {
+                          let dData = "";
+                          dRes.on("data", c => dData += c);
+                          dRes.on("end", () => {
+                            try {
+                              const devParsed = JSON.parse(dData);
+                              const token = devParsed.fields?.token?.stringValue;
+                              if (token) {
+                                const payload = JSON.stringify({
+                                  to: token,
+                                  notification: {
+                                    title: "⚠️ Missing Study Log!",
+                                    body: `Hey ${member}, you did not log your study hours yesterday. Update your log now!`
+                                  }
+                                });
+                                const fcmReq = https.request({
+                                  hostname: "fcm.googleapis.com",
+                                  path: "/fcm/send",
+                                  method: "POST",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": `key=${fcmKey}`
+                                  }
+                                });
+                                fcmReq.write(payload);
+                                fcmReq.end();
+                              }
+                            } catch(err) {
+                              console.error("FCM error for " + member, err);
+                            }
+                          });
+                        });
+                      });
+                    }
+                  } else {
+                    console.log("All members posted yesterday. No alert required.");
+                  }
+                } catch (e) {
+                  console.error("Error processing data:", e);
+                }
+              });
+            });
+          }
+
+          checkAndAlert();
+          '
