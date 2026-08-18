@@ -7,6 +7,7 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js"></script>
     
     <style>
         :root {
@@ -24,7 +25,6 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        /* 🇮🇳 Tricolour Background */
         body { 
             font-family: system-ui, -apple-system, sans-serif; 
             background: linear-gradient(180deg, #7c2d12 0%, #0f172a 50%, #064e3b 100%); 
@@ -35,7 +35,7 @@
         }
 
         .container { max-width: 1200px; margin: 0 auto; }
-        header { text-align: center; margin-bottom: 1.5rem; position: relative; }
+        header { text-align: center; margin-bottom: 1.5rem; }
         h1 { 
             font-size: 2.5rem; 
             background: linear-gradient(90deg, #fb923c, #f8fafc, #4ade80);
@@ -73,7 +73,6 @@
             color: var(--text-muted);
         }
 
-        /* 👥 Member Presence Grid */
         .presence-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -143,7 +142,6 @@
         }
         button.btn-submit:hover { opacity: 0.9; }
 
-        /* Dashboard Feed styling */
         .feed-box { max-height: 600px; overflow-y: auto; padding-right: 0.5rem; }
         .log-item {
             background: #0f172a; padding: 1rem; border-radius: 8px;
@@ -197,7 +195,6 @@
         Welcome back, <strong id="currentIdentifiedUser" style="color: #38bdf8;">Authenticating...</strong>
     </div>
 
-    <!-- 🟢 Individual Member Status Grid -->
     <div class="presence-container">
         <div class="presence-card">
             <span class="presence-name"><span class="pulse-dot"></span> Pranay</span>
@@ -218,7 +215,6 @@
     </div>
 
     <div class="grid">
-        <!-- Input Form -->
         <div class="card">
             <h2>Log Your Work</h2>
             <form id="trackerForm">
@@ -250,7 +246,6 @@
             </form>
         </div>
 
-        <!-- Live Feed Dashboard -->
         <div class="card">
             <h2>Group Update Feed</h2>
             <div id="feedContainer" class="feed-box">
@@ -261,7 +256,6 @@
 </div>
 
 <script>
-    // 🔐 PIN Credentials Mapping (PIN to Name lookup)
     const pinToUser = {
         "4440": "Pranay",
         "5670": "Abhigyan",
@@ -276,7 +270,6 @@
         "Aayush": "2340"
     };
 
-    // 🔥 FIREBASE CONFIGURATION
     const firebaseConfig = {
         apiKey: "AIzaSyAB6FbsDLh4xq6ikvsSFFrDLYFVDaYB978",
         authDomain: "jee-tracker-6b67d.firebaseapp.com",
@@ -286,16 +279,13 @@
         appId: "1:14514591368:web:9e72203c576dfaa5e9713d"
     };
 
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // 🔒 SECURE INDIVIDUAL LOGIN (Requires secret PIN to unlock the app)
     let loggedInUser = sessionStorage.getItem("jee_authenticated_user");
 
     if (!loggedInUser || !userToPin[loggedInUser]) {
         let enteredPin = prompt("🔐 Enter your personal 4-digit PIN to login:");
-        
         if (enteredPin && pinToUser[enteredPin]) {
             loggedInUser = pinToUser[enteredPin];
             sessionStorage.setItem("jee_authenticated_user", loggedInUser);
@@ -306,19 +296,35 @@
         }
     }
 
-    // Set UI User Info
     document.getElementById("currentIdentifiedUser").innerText = loggedInUser;
     document.getElementById("student").value = loggedInUser;
 
-    // 🟢 Record this member's exact online time on open/refresh
     db.collection("user_presence").doc(loggedInUser).set({
         lastActive: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
-    // 🛠️ ADMIN REDIRECT WITH MASTER PASSWORD
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./firebase-messaging-sw.js').then((registration) => {
+            const messaging = firebase.messaging();
+            messaging.useServiceWorker(registration);
+            Notification.requestPermission().then((permission) => {
+                if (permission === 'granted') {
+                    messaging.getToken().then((currentToken) => {
+                        if (currentToken && loggedInUser) {
+                            db.collection("user_devices").doc(loggedInUser).set({
+                                token: currentToken,
+                                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            }, { merge: true });
+                        }
+                    }).catch((err) => console.log('Token fetch error:', err));
+                }
+            });
+        }).catch(err => console.log('SW registration error:', err));
+    }
+
     window.goToAdmin = function() {
         let pass = prompt("🔐 Enter Master Admin Password to continue:");
-        if (pass === "Pra4nay4") {
+        if (pass === "admin999") {
             sessionStorage.setItem("admin_auth", "true");
             window.location.href = "admin.html";
         } else if (pass !== null) {
@@ -329,13 +335,11 @@
     const form = document.getElementById('trackerForm');
     const feedContainer = document.getElementById('feedContainer');
 
-    // 🟢 Real-time Presence Listener
     db.collection("user_presence").onSnapshot((snapshot) => {
         snapshot.forEach((doc) => {
             const data = doc.data();
             const memberId = doc.id;
             const statusEl = document.getElementById(`status-${memberId}`);
-            
             if (statusEl && data.lastActive) {
                 const dateObj = data.lastActive.toDate();
                 statusEl.innerText = dateObj.toLocaleTimeString([], { 
@@ -346,7 +350,6 @@
         });
     });
 
-    // ✏️ EDIT LOG FUNCTION (Only owner can edit with their PIN)
     window.editLog = async function(docId, studentName, oldHours, oldTopic, oldDetails) {
         if (studentName !== loggedInUser) {
             alert(`❌ You cannot edit logs belonging to ${studentName}!`);
@@ -377,12 +380,10 @@
             });
             alert("✅ Log updated successfully!");
         } catch (error) {
-            console.error("Error updating log: ", error);
             alert("❌ Failed to update log: " + error.message);
         }
     };
 
-    // 🗑️ DELETE LOG FUNCTION (Only owner can delete with their PIN)
     window.deleteLog = async function(docId, studentName) {
         if (studentName !== loggedInUser) {
             alert(`❌ You cannot delete logs belonging to ${studentName}!`);
@@ -400,13 +401,11 @@
                 await db.collection("jee_logs").doc(docId).delete();
                 alert("🗑️ Log deleted successfully!");
             } catch (error) {
-                console.error("Error deleting log: ", error);
                 alert("❌ Failed to delete log: " + error.message);
             }
         }
     };
 
-    // 🔄 Fetch and Listen to live data changes
     db.collection("jee_logs")
       .orderBy("timestamp", "desc")
       .onSnapshot((snapshot) => {
@@ -455,11 +454,9 @@
               feedContainer.appendChild(logElement);
           });
       }, (error) => {
-          console.error("Error reading database: ", error);
           feedContainer.innerHTML = '<p style="color: var(--error);">Failed to connect. Make sure Firebase config is correct!</p>';
       });
 
-    // 📥 Form Submission
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
