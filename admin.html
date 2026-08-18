@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEE Tracker - Master Admin Dashboard</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --bg: #090d16;
+            --card-bg: #131d31;
+            --accent: #ef4444;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: system-ui, -apple-system, sans-serif; 
+            background: linear-gradient(180deg, #1e1124 0%, #090d16 100%);
+            min-height: 100vh;
+            color: var(--text);
+            padding: 2rem;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; }
+        
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 1rem;
+        }
+
+        h1 { color: #f87171; font-size: 2rem; display: flex; align-items: center; gap: 8px; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+        }
+
+        .stat-val { font-size: 2rem; font-weight: bold; color: var(--accent-blue); margin-top: 5px; }
+
+        /* Members Table */
+        .section-title { font-size: 1.25rem; margin-bottom: 1rem; color: #cbd5e1; }
+        .member-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .member-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 1rem;
+            border-left: 4px solid var(--accent-green);
+        }
+
+        /* Feed styling with Master controls */
+        .log-table {
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #1e293b;
+            border-collapse: collapse;
+        }
+
+        .log-table th, .log-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #1e293b;
+            font-size: 0.9rem;
+        }
+
+        .log-table th { background: #0f172a; color: var(--text-muted); font-weight: 600; }
+        .log-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .tag { padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        .tag-Physics { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .tag-Chemistry { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .tag-Math { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+
+        .btn-action {
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.75rem;
+            margin-right: 4px;
+        }
+        .btn-edit { background: #eab308; color: #000; }
+        .btn-del { background: #ef4444; color: #fff; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>🛠️ Master Admin Dashboard</h1>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">Control Panel for JEE Target Tracker</p>
+        </div>
+        <button onclick="logoutAdmin()" style="padding: 8px 16px; background: #334155; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">🔒 Logout</button>
+    </header>
+
+    <!-- Global Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Total Study Hours</p>
+            <div class="stat-val" id="totalHoursCount">0 hrs</div>
+        </div>
+        <div class="stat-card">
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Total Updates Published</p>
+            <div class="stat-val" id="totalLogsCount" style="color: var(--accent-green);">0</div>
+        </div>
+        <div class="stat-card">
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Active Students</p>
+            <div class="stat-val" style="color: #fbbf24;">4</div>
+        </div>
+    </div>
+
+    <!-- Member Status Overview -->
+    <h2 class="section-title">👥 Member Last Online & Total Hours</h2>
+    <div class="member-grid" id="memberCards">
+        <!-- Rendered by JS -->
+    </div>
+
+    <!-- Master Logs Table -->
+    <h2 class="section-title">📋 Master Logs Management (Edit / Delete Any Entry)</h2>
+    <div style="overflow-x: auto;">
+        <table class="log-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Subject</th>
+                    <th>Hours</th>
+                    <th>Topic / Task</th>
+                    <th>Timestamp</th>
+                    <th>Admin Actions</th>
+                </tr>
+            </thead>
+            <tbody id="masterLogsBody">
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading database logs...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // 🔐 MASTER ADMIN PASSWORD PROTECTION
+    const MASTER_ADMIN_PASS = "Pra4nay4"; // Change this password anytime
+
+    if (sessionStorage.getItem("admin_auth") !== "true") {
+        let entered = prompt("🔐 Enter Master Admin Password:");
+        if (entered === MASTER_ADMIN_PASS) {
+            sessionStorage.setItem("admin_auth", "true");
+        } else {
+            alert("❌ Access Denied!");
+            document.body.innerHTML = "<h1 style='color:white; text-align:center; margin-top:20vh; font-family:sans-serif;'>🔒 Access Denied</h1>";
+            throw new Error("Admin authentication failed.");
+        }
+    }
+
+    function logoutAdmin() {
+        sessionStorage.removeItem("admin_auth");
+        location.reload();
+    }
+
+    // 🔥 FIREBASE INITIALIZATION
+    const firebaseConfig = {
+        apiKey: "AIzaSyAB6FbsDLh4xq6ikvsSFFrDLYFVDaYB978",
+        authDomain: "jee-tracker-6b67d.firebaseapp.com",
+        projectId: "jee-tracker-6b67d",
+        storageBucket: "jee-tracker-6b67d.firebasestorage.app",
+        messagingSenderId: "14514591368",
+        appId: "1:14514591368:web:9e72203c576dfaa5e9713d"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const students = ["Pranay", "Abhigyan", "Pranjal", "Aayush"];
+    let studentHours = { "Pranay": 0, "Abhigyan": 0, "Pranjal": 0, "Aayush": 0 };
+    let studentPresence = {};
+
+    // 1. Fetch Presence Data
+    db.collection("user_presence").onSnapshot((snapshot) => {
+        snapshot.forEach((doc) => {
+            if (doc.data().lastActive) {
+                studentPresence[doc.id] = doc.data().lastActive.toDate();
+            }
+        });
+        renderMemberCards();
+    });
+
+    // 2. Fetch and Manage All Study Logs
+    db.collection("jee_logs").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+        const tbody = document.getElementById("masterLogsBody");
+        tbody.innerHTML = "";
+
+        let totalHours = 0;
+        studentHours = { "Pranay": 0, "Abhigyan": 0, "Pranjal": 0, "Aayush": 0 };
+
+        if (snapshot.empty) {
+            tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; color:var(--text-muted);'>No logs found in database.</td></tr>";
+            return;
+        }
+
+        document.getElementById("totalLogsCount").innerText = snapshot.size;
+
+        snapshot.forEach((docSnap) => {
+            const log = docSnap.data();
+            const id = docSnap.id;
+            const hours = parseFloat(log.studyHours || log.hours || 0);
+            
+            totalHours += hours;
+            if (studentHours[log.student] !== undefined) {
+                studentHours[log.student] += hours;
+            }
+
+            const formattedTime = log.timestamp ? new Date(log.timestamp.seconds * 1000).toLocaleString([], {
+                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            }) : 'Recently';
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><strong style="color: #38bdf8;">${log.student}</strong></td>
+                <td><span class="tag tag-${log.subject}">${log.subject || 'General'}</span></td>
+                <td><strong>${hours} hrs</strong></td>
+                <td>
+                    <b>${log.topic}</b>
+                    <br><small style="color: var(--text-muted);">${log.details || log.accomplishment || ''}</small>
+                </td>
+                <td style="color: var(--text-muted);">${formattedTime}</td>
+                <td>
+                    <button class="btn-action btn-edit" onclick="adminEdit('${id}', '${(log.topic || '').replace(/'/g, "\\'")}', '${hours}', '${(log.details || '').replace(/'/g, "\\'")}')">Edit</button>
+                    <button class="btn-action btn-del" onclick="adminDelete('${id}')">Delete</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById("totalHoursCount").innerText = `${totalHours.toFixed(1)} hrs`;
+        renderMemberCards();
+    });
+
+    function renderMemberCards() {
+        const container = document.getElementById("memberCards");
+        container.innerHTML = "";
+
+        students.forEach((name) => {
+            let lastSeenStr = "Never";
+            if (studentPresence[name]) {
+                lastSeenStr = studentPresence[name].toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + 
+                              " (" + studentPresence[name].toLocaleDateString([], { month: 'short', day: 'numeric' }) + ")";
+            }
+
+            container.innerHTML += `
+                <div class="member-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong style="font-size: 1.1rem; color: #38bdf8;">${name}</strong>
+                        <span style="font-weight: bold; color: #fbbf24;">${(studentHours[name] || 0).toFixed(1)} hrs</span>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">
+                        🕒 Last Seen: <span style="color: #cbd5e1;">${lastSeenStr}</span>
+                    </p>
+                </div>
+            `;
+        });
+    }
+
+    // 🛠️ ADMIN MASTER ACTIONS (No student PIN required)
+    window.adminEdit = async function(id, oldTopic, oldHours, oldDetails) {
+        let newHours = prompt("🛠️ [Admin] Update Study Hours:", oldHours);
+        if (newHours === null) return;
+
+        let newTopic = prompt("🛠️ [Admin] Update Topic/Chapter:", oldTopic);
+        if (newTopic === null) return;
+
+        let newDetails = prompt("🛠️ [Admin] Update Accomplishment details:", oldDetails);
+        if (newDetails === null) return;
+
+        try {
+            await db.collection("jee_logs").doc(id).update({
+                studyHours: parseFloat(newHours),
+                topic: newTopic,
+                details: newDetails,
+                adminEdited: true
+            });
+            alert("✅ [Admin] Log updated successfully!");
+        } catch (e) {
+            alert("❌ Failed to update: " + e.message);
+        }
+    };
+
+    window.adminDelete = async function(id) {
+        if (confirm("⚠️ [Admin] Are you sure you want to permanently delete this log entry?")) {
+            try {
+                await db.collection("jee_logs").doc(id).delete();
+                alert("🗑️ [Admin] Log deleted successfully!");
+            } catch (e) {
+                alert("❌ Failed to delete: " + e.message);
+            }
+        }
+    };
+</script>
+</body>
+</html>
