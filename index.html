@@ -156,6 +156,13 @@
         .tag-c { background: rgba(16, 185, 129, 0.2); color: #34d399; }
         .tag-m { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
 
+        .tag-activity {
+            background: rgba(168, 85, 247, 0.18);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            margin-left: 6px;
+        }
+
         .btn-edit {
             background-color: var(--accent-edit);
             color: #000;
@@ -228,6 +235,15 @@
                         <option value="Physics">Physics</option>
                         <option value="Chemistry">Chemistry</option>
                         <option value="Math">Mathematics</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="activityType">Activity Type</label>
+                    <select id="activityType" required>
+                        <option value="Question Practice">✍️ Question Practice</option>
+                        <option value="Lecture">🎥 Lecture</option>
+                        <option value="Revision">📖 Revision</option>
+                        <option value="Self Study">📚 Self Study</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -304,27 +320,27 @@
     }, { merge: true });
 
     if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./firebase-messaging-sw.js').then((registration) => {
-        const messaging = firebase.messaging();
-        
-        Notification.requestPermission().then((permission) => {
-            if (permission === 'granted') {
-                messaging.getToken({
-                    serviceWorkerRegistration: registration,
-                    vapidKey: 'BMkFrIBnJGNhTmCTm0I01_cy7tmn6y4-iHodUfHCoy9SW8FXJZLrHt92u5lnqtoBVGvaDpHr7S9zileZgJyXE7I'
-                }).then((currentToken) => {
-                    if (currentToken && loggedInUser) {
-                        db.collection("user_devices").doc(loggedInUser).set({
-                            token: currentToken,
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        }, { merge: true });
-                        console.log("Device token successfully registered for:", loggedInUser);
-                    }
-                }).catch((err) => console.log('Token fetch error:', err));
-            }
-        });
-    }).catch(err => console.log('SW registration error:', err));
-}
+        navigator.serviceWorker.register('./firebase-messaging-sw.js').then((registration) => {
+            const messaging = firebase.messaging();
+            
+            Notification.requestPermission().then((permission) => {
+                if (permission === 'granted') {
+                    messaging.getToken({
+                        serviceWorkerRegistration: registration,
+                        vapidKey: 'BMkFrIBnJGNhTmCTm0I01_cy7tmn6y4-iHodUfHCoy9SW8FXJZLrHt92u5lnqtoBVGvaDpHr7S9zileZgJyXE7I'
+                    }).then((currentToken) => {
+                        if (currentToken && loggedInUser) {
+                            db.collection("user_devices").doc(loggedInUser).set({
+                                token: currentToken,
+                                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            }, { merge: true });
+                            console.log("Device token successfully registered for:", loggedInUser);
+                        }
+                    }).catch((err) => console.log('Token fetch error:', err));
+                }
+            });
+        }).catch(err => console.log('SW registration error:', err));
+    }
 
     window.goToAdmin = function() {
         let pass = prompt("🔐 Enter Master Admin Password to continue:");
@@ -427,6 +443,8 @@
               if(log.subject === 'Chemistry') tagClass = 'tag-c';
               if(log.subject === 'Math') tagClass = 'tag-m';
 
+              const activity = log.activityType || 'Self Study';
+
               const formattedTime = log.timestamp ? new Date(log.timestamp.seconds * 1000).toLocaleString([], { 
                   month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
               }) : 'Just now';
@@ -439,7 +457,10 @@
               logElement.innerHTML = `
                   <div style="display: flex; justify-content: space-between; align-items: center;">
                       <strong style="color: #38bdf8; font-size: 1.1rem;">${log.student}${hoursDisplay}</strong>
-                      <span class="tag ${tagClass}">${log.subject || 'General'}</span>
+                      <div>
+                          <span class="tag ${tagClass}">${log.subject || 'General'}</span>
+                          <span class="tag tag-activity">${activity}</span>
+                      </div>
                   </div>
                   <p style="margin: 0.5rem 0; font-weight: 500;">📖 ${log.topic}</p>
                   <p style="color: var(--text-muted); font-size: 0.95rem;">✅ ${detailsDisplay}</p>
@@ -466,6 +487,7 @@
 
         const student = loggedInUser;
         const subject = document.getElementById('subject').value;
+        const activityType = document.getElementById('activityType').value;
         const studyHours = parseFloat(document.getElementById('studyHours').value);
         const topic = document.getElementById('topic').value;
         const details = document.getElementById('details').value;
@@ -474,10 +496,11 @@
             await db.collection("jee_logs").add({
                 student: student,
                 subject: subject,
+                activityType: activityType,
                 studyHours: studyHours,
                 topic: topic,
                 details: details,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
 
             document.getElementById('studyHours').value = '';
