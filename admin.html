@@ -94,10 +94,16 @@
         .log-table th { background: #0f172a; color: var(--text-muted); font-weight: 600; }
         .log-table tr:hover { background: rgba(255,255,255,0.02); }
 
-        .tag { padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        .tag { padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
         .tag-Physics { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
         .tag-Chemistry { background: rgba(16, 185, 129, 0.2); color: #34d399; }
         .tag-Math { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+
+        .tag-activity {
+            background: rgba(168, 85, 247, 0.18);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.35);
+        }
 
         .btn-action {
             padding: 4px 8px;
@@ -153,6 +159,7 @@
                 <tr>
                     <th>Student</th>
                     <th>Subject</th>
+                    <th>Activity</th>
                     <th>Hours</th>
                     <th>Topic / Task</th>
                     <th>Timestamp</th>
@@ -160,7 +167,7 @@
                 </tr>
             </thead>
             <tbody id="masterLogsBody">
-                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading database logs...</td></tr>
+                <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading database logs...</td></tr>
             </tbody>
         </table>
     </div>
@@ -168,7 +175,7 @@
 
 <script>
     // 🔐 MASTER ADMIN PASSWORD PROTECTION
-    const MASTER_ADMIN_PASS = "Pra4nay4"; // Change this password anytime
+    const MASTER_ADMIN_PASS = "Pra4nay4";
 
     if (sessionStorage.getItem("admin_auth") !== "true") {
         let entered = prompt("🔐 Enter Master Admin Password:");
@@ -222,7 +229,7 @@
         studentHours = { "Pranay": 0, "Abhigyan": 0, "Pranjal": 0, "Aayush": 0 };
 
         if (snapshot.empty) {
-            tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; color:var(--text-muted);'>No logs found in database.</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; color:var(--text-muted);'>No logs found in database.</td></tr>";
             return;
         }
 
@@ -232,6 +239,7 @@
             const log = docSnap.data();
             const id = docSnap.id;
             const hours = parseFloat(log.studyHours || log.hours || 0);
+            const activity = log.activityType || 'Self Study';
             
             totalHours += hours;
             if (studentHours[log.student] !== undefined) {
@@ -246,6 +254,7 @@
             tr.innerHTML = `
                 <td><strong style="color: #38bdf8;">${log.student}</strong></td>
                 <td><span class="tag tag-${log.subject}">${log.subject || 'General'}</span></td>
+                <td><span class="tag tag-activity">${activity}</span></td>
                 <td><strong>${hours} hrs</strong></td>
                 <td>
                     <b>${log.topic}</b>
@@ -253,7 +262,7 @@
                 </td>
                 <td style="color: var(--text-muted);">${formattedTime}</td>
                 <td>
-                    <button class="btn-action btn-edit" onclick="adminEdit('${id}', '${(log.topic || '').replace(/'/g, "\\'")}', '${hours}', '${(log.details || '').replace(/'/g, "\\'")}')">Edit</button>
+                    <button class="btn-action btn-edit" onclick="adminEdit('${id}', '${(log.topic || '').replace(/'/g, "\\'")}', '${hours}', '${(log.details || '').replace(/'/g, "\\'")}', '${(activity).replace(/'/g, "\\'")}')">Edit</button>
                     <button class="btn-action btn-del" onclick="adminDelete('${id}')">Delete</button>
                 </td>
             `;
@@ -290,9 +299,12 @@
     }
 
     // 🛠️ ADMIN MASTER ACTIONS (No student PIN required)
-    window.adminEdit = async function(id, oldTopic, oldHours, oldDetails) {
+    window.adminEdit = async function(id, oldTopic, oldHours, oldDetails, oldActivity) {
         let newHours = prompt("🛠️ [Admin] Update Study Hours:", oldHours);
         if (newHours === null) return;
+
+        let newActivity = prompt("🛠️ [Admin] Update Activity Type (Question Practice / Lecture / Revision / Self Study):", oldActivity || "Question Practice");
+        if (newActivity === null) return;
 
         let newTopic = prompt("🛠️ [Admin] Update Topic/Chapter:", oldTopic);
         if (newTopic === null) return;
@@ -303,6 +315,7 @@
         try {
             await db.collection("jee_logs").doc(id).update({
                 studyHours: parseFloat(newHours),
+                activityType: newActivity,
                 topic: newTopic,
                 details: newDetails,
                 adminEdited: true
