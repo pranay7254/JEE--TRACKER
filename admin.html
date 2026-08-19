@@ -70,8 +70,19 @@
         .member-card {
             background: var(--card-bg);
             border-radius: 10px;
-            padding: 1rem;
+            padding: 1.2rem;
             border-left: 4px solid var(--accent-green);
+        }
+
+        .practice-highlight-box {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         /* Feed styling with Master controls */
@@ -132,21 +143,21 @@
     <!-- Global Stats -->
     <div class="stats-grid">
         <div class="stat-card">
-            <p style="color: var(--text-muted); font-size: 0.85rem;">Total Study Hours</p>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Total All Study Hours</p>
             <div class="stat-val" id="totalHoursCount">0 hrs</div>
         </div>
         <div class="stat-card">
-            <p style="color: var(--text-muted); font-size: 0.85rem;">Total Updates Published</p>
-            <div class="stat-val" id="totalLogsCount" style="color: var(--accent-green);">0</div>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Total Question Practice / Self Study</p>
+            <div class="stat-val" id="totalPracticeCount" style="color: var(--accent-green);">0 hrs</div>
         </div>
         <div class="stat-card">
-            <p style="color: var(--text-muted); font-size: 0.85rem;">Active Students</p>
-            <div class="stat-val" style="color: #fbbf24;">4</div>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Total Updates Published</p>
+            <div class="stat-val" id="totalLogsCount" style="color: #38bdf8;">0</div>
         </div>
     </div>
 
     <!-- Member Status Overview -->
-    <h2 class="section-title">👥 Member Last Online & Total Hours</h2>
+    <h2 class="section-title">👥 Member Total vs Self-Study Hours</h2>
     <div class="member-grid" id="memberCards">
         <!-- Rendered by JS -->
     </div>
@@ -208,6 +219,7 @@
 
     const students = ["Pranay", "Abhigyan", "Pranjal", "Aayush"];
     let studentHours = { "Pranay": 0, "Abhigyan": 0, "Pranjal": 0, "Aayush": 0 };
+    let studentPracticeHours = { "Pranay": 0, "Abhigyan": 0, "Pranjal": 0, "Aayush": 0 };
     let studentPresence = {};
 
     // 1. Fetch Presence Data
@@ -226,7 +238,9 @@
         tbody.innerHTML = "";
 
         let totalHours = 0;
+        let totalPracticeHours = 0;
         studentHours = { "Pranay": 0, "Abhigyan": 0, "Pranjal": 0, "Aayush": 0 };
+        studentPracticeHours = { "Pranay": 0, "Abhigyan": 0, "Pranjal": 0, "Aayush": 0 };
 
         if (snapshot.empty) {
             tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; color:var(--text-muted);'>No logs found in database.</td></tr>";
@@ -238,13 +252,19 @@
         snapshot.forEach((docSnap) => {
             const log = docSnap.data();
             const id = docSnap.id;
-            const hours = parseFloat(log.studyHours || log.hours || 0);
-            const activity = log.activityType || 'Self Study';
-            
+            const hours = parseFloat(log.studyHours || log.hours || 0); 
+            const activity = log.activityType || 'Unassigned';
+
             totalHours += hours;
             if (studentHours[log.student] !== undefined) {
-                studentHours[log.student] += hours;
-            }
+            studentHours[log.student] += hours;
+
+            // Only count if explicitly marked as Question Practice
+            if (log.activityType && log.activityType.toLowerCase().includes("practice")) {
+            studentPracticeHours[log.student] += hours;
+            totalPracticeHours += hours;
+         }
+     }
 
             const formattedTime = log.timestamp ? new Date(log.timestamp.seconds * 1000).toLocaleString([], {
                 month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -270,6 +290,7 @@
         });
 
         document.getElementById("totalHoursCount").innerText = `${totalHours.toFixed(1)} hrs`;
+        document.getElementById("totalPracticeCount").innerText = `${totalPracticeHours.toFixed(1)} hrs`;
         renderMemberCards();
     });
 
@@ -288,9 +309,15 @@
                 <div class="member-card">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <strong style="font-size: 1.1rem; color: #38bdf8;">${name}</strong>
-                        <span style="font-weight: bold; color: #fbbf24;">${(studentHours[name] || 0).toFixed(1)} hrs</span>
+                        <span style="font-weight: bold; color: #fbbf24; font-size: 1.05rem;">${(studentHours[name] || 0).toFixed(1)} hrs Total</span>
                     </div>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">
+
+                    <div class="practice-highlight-box">
+                        <span style="font-size: 0.85rem; color: #10b981; font-weight: 600;">✍️ Self Study / Practice:</span>
+                        <strong style="color: #10b981; font-size: 0.95rem;">${(studentPracticeHours[name] || 0).toFixed(1)} hrs</strong>
+                    </div>
+
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
                         🕒 Last Seen: <span style="color: #cbd5e1;">${lastSeenStr}</span>
                     </p>
                 </div>
