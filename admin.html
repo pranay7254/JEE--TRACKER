@@ -147,8 +147,8 @@
 <div class="container">
     <header>
         <div>
-            <h1>🛠️ Master Admin Dashboard</h1>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">JEE Target Tracker Control Panel</p>
+            <h1 id="dashTitle">🛠️ Master Admin Dashboard</h1>
+            <p id="dashSub" style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">JEE Target Tracker Control Panel</p>
         </div>
         <button onclick="logoutAdmin()" style="padding: 8px 16px; background: #334155; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">🔒 Logout</button>
     </header>
@@ -199,20 +199,35 @@
 
 <script>
     const MASTER_ADMIN_PASS = "Pran4444";
+    const authType = sessionStorage.getItem("admin_auth");
+    const viewerUser = sessionStorage.getItem("viewer_user") || "Guest";
+    const viewerTier = sessionStorage.getItem("viewer_tier") || "";
+    const viewerBadge = sessionStorage.getItem("viewer_badge") || "";
 
-    if (sessionStorage.getItem("admin_auth") !== "true") {
+    if (!authType) {
         let entered = prompt("🔐 Enter Master Admin Password:");
         if (entered === MASTER_ADMIN_PASS) {
-            sessionStorage.setItem("admin_auth", "true");
+            sessionStorage.setItem("admin_auth", "master");
+            sessionStorage.setItem("viewer_user", "Pranay");
         } else {
-            alert("❌ Access Denied!");
-            document.body.innerHTML = "<h1 style='color:white; text-align:center; margin-top:20vh; font-family:sans-serif;'>🔒 Access Denied</h1>";
-            throw new Error("Admin authentication failed.");
+            alert("❌ Access Denied! Unlock a study pass to view.");
+            window.location.href = "index.html";
+            throw new Error("Unauthorized");
         }
+    }
+
+    const isMasterAdmin = (sessionStorage.getItem("admin_auth") === "master");
+
+    if (!isMasterAdmin) {
+        document.getElementById("dashTitle").innerHTML = `📊 JEE Member Viewer Dashboard`;
+        document.getElementById("dashSub").innerHTML = `Unlocked by <b>${viewerUser}</b> via <span style="color:#fbbf24;">${viewerTier}</span> (${viewerBadge})`;
     }
 
     function logoutAdmin() {
         sessionStorage.removeItem("admin_auth");
+        sessionStorage.removeItem("viewer_user");
+        sessionStorage.removeItem("viewer_tier");
+        sessionStorage.removeItem("viewer_badge");
         location.reload();
     }
 
@@ -278,11 +293,9 @@
             const isPracticeOrSelf = actLower.includes("practice") || actLower.includes("self study") || actLower.includes("self");
 
             if (memberStats[log.student]) {
-                // Total hours includes everything (Lectures + Practice + Revision)
                 memberStats[log.student].total += hours;
                 totalAllHours += hours;
 
-                // Practice / Self Study block and subject sub-grouping
                 if (log.activityType && isPracticeOrSelf) {
                     memberStats[log.student].practiceTotal += hours;
                     totalPracticeHours += hours;
@@ -301,6 +314,11 @@
                 month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
             }) : 'Recently';
 
+            const actionButtons = isMasterAdmin ? `
+                <button class="btn-action btn-edit" onclick="adminEdit('${id}', '${(log.topic || '').replace(/'/g, "\\'")}', '${hours}', '${(log.details || '').replace(/'/g, "\\'")}', '${activity.replace(/'/g, "\\'")}')">Edit</button>
+                <button class="btn-action btn-del" onclick="adminDelete('${id}')">Delete</button>
+            ` : `<span style="color:var(--text-muted); font-size:0.8rem;">🔒 View Only</span>`;
+
             const tr = document.createElement("tr");
             tr.innerHTML = `
                 <td><strong style="color: #38bdf8;">${log.student}</strong></td>
@@ -312,10 +330,7 @@
                     <br><small style="color: var(--text-muted);">${log.details || log.accomplishment || ''}</small>
                 </td>
                 <td style="color: var(--text-muted);">${formattedTime}</td>
-                <td>
-                    <button class="btn-action btn-edit" onclick="adminEdit('${id}', '${(log.topic || '').replace(/'/g, "\\'")}', '${hours}', '${(log.details || '').replace(/'/g, "\\'")}', '${activity.replace(/'/g, "\\'")}')">Edit</button>
-                    <button class="btn-action btn-del" onclick="adminDelete('${id}')">Delete</button>
-                </td>
+                <td>${actionButtons}</td>
             `;
             tbody.appendChild(tr);
         });
@@ -344,7 +359,6 @@
                         <span style="font-weight: bold; color: #fbbf24; font-size: 1.05rem;">${stats.total.toFixed(1)} hrs Total</span>
                     </div>
 
-                    <!-- Question Practice & Self Study Box with Subject Breakdown -->
                     <div class="practice-box-container">
                         <div class="practice-header">
                             <span style="font-size: 0.85rem; color: #10b981; font-weight: 600;">✍️ Practice / Self Study:</span>
