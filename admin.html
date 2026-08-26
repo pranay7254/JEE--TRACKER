@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JEE Tracker - Master Admin Dashboard</title>
+    <title>JEE Trio - Leaderboard & Dashboard</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -12,7 +12,6 @@
         :root {
             --bg: #090d16;
             --card-bg: #131d31;
-            --accent: #ef4444;
             --accent-blue: #3b82f6;
             --accent-green: #10b981;
             --text: #f8fafc;
@@ -39,7 +38,7 @@
             padding-bottom: 1rem;
         }
 
-        h1 { color: #f87171; font-size: 2rem; display: flex; align-items: center; gap: 8px; }
+        h1 { color: #f87171; font-size: 1.8rem; }
 
         .stats-grid {
             display: grid;
@@ -58,7 +57,6 @@
 
         .stat-val { font-size: 2rem; font-weight: bold; color: var(--accent-blue); margin-top: 5px; }
 
-        /* Members Grid */
         .section-title { font-size: 1.25rem; margin-bottom: 1rem; color: #cbd5e1; }
         .member-grid {
             display: grid;
@@ -98,7 +96,6 @@
             font-size: 0.8rem;
         }
 
-        /* Table */
         .log-table {
             width: 100%;
             background: var(--card-bg);
@@ -150,13 +147,13 @@
             <h1 id="dashTitle">🛠️ Master Admin Dashboard</h1>
             <p id="dashSub" style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">JEE Target Tracker Control Panel</p>
         </div>
-        <button onclick="logoutAdmin()" style="padding: 8px 16px; background: #334155; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">🔒 Logout</button>
+        <button onclick="logoutAdmin()" style="padding: 8px 16px; background: #334155; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">🔒 Exit</button>
     </header>
 
     <!-- Global Stats -->
     <div class="stats-grid">
         <div class="stat-card">
-            <p style="color: var(--text-muted); font-size: 0.85rem;">Total All Study Hours</p>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Total Group Study Hours</p>
             <div class="stat-val" id="totalHoursCount">0 hrs</div>
         </div>
         <div class="stat-card">
@@ -164,36 +161,36 @@
             <div class="stat-val" id="totalPracticeCount" style="color: var(--accent-green);">0 hrs</div>
         </div>
         <div class="stat-card">
-            <p style="color: var(--text-muted); font-size: 0.85rem;">Total Updates Published</p>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Total Updates Logged</p>
             <div class="stat-val" id="totalLogsCount" style="color: #38bdf8;">0</div>
         </div>
     </div>
 
-    <!-- Member Status Overview -->
-    <h2 class="section-title">👥 Member Total & Question Practice Breakdown</h2>
-    <div class="member-grid" id="memberCards">
-        <!-- Rendered by JS -->
-    </div>
+    <!-- Leaderboard Cards -->
+    <h2 class="section-title">👥 Member Performance & Subject Breakdown</h2>
+    <div class="member-grid" id="memberCards"></div>
 
-    <!-- Master Logs Table -->
-    <h2 class="section-title">📋 Master Logs Management (Edit / Delete Any Entry)</h2>
-    <div style="overflow-x: auto;">
-        <table class="log-table">
-            <thead>
-                <tr>
-                    <th>Student</th>
-                    <th>Subject</th>
-                    <th>Activity</th>
-                    <th>Hours</th>
-                    <th>Topic / Task</th>
-                    <th>Timestamp</th>
-                    <th>Admin Actions</th>
-                </tr>
-            </thead>
-            <tbody id="masterLogsBody">
-                <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading database logs...</td></tr>
-            </tbody>
-        </table>
+    <!-- Master Database Log Table (Strictly Hidden for Pass-Holders) -->
+    <div id="masterLogSection" style="display: none;">
+        <h2 class="section-title">📋 Master Database Controls (Edit / Delete Any Record)</h2>
+        <div style="overflow-x: auto;">
+            <table class="log-table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Subject</th>
+                        <th>Activity</th>
+                        <th>Hours</th>
+                        <th>Topic / Task</th>
+                        <th>Timestamp</th>
+                        <th>Master Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="masterLogsBody">
+                    <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading database logs...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -210,7 +207,7 @@
             sessionStorage.setItem("admin_auth", "master");
             sessionStorage.setItem("viewer_user", "Pranay");
         } else {
-            alert("❌ Access Denied! Unlock a study pass to view.");
+            alert("❌ Access Denied! Complete a study pass target to view.");
             window.location.href = "index.html";
             throw new Error("Unauthorized");
         }
@@ -219,8 +216,11 @@
     const isMasterAdmin = (sessionStorage.getItem("admin_auth") === "master");
 
     if (!isMasterAdmin) {
-        document.getElementById("dashTitle").innerHTML = `📊 JEE Member Viewer Dashboard`;
+        document.getElementById("dashTitle").innerText = "🏆 JEE Trio - Hall of Fame Leaderboard";
         document.getElementById("dashSub").innerHTML = `Unlocked by <b>${viewerUser}</b> via <span style="color:#fbbf24;">${viewerTier}</span> (${viewerBadge})`;
+        document.getElementById("masterLogSection").style.display = "none";
+    } else {
+        document.getElementById("masterLogSection").style.display = "block";
     }
 
     function logoutAdmin() {
@@ -228,7 +228,7 @@
         sessionStorage.removeItem("viewer_user");
         sessionStorage.removeItem("viewer_tier");
         sessionStorage.removeItem("viewer_badge");
-        location.reload();
+        window.location.href = "index.html";
     }
 
     const firebaseConfig = {
@@ -271,16 +271,11 @@
 
     db.collection("jee_logs").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
         const tbody = document.getElementById("masterLogsBody");
-        tbody.innerHTML = "";
+        if (tbody) tbody.innerHTML = "";
 
         initMemberStats();
         let totalAllHours = 0;
         let totalPracticeHours = 0;
-
-        if (snapshot.empty) {
-            tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; color:var(--text-muted);'>No logs found in database.</td></tr>";
-            return;
-        }
 
         document.getElementById("totalLogsCount").innerText = snapshot.size;
 
@@ -296,7 +291,7 @@
                 memberStats[log.student].total += hours;
                 totalAllHours += hours;
 
-                if (log.activityType && isPracticeOrSelf) {
+                if (isPracticeOrSelf) {
                     memberStats[log.student].practiceTotal += hours;
                     totalPracticeHours += hours;
 
@@ -310,29 +305,29 @@
                 }
             }
 
-            const formattedTime = log.timestamp ? new Date(log.timestamp.seconds * 1000).toLocaleString([], {
-                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-            }) : 'Recently';
+            if (isMasterAdmin && tbody) {
+                const formattedTime = log.timestamp ? new Date(log.timestamp.seconds * 1000).toLocaleString([], {
+                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                }) : 'Recently';
 
-            const actionButtons = isMasterAdmin ? `
-                <button class="btn-action btn-edit" onclick="adminEdit('${id}', '${(log.topic || '').replace(/'/g, "\\'")}', '${hours}', '${(log.details || '').replace(/'/g, "\\'")}', '${activity.replace(/'/g, "\\'")}')">Edit</button>
-                <button class="btn-action btn-del" onclick="adminDelete('${id}')">Delete</button>
-            ` : `<span style="color:var(--text-muted); font-size:0.8rem;">🔒 View Only</span>`;
-
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td><strong style="color: #38bdf8;">${log.student}</strong></td>
-                <td><span class="tag tag-${log.subject}">${log.subject || 'General'}</span></td>
-                <td><span class="tag tag-activity">${activity}</span></td>
-                <td><strong>${hours} hrs</strong></td>
-                <td>
-                    <b>${log.topic}</b>
-                    <br><small style="color: var(--text-muted);">${log.details || log.accomplishment || ''}</small>
-                </td>
-                <td style="color: var(--text-muted);">${formattedTime}</td>
-                <td>${actionButtons}</td>
-            `;
-            tbody.appendChild(tr);
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td><strong style="color: #38bdf8;">${log.student}</strong></td>
+                    <td><span class="tag tag-${log.subject}">${log.subject || 'General'}</span></td>
+                    <td><span class="tag tag-activity">${activity}</span></td>
+                    <td><strong>${hours} hrs</strong></td>
+                    <td>
+                        <b>${log.topic}</b>
+                        <br><small style="color: var(--text-muted);">${log.details || log.accomplishment || ''}</small>
+                    </td>
+                    <td style="color: var(--text-muted);">${formattedTime}</td>
+                    <td>
+                        <button class="btn-action btn-edit" onclick="adminEdit('${id}', '${(log.topic || '').replace(/'/g, "\\'")}', '${hours}', '${(log.details || '').replace(/'/g, "\\'")}', '${activity.replace(/'/g, "\\'")}')">Edit</button>
+                        <button class="btn-action btn-del" onclick="adminDelete('${id}')">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            }
         });
 
         document.getElementById("totalHoursCount").innerText = `${totalAllHours.toFixed(1)} hrs`;
@@ -344,7 +339,13 @@
         const container = document.getElementById("memberCards");
         container.innerHTML = "";
 
-        students.forEach((name) => {
+        const sortedStudents = [...students].sort((a, b) => {
+            const statA = memberStats[a] ? memberStats[a].practiceTotal : 0;
+            const statB = memberStats[b] ? memberStats[b].practiceTotal : 0;
+            return statB - statA;
+        });
+
+        sortedStudents.forEach((name, idx) => {
             const stats = memberStats[name] || { total: 0, practiceTotal: 0, practicePhysics: 0, practiceChemistry: 0, practiceMath: 0 };
             let lastSeenStr = "Never";
             if (studentPresence[name]) {
@@ -352,10 +353,12 @@
                               " (" + studentPresence[name].toLocaleDateString([], { month: 'short', day: 'numeric' }) + ")";
             }
 
+            const rankBadge = idx === 0 && stats.practiceTotal > 0 ? "👑 Rank #1 Leader" : `Rank #${idx + 1}`;
+
             container.innerHTML += `
                 <div class="member-card">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <strong style="font-size: 1.1rem; color: #38bdf8;">${name}</strong>
+                        <strong style="font-size: 1.1rem; color: #38bdf8;">${name} <span style="font-size: 0.75rem; color: #fbbf24;">(${rankBadge})</span></strong>
                         <span style="font-weight: bold; color: #fbbf24; font-size: 1.05rem;">${stats.total.toFixed(1)} hrs Total</span>
                     </div>
 
@@ -379,18 +382,18 @@
         });
     }
 
-    // 🛠️ ADMIN MASTER ACTIONS
     window.adminEdit = async function(id, oldTopic, oldHours, oldDetails, oldActivity) {
-        let newHours = prompt("🛠️ [Admin] Update Study Hours:", oldHours);
+        if (!isMasterAdmin) return;
+        let newHours = prompt("🛠️ [Master] Update Study Hours:", oldHours);
         if (newHours === null) return;
 
-        let newActivity = prompt("🛠️ [Admin] Update Activity Type (Question Practice / Self Study / Lecture / Revision):", oldActivity || "Question Practice");
+        let newActivity = prompt("🛠️ [Master] Update Activity Type:", oldActivity || "Question Practice");
         if (newActivity === null) return;
 
-        let newTopic = prompt("🛠️ [Admin] Update Topic/Chapter:", oldTopic);
+        let newTopic = prompt("🛠️ [Master] Update Topic/Chapter:", oldTopic);
         if (newTopic === null) return;
 
-        let newDetails = prompt("🛠️ [Admin] Update Accomplishment details:", oldDetails);
+        let newDetails = prompt("🛠️ [Master] Update Accomplishment details:", oldDetails);
         if (newDetails === null) return;
 
         try {
@@ -401,17 +404,18 @@
                 details: newDetails,
                 adminEdited: true
             });
-            alert("✅ [Admin] Log updated successfully!");
+            alert("✅ [Master] Log updated successfully!");
         } catch (e) {
             alert("❌ Failed to update: " + e.message);
         }
     };
 
     window.adminDelete = async function(id) {
-        if (confirm("⚠️ [Admin] Are you sure you want to permanently delete this log entry?")) {
+        if (!isMasterAdmin) return;
+        if (confirm("⚠️ [Master] Are you sure you want to permanently delete this log record?")) {
             try {
                 await db.collection("jee_logs").doc(id).delete();
-                alert("🗑️ [Admin] Log deleted successfully!");
+                alert("🗑️ [Master] Log deleted successfully!");
             } catch (e) {
                 alert("❌ Failed to delete: " + e.message);
             }
