@@ -32,9 +32,85 @@
             min-height: 100vh;
             color: var(--text-main);
             padding: 2rem;
+            position: relative;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; }
+        /* Watermark Welcome Background Text */
+        .bg-welcome-watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(4rem, 15vw, 12rem);
+            font-weight: 900;
+            letter-spacing: 12px;
+            color: rgba(255, 255, 255, 0.03);
+            pointer-events: none;
+            z-index: 0;
+            user-select: none;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        /* 1-Month Milestone Celebration Card */
+        .celebration-card {
+            position: relative;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(234, 88, 12, 0.1) 50%, rgba(16, 185, 129, 0.15) 100%);
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            border-radius: 14px;
+            padding: 1.25rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.15);
+            z-index: 2;
+        }
+
+        .celebration-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #fbbf24, #f87171, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+
+        .celebration-badge {
+            display: inline-block;
+            background: #fbbf24;
+            color: #0f172a;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .celebration-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* Confetti Sparkle Animation */
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+
+        .sparkle {
+            position: fixed;
+            bottom: -10px;
+            font-size: 1.2rem;
+            pointer-events: none;
+            z-index: 1;
+            animation: floatUp 6s linear infinite;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
         header { text-align: center; margin-bottom: 1.5rem; }
         h1 { 
             font-size: 2.5rem; 
@@ -188,6 +264,12 @@
 </head>
 <body>
 
+<!-- Background Watermark -->
+<div class="bg-welcome-watermark">WELCOME</div>
+
+<!-- Floating Celebration Particles -->
+<div id="confettiContainer"></div>
+
 <div class="container">
     <div class="header-top-bar">
         <button class="admin-nav-btn" onclick="goToAdmin()">🛠️ Admin Panel</button>
@@ -197,6 +279,16 @@
         <h1>🎯 JEE Target Tracker</h1>
         <p style="color: var(--text-muted); margin-top: 0.5rem;">Class 11 Daily Log Dashboard</p>
     </header>
+
+    <!-- 1 Month Milestone Celebration Banner -->
+    <div class="celebration-card">
+        <div class="celebration-badge">🎉 Milestone Achieved</div>
+        <div class="celebration-title">🚀 1 Month of JEE Target Tracker!</div>
+        <p class="celebration-desc">
+            Celebrating consistent tracking, daily targets, and relentless question practice.<br>
+            Keep pushing forward toward JEE 2028! 🎯
+        </p>
+    </div>
 
     <div class="user-status-bar">
         Welcome back, <strong id="currentIdentifiedUser" style="color: #38bdf8;">Authenticating...</strong>
@@ -247,7 +339,7 @@
 
             <div style="background: #0f172a; border-left: 4px solid #fbbf24; border-radius: 8px; padding: 12px;">
                 <div style="font-weight: bold; color: #fbbf24; font-size: 0.95rem;">🥇 Gold VIP Pass</div>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0;">#1 Leaderboard (≥5.0h Practice)</p>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0;">#1 All-Time Rank (≥5.0h Practice)</p>
                 <div style="font-size: 0.75rem; color: #34d399; font-weight: 600;">⚡ Validity: 24 Hours Daily Check</div>
             </div>
 
@@ -370,17 +462,34 @@
         lastActive: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
-    // Strict Evaluation Function (Resets daily practice strictly at 12:00 AM Midnight)
+    // Floating celebration sparkles generator
+    function launchCelebrationSparkles() {
+        const container = document.getElementById("confettiContainer");
+        const icons = ["✨", "🎉", "🔥", "⭐", "🎯"];
+        
+        for (let i = 0; i < 18; i++) {
+            const span = document.createElement("span");
+            span.className = "sparkle";
+            span.innerText = icons[Math.floor(Math.random() * icons.length)];
+            span.style.left = Math.random() * 100 + "vw";
+            span.style.animationDuration = (4 + Math.random() * 4) + "s";
+            span.style.animationDelay = (Math.random() * 5) + "s";
+            span.style.fontSize = (0.8 + Math.random() * 0.8) + "rem";
+            container.appendChild(span);
+        }
+    }
+    launchCelebrationSparkles();
+
     async function evaluateMemberPasses(user) {
         const startOfToday = new Date();
-        startOfToday.setHours(0, 0, 0, 0); // Strict Midnight 00:00:00 Reset
+        startOfToday.setHours(0, 0, 0, 0); // Strict Midnight Reset for Today's Practice (Bronze)
 
         const logsSnap = await db.collection("jee_logs").get();
 
         let practiceAllTime = 0;
         let lectureAllTime = 0;
         let practiceToday = 0;
-        let practiceByStudent = { "Pranay": 0, "Abhigyan": 0, "Pranjal": 0, "Aayush": 0 };
+  let practiceAllTimeByStudent = { "Pranay": 0, "Abhigyan": 0, "Pranjal": 0, "Aayush": 0 };
         let practiceDates = new Set();
 
         logsSnap.forEach(doc => {
@@ -391,15 +500,16 @@
             const isLecture = act.includes("lecture");
             const logDate = d.timestamp ? d.timestamp.toDate() : new Date();
 
-            if (isPractice && practiceByStudent[d.student] !== undefined) {
-                practiceByStudent[d.student] += hours;
+            // All-Time Practice Accumulator for Gold VIP
+            if (isPractice && practiceAllTimeByStudent[d.student] !== undefined) {
+                practiceAllTimeByStudent[d.student] += hours;
             }
 
             if (d.student === user) {
                 if (isPractice) practiceAllTime += hours;
                 if (isLecture) lectureAllTime += hours;
 
-                // Midnight Filter: Only logs submitted today after 00:00 count
+                // Today's Practice (Strictly since 12 AM for Bronze)
                 if (isPractice && logDate >= startOfToday) {
                     practiceToday += hours;
                 }
@@ -411,10 +521,10 @@
         });
 
         let streakCount = practiceDates.size;
-        let sortedRank = Object.keys(practiceByStudent).sort((a, b) => practiceByStudent[b] - practiceByStudent[a]);
-        
-        // 5.0 hours minimum practice required to claim #1 Gold VIP Pass
-        let isGold = sortedRank[0] === user && practiceByStudent[user] >= 5.0;
+
+        // Gold VIP is evaluated on ALL-TIME practice hours
+        let sortedRank = Object.keys(practiceAllTimeByStudent).sort((a, b) => practiceAllTimeByStudent[b] - practiceAllTimeByStudent[a]);
+        let isGold = sortedRank[0] === user && practiceAllTimeByStudent[user] >= 5.0;
 
         let qualifiedTier = null;
         let badgeText = "";
@@ -422,7 +532,7 @@
 
         if (isGold) {
             qualifiedTier = "🥇 Gold VIP Pass";
-            badgeText = "👑 Study King VIP";
+            badgeText = "👑 Study King VIP (All-Time Leader)";
             accessDuration = "24 Hours (Daily Leaderboard)";
         } else if (practiceAllTime >= 15.0 && lectureAllTime >= 20.0) {
             qualifiedTier = "🥈 Silver Pass";
@@ -477,13 +587,14 @@
             🥉 <b>Bronze (2h):</b> ≥3.0h practice today (You have: <b>${passData.practiceToday.toFixed(1)}h</b>)<br>
             🥈 <b>Silver (72h):</b> 15h practice & 20h lectures (You: <b>${passData.practiceAllTime.toFixed(1)}h / ${passData.lectureAllTime.toFixed(1)}h</b>)<br>
             🔥 <b>Streak (48h):</b> 7 unbroken days (≥2h/day)<br>
-            🥇 <b>Gold VIP (24h):</b> #1 Rank & ≥5.0h Practice`;
+            🥇 <b>Gold VIP (24h):</b> #1 All-Time Rank & ≥5.0h Total Practice`;
             enterBtn.style.display = "none";
         }
 
         modal.style.display = "flex";
     }
 
+    // Top Navigation Admin Button
     window.goToAdmin = async function() {
         if (loggedInUser === "Pranay") {
             let choice = prompt("Enter Master Admin Password (or type 'VIEW' to see your earned Study Pass):");
@@ -579,7 +690,7 @@
               feedContainer.appendChild(logElement);
           });
 
-          // Live Pass Status Update on Main UI
+          // Live Pass Status Update on Main Page
           const passData = await evaluateMemberPasses(loggedInUser);
           const statusBox = document.getElementById("userMembershipStatus");
           if (statusBox) {
