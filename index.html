@@ -222,38 +222,38 @@
         </div>
     </div>
 
-    <!-- Always Visible Membership Passes Showcase -->
+    <!-- Membership Rules Showcase -->
     <div class="card" style="margin-bottom: 2rem;">
-        <h2>🏆 Study Membership Passes & Perks</h2>
+        <h2>🏆 Study Membership Passes & Leaderboard Privileges</h2>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 10px;">
             
-            <div style="background: #0f172a; border: 1px solid #78350f; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 12px;">
+            <div style="background: #0f172a; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 12px;">
                 <div style="font-weight: bold; color: #f59e0b; font-size: 0.95rem;">🥉 Bronze Pass</div>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0;">≥3.0 hrs Practice Today</p>
-                <div style="font-size: 0.75rem; color: #34d399; font-weight: 600;">⚡ Perk: 24h Admin Access</div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0;">≥3.0h Practice Today (Since 12 AM)</p>
+                <div style="font-size: 0.75rem; color: #34d399; font-weight: 600;">⚡ Validity: 2 Hours</div>
             </div>
 
-            <div style="background: #0f172a; border: 1px solid #334155; border-left: 4px solid #94a3b8; border-radius: 8px; padding: 12px;">
+            <div style="background: #0f172a; border-left: 4px solid #94a3b8; border-radius: 8px; padding: 12px;">
                 <div style="font-weight: bold; color: #cbd5e1; font-size: 0.95rem;">🥈 Silver Pass</div>
                 <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0;">15h Practice & 20h Lectures</p>
-                <div style="font-size: 0.75rem; color: #34d399; font-weight: 600;">⚡ Perk: 7 Days Access + Continuity Badge</div>
+                <div style="font-size: 0.75rem; color: #34d399; font-weight: 600;">⚡ Validity: 72 Hours (3 Days)</div>
             </div>
 
-            <div style="background: #0f172a; border: 1px solid #064e3b; border-left: 4px solid #10b981; border-radius: 8px; padding: 12px;">
+            <div style="background: #0f172a; border-left: 4px solid #10b981; border-radius: 8px; padding: 12px;">
                 <div style="font-weight: bold; color: #34d399; font-size: 0.95rem;">🔥 Streak Pass</div>
                 <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0;">7 Days Unbroken (≥2h/day)</p>
-                <div style="font-size: 0.75rem; color: #34d399; font-weight: 600;">⚡ Perk: 30 Days Access + Streak Badge</div>
+                <div style="font-size: 0.75rem; color: #34d399; font-weight: 600;">⚡ Validity: 48 Hours</div>
             </div>
 
-            <div style="background: #0f172a; border: 1px solid #854d0e; border-left: 4px solid #fbbf24; border-radius: 8px; padding: 12px;">
+            <div style="background: #0f172a; border-left: 4px solid #fbbf24; border-radius: 8px; padding: 12px;">
                 <div style="font-weight: bold; color: #fbbf24; font-size: 0.95rem;">🥇 Gold VIP Pass</div>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0;">#1 Practice Leaderboard Rank</p>
-                <div style="font-size: 0.75rem; color: #34d399; font-weight: 600;">⚡ Perk: 7 Days Full View + VIP Crown</div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0;">#1 Leaderboard (≥5.0h Practice)</p>
+                <div style="font-size: 0.75rem; color: #34d399; font-weight: 600;">⚡ Validity: 24 Hours Daily Check</div>
             </div>
 
         </div>
 
-        <div id="userMembershipStatus" style="margin-top: 14px; padding: 10px; background: rgba(56, 189, 248, 0.08); border: 1px dashed rgba(56, 189, 248, 0.3); border-radius: 8px; font-size: 0.85rem; color: #cbd5e1;">
+        <div id="userMembershipStatus" style="margin-top: 14px; padding: 10px; background: rgba(56, 189, 248, 0.08); border-radius: 8px; font-size: 0.85rem; color: #cbd5e1;">
             Checking active unlocked passes...
         </div>
     </div>
@@ -309,7 +309,7 @@
     </div>
 </div>
 
-<!-- Modal Dialog -->
+<!-- Modal Popup -->
 <div id="tierModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.95); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(8px);">
   <div style="background:#1e293b; border:1px solid #334155; border-radius:16px; padding:24px; max-width:420px; width:90%; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
     <h2 id="tierModalTitle" style="color:#38bdf8; font-size:1.25rem; margin-bottom:10px;">Membership Access Check</h2>
@@ -370,45 +370,11 @@
         lastActive: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./firebase-messaging-sw.js').then((registration) => {
-            const messaging = firebase.messaging();
-            
-            Notification.requestPermission().then((permission) => {
-                if (permission === 'granted') {
-                    messaging.getToken({
-                        serviceWorkerRegistration: registration,
-                        vapidKey: 'BMkFrIBnJGNhTmCTm0I01_cy7tmn6y4-iHodUfHCoy9SW8FXJZLrHt92u5lnqtoBVGvaDpHr7S9zileZgJyXE7I'
-                    }).then((currentToken) => {
-                        if (currentToken && loggedInUser) {
-                            db.collection("user_devices").doc(loggedInUser).set({
-                                token: currentToken,
-                                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                            }, { merge: true });
-                            console.log("Device token successfully registered for:", loggedInUser);
-                        }
-                    }).catch((err) => console.log('Token fetch error:', err));
-                }
-            });
-        }).catch(err => console.log('SW registration error:', err));
-    }
+    // Strict Evaluation Function (Resets daily practice strictly at 12:00 AM Midnight)
+    async function evaluateMemberPasses(user) {
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0); // Strict Midnight 00:00:00 Reset
 
-    // 🛠️ ADMIN BUTTON & PASS CHECK
-    window.goToAdmin = async function() {
-        if (loggedInUser === "Pranay") {
-            let pass = prompt("🔐 Enter Master Admin Password:");
-            if (pass === "Pran4444") {
-                sessionStorage.setItem("admin_auth", "master");
-                sessionStorage.setItem("viewer_user", "Pranay");
-                window.location.href = "admin.html";
-            } else if (pass !== null) {
-                alert("❌ Incorrect Master Admin Password!");
-            }
-            return;
-        }
-
-        const now = new Date();
-        const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
         const logsSnap = await db.collection("jee_logs").get();
 
         let practiceAllTime = 0;
@@ -429,11 +395,12 @@
                 practiceByStudent[d.student] += hours;
             }
 
-            if (d.student === loggedInUser) {
+            if (d.student === user) {
                 if (isPractice) practiceAllTime += hours;
                 if (isLecture) lectureAllTime += hours;
 
-                if (isPractice && logDate >= oneDayAgo) {
+                // Midnight Filter: Only logs submitted today after 00:00 count
+                if (isPractice && logDate >= startOfToday) {
                     practiceToday += hours;
                 }
 
@@ -445,7 +412,9 @@
 
         let streakCount = practiceDates.size;
         let sortedRank = Object.keys(practiceByStudent).sort((a, b) => practiceByStudent[b] - practiceByStudent[a]);
-        let isGold = sortedRank[0] === loggedInUser && practiceByStudent[loggedInUser] > 0;
+        
+        // 5.0 hours minimum practice required to claim #1 Gold VIP Pass
+        let isGold = sortedRank[0] === user && practiceByStudent[user] >= 5.0;
 
         let qualifiedTier = null;
         let badgeText = "";
@@ -454,53 +423,82 @@
         if (isGold) {
             qualifiedTier = "🥇 Gold VIP Pass";
             badgeText = "👑 Study King VIP";
-            accessDuration = "7 Days Access";
-        } else if (streakCount >= 7) {
-            qualifiedTier = "🔥 Streak Pass";
-            badgeText = "⚡ Streak Master (7+ Days)";
-            accessDuration = "30 Days Access";
+            accessDuration = "24 Hours (Daily Leaderboard)";
         } else if (practiceAllTime >= 15.0 && lectureAllTime >= 20.0) {
             qualifiedTier = "🥈 Silver Pass";
             badgeText = "🎖️ Continuity Achiever";
-            accessDuration = "7 Days Access";
+            accessDuration = "72 Hours (3 Days)";
+        } else if (streakCount >= 7) {
+            qualifiedTier = "🔥 Streak Pass";
+            badgeText = "⚡ Streak Master (7+ Days)";
+            accessDuration = "48 Hours";
         } else if (practiceToday >= 3.0) {
             qualifiedTier = "🥉 Bronze Pass";
             badgeText = "🎯 Daily Grinder";
-            accessDuration = "24 Hours Access";
+            accessDuration = "2 Hours";
         }
 
+        return {
+            qualifiedTier,
+            badgeText,
+            accessDuration,
+            practiceToday,
+            practiceAllTime,
+            lectureAllTime,
+            streakCount
+        };
+    }
+
+    function showPassModal(passData, user) {
         const modal = document.getElementById("tierModal");
         const title = document.getElementById("tierModalTitle");
         const msg = document.getElementById("tierModalMsg");
         const badge = document.getElementById("tierModalBadge");
         const enterBtn = document.getElementById("tierEnterBtn");
 
-        modal.style.display = "flex";
-
-        if (qualifiedTier) {
+        if (passData.qualifiedTier) {
             title.innerText = `🎉 Pass Unlocked!`;
-            badge.innerHTML = `<span style="padding:5px 12px; background:#10b981; color:#0f172a; border-radius:20px; font-size:0.85rem; font-weight:700;">${qualifiedTier} — ${badgeText}</span>`;
-            msg.innerHTML = `Great work <b>${loggedInUser}</b>!<br><br>
-            • Today's Practice: <b>${practiceToday.toFixed(1)} hrs</b><br>
-            • Total Practice: <b>${practiceAllTime.toFixed(1)} hrs</b><br>
-            • Total Lectures: <b>${lectureAllTime.toFixed(1)} hrs</b><br><br>
-            ✅ <b>Perk:</b> ${accessDuration} to Admin Dashboard.`;
+            badge.innerHTML = `<span style="padding:5px 12px; background:#10b981; color:#0f172a; border-radius:20px; font-size:0.85rem; font-weight:700;">${passData.qualifiedTier} — ${passData.badgeText}</span>`;
+            msg.innerHTML = `Great work <b>${user}</b>!<br><br>
+            • Today's Practice (Since 12 AM): <b>${passData.practiceToday.toFixed(1)} hrs</b><br>
+            • Total Practice: <b>${passData.practiceAllTime.toFixed(1)} hrs</b><br>
+            • Total Lectures: <b>${passData.lectureAllTime.toFixed(1)} hrs</b><br><br>
+            ✅ <b>Perk:</b> ${passData.accessDuration} Leaderboard Access.`;
             enterBtn.style.display = "inline-block";
 
             sessionStorage.setItem("admin_auth", "viewer");
-            sessionStorage.setItem("viewer_user", loggedInUser);
-            sessionStorage.setItem("viewer_tier", qualifiedTier);
-            sessionStorage.setItem("viewer_badge", badgeText);
+            sessionStorage.setItem("viewer_user", user);
+            sessionStorage.setItem("viewer_tier", passData.qualifiedTier);
+            sessionStorage.setItem("viewer_badge", passData.badgeText);
         } else {
             title.innerText = "🔒 Dashboard Locked";
             badge.innerHTML = "";
             msg.innerHTML = `You have not met any membership pass requirements yet:<br><br>
-            🥉 <b>Bronze (24h Access):</b> 3.0h practice today (You: <b>${practiceToday.toFixed(1)}h</b>)<br>
-            🥈 <b>Silver (7 Days):</b> 15h practice & 20h lectures (You: <b>${practiceAllTime.toFixed(1)}h / ${lectureAllTime.toFixed(1)}h</b>)<br>
-            🔥 <b>Streak (30 Days):</b> 7 unbroken days (≥2h/day)<br>
-            🥇 <b>Gold VIP (7 Days):</b> #1 Rank on pure practice hours`;
+            🥉 <b>Bronze (2h):</b> ≥3.0h practice today (You have: <b>${passData.practiceToday.toFixed(1)}h</b>)<br>
+            🥈 <b>Silver (72h):</b> 15h practice & 20h lectures (You: <b>${passData.practiceAllTime.toFixed(1)}h / ${passData.lectureAllTime.toFixed(1)}h</b>)<br>
+            🔥 <b>Streak (48h):</b> 7 unbroken days (≥2h/day)<br>
+            🥇 <b>Gold VIP (24h):</b> #1 Rank & ≥5.0h Practice`;
             enterBtn.style.display = "none";
         }
+
+        modal.style.display = "flex";
+    }
+
+    window.goToAdmin = async function() {
+        if (loggedInUser === "Pranay") {
+            let choice = prompt("Enter Master Admin Password (or type 'VIEW' to see your earned Study Pass):");
+            if (choice === "Pran4444") {
+                sessionStorage.setItem("admin_auth", "master");
+                sessionStorage.setItem("viewer_user", "Pranay");
+                window.location.href = "admin.html";
+                return;
+            } else if (choice === null) {
+                return;
+            }
+        }
+
+        const passData = await evaluateMemberPasses(loggedInUser);
+        showPassModal(passData, loggedInUser);
     };
 
     window.openAdminDashboard = function() {
@@ -527,6 +525,107 @@
                 }) + " (" + dateObj.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ")";
             }
         });
+    });
+
+    db.collection("jee_logs")
+      .orderBy("timestamp", "desc")
+      .onSnapshot(async (snapshot) => {
+          feedContainer.innerHTML = '';
+          if (snapshot.empty) {
+              feedContainer.innerHTML = '<p style="color: var(--text-muted);">No logs posted yet. Start studying!</p>';
+              return;
+          }
+          
+          snapshot.forEach((docSnap) => {
+              const log = docSnap.data();
+              const logId = docSnap.id;
+
+              let tagClass = 'tag-p';
+              if(log.subject === 'Chemistry') tagClass = 'tag-c';
+              if(log.subject === 'Math') tagClass = 'tag-m';
+
+              const activity = log.activityType || 'Self Study';
+              const formattedTime = log.timestamp ? new Date(log.timestamp.seconds * 1000).toLocaleString([], { 
+                  month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+              }) : 'Just now';
+
+              const hoursDisplay = log.studyHours ? ` — <strong>${log.studyHours} hrs</strong>` : '';
+              const detailsDisplay = log.details || log.accomplishment || '';
+
+              const logElement = document.createElement('div');
+              logElement.className = 'log-item';
+              logElement.innerHTML = `
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <strong style="color: #38bdf8; font-size: 1.1rem;">${log.student}${hoursDisplay}</strong>
+                      <div>
+                          <span class="tag ${tagClass}">${log.subject || 'General'}</span>
+                          <span class="tag tag-activity">${activity}</span>
+                      </div>
+                  </div>
+                  <p style="margin: 0.5rem 0; font-weight: 500;">📖 ${log.topic}</p>
+                  <p style="color: var(--text-muted); font-size: 0.95rem;">✅ ${detailsDisplay}</p>
+                  <div class="log-meta">
+                      <span>🕒 ${formattedTime}</span>
+                      <div class="action-btns">
+                          <button class="btn-edit" onclick="editLog('${logId}', '${log.student}', '${log.studyHours || 0}', '${(log.topic || '').replace(/'/g, "\\'")}', '${detailsDisplay.replace(/'/g, "\\'")}')">
+                              ✏️ Edit
+                          </button>
+                          <button class="btn-delete" onclick="deleteLog('${logId}', '${log.student}')">
+                              🗑️ Delete
+                          </button>
+                      </div>
+                  </div>
+              `;
+              feedContainer.appendChild(logElement);
+          });
+
+          // Live Pass Status Update on Main UI
+          const passData = await evaluateMemberPasses(loggedInUser);
+          const statusBox = document.getElementById("userMembershipStatus");
+          if (statusBox) {
+              if (passData.qualifiedTier) {
+                  statusBox.innerHTML = `🎉 <b>${loggedInUser}'s Active Pass:</b> <span style="color:#10b981; font-weight:bold;">${passData.qualifiedTier} — ${passData.badgeText} (${passData.accessDuration})</span>`;
+              } else {
+                  statusBox.innerHTML = `🔒 <b>${loggedInUser}:</b> No active pass. Log <b>3.0h practice today</b> (Current: <b>${passData.practiceToday.toFixed(1)}h</b>) to unlock Bronze!`;
+              }
+          }
+      });
+
+    // Form Submission: Publishes log and triggers immediate popup evaluation
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const student = loggedInUser;
+        const subject = document.getElementById('subject').value;
+        const activityType = document.getElementById('activityType').value;
+        const studyHours = parseFloat(document.getElementById('studyHours').value);
+        const topic = document.getElementById('topic').value;
+        const details = document.getElementById('details').value;
+
+        try {
+            await db.collection("jee_logs").add({
+                student: student,
+                subject: subject,
+                activityType: activityType,
+                studyHours: studyHours,
+                topic: topic,
+                details: details,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            document.getElementById('studyHours').value = '';
+            document.getElementById('topic').value = '';
+            document.getElementById('details').value = '';
+
+            // Instant Evaluation and Popup Trigger
+            setTimeout(async () => {
+                const passData = await evaluateMemberPasses(student);
+                showPassModal(passData, student);
+            }, 600);
+
+        } catch (error) {
+            alert("Error uploading log: " + error.message);
+        }
     });
 
     window.editLog = async function(docId, studentName, oldHours, oldTopic, oldDetails) {
@@ -584,140 +683,6 @@
             }
         }
     };
-
-    db.collection("jee_logs")
-      .orderBy("timestamp", "desc")
-      .onSnapshot((snapshot) => {
-          feedContainer.innerHTML = '';
-          
-          let practiceAllTime = 0;
-          let lectureAllTime = 0;
-          let practiceToday = 0;
-          let practiceByStudent = { "Pranay": 0, "Abhigyan": 0, "Pranjal": 0, "Aayush": 0 };
-          let practiceDates = new Set();
-          const now = new Date();
-          const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-
-          if (snapshot.empty) {
-              feedContainer.innerHTML = '<p style="color: var(--text-muted);">No logs posted yet. Start studying!</p>';
-              return;
-          }
-          
-          snapshot.forEach((docSnap) => {
-              const log = docSnap.data();
-              const logId = docSnap.id;
-              const hours = parseFloat(log.studyHours || log.hours || 0);
-              const activity = log.activityType || 'Self Study';
-              const actLower = activity.toLowerCase();
-              const isPractice = actLower.includes("practice") || actLower.includes("self study") || actLower.includes("self");
-              const isLecture = actLower.includes("lecture");
-              const logDate = log.timestamp ? log.timestamp.toDate() : new Date();
-
-              if (isPractice && practiceByStudent[log.student] !== undefined) {
-                  practiceByStudent[log.student] += hours;
-              }
-
-              if (log.student === loggedInUser) {
-                  if (isPractice) practiceAllTime += hours;
-                  if (isLecture) lectureAllTime += hours;
-                  if (isPractice && logDate >= oneDayAgo) practiceToday += hours;
-                  if (isPractice && hours >= 2.0) practiceDates.add(logDate.toDateString());
-              }
-
-              let tagClass = 'tag-p';
-              if(log.subject === 'Chemistry') tagClass = 'tag-c';
-              if(log.subject === 'Math') tagClass = 'tag-m';
-
-              const formattedTime = log.timestamp ? new Date(log.timestamp.seconds * 1000).toLocaleString([], { 
-                  month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
-              }) : 'Just now';
-
-              const hoursDisplay = log.studyHours ? ` — <strong>${log.studyHours} hrs</strong>` : '';
-              const detailsDisplay = log.details || log.accomplishment || '';
-
-              const logElement = document.createElement('div');
-              logElement.className = 'log-item';
-              logElement.innerHTML = `
-                  <div style="display: flex; justify-content: space-between; align-items: center;">
-                      <strong style="color: #38bdf8; font-size: 1.1rem;">${log.student}${hoursDisplay}</strong>
-                      <div>
-                          <span class="tag ${tagClass}">${log.subject || 'General'}</span>
-                          <span class="tag tag-activity">${activity}</span>
-                      </div>
-                  </div>
-                  <p style="margin: 0.5rem 0; font-weight: 500;">📖 ${log.topic}</p>
-                  <p style="color: var(--text-muted); font-size: 0.95rem;">✅ ${detailsDisplay}</p>
-                  <div class="log-meta">
-                      <span>🕒 ${formattedTime}</span>
-                      <div class="action-btns">
-                          <button class="btn-edit" onclick="editLog('${logId}', '${log.student}', '${log.studyHours || 0}', '${(log.topic || '').replace(/'/g, "\\'")}', '${detailsDisplay.replace(/'/g, "\\'")}')">
-                              ✏️ Edit
-                          </button>
-                          <button class="btn-delete" onclick="deleteLog('${logId}', '${log.student}')">
-                              🗑️ Delete
-                          </button>
-                      </div>
-                  </div>
-              `;
-              feedContainer.appendChild(logElement);
-          });
-
-          // Live Pass Status Update
-          const statusBox = document.getElementById("userMembershipStatus");
-          if (statusBox) {
-              if (loggedInUser === "Pranay") {
-                  statusBox.innerHTML = `👑 <b>Pranay (Master Admin):</b> Permanent Unrestricted Dashboard Access.`;
-              } else {
-                  let streakCount = practiceDates.size;
-                  let sortedRank = Object.keys(practiceByStudent).sort((a, b) => practiceByStudent[b] - practiceByStudent[a]);
-                  let isGold = sortedRank[0] === loggedInUser && practiceByStudent[loggedInUser] > 0;
-
-                  let passes = [];
-                  if (isGold) passes.push("🥇 Gold VIP (Rank #1)");
-                  if (streakCount >= 7) passes.push("🔥 Streak Master (30 Days)");
-                  if (practiceAllTime >= 15.0 && lectureAllTime >= 20.0) passes.push("🥈 Silver Achiever (7 Days)");
-                  if (practiceToday >= 3.0) passes.push("🥉 Bronze Active (24h)");
-
-                  if (passes.length > 0) {
-                      statusBox.innerHTML = `🎉 <b>${loggedInUser}'s Active Passes:</b> <span style="color:#10b981; font-weight:bold;">${passes.join(" | ")}</span>`;
-                  } else {
-                      statusBox.innerHTML = `🔒 <b>${loggedInUser}:</b> No active pass. Log <b>3.0h practice today</b> (Current: <b>${practiceToday.toFixed(1)}h</b>) to unlock Bronze!`;
-                  }
-              }
-          }
-      }, (error) => {
-          feedContainer.innerHTML = '<p style="color: var(--error);">Failed to connect. Make sure Firebase config is correct!</p>';
-      });
-
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const student = loggedInUser;
-        const subject = document.getElementById('subject').value;
-        const activityType = document.getElementById('activityType').value;
-        const studyHours = parseFloat(document.getElementById('studyHours').value);
-        const topic = document.getElementById('topic').value;
-        const details = document.getElementById('details').value;
-
-        try {
-            await db.collection("jee_logs").add({
-                student: student,
-                subject: subject,
-                activityType: activityType,
-                studyHours: studyHours,
-                topic: topic,
-                details: details,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-
-            document.getElementById('studyHours').value = '';
-            document.getElementById('topic').value = '';
-            document.getElementById('details').value = '';
-            alert("✅ Log published successfully!");
-        } catch (error) {
-            alert("Error uploading to cloud: " + error.message);
-        }
-    });
 </script>
 </body>
 </html>
