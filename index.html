@@ -31,8 +31,45 @@
             background-attachment: fixed;
             min-height: 100vh;
             color: var(--text-main);
-            padding: 2rem;
+            padding: 5rem 2rem 2rem 2rem; /* Added top padding to fit floating banner */
             position: relative;
+        }
+
+        /* Floating Top Black & Yellow Welcome Label */
+        .floating-top-welcome {
+            position: fixed;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000000;
+            color: #fbbf24; /* Vibrant Yellow Text */
+            border: 2px solid #fbbf24; /* Yellow Outline */
+            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.4), 0 0 10px rgba(0, 0, 0, 0.8);
+            padding: 6px 24px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: gentleFloat 3s ease-in-out infinite alternate;
+        }
+
+        .floating-top-welcome .yellow-dot {
+            width: 8px;
+            height: 8px;
+            background: #fbbf24;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px #fbbf24;
+        }
+
+        @keyframes gentleFloat {
+            0% { transform: translate(-50%, 0px); }
+            100% { transform: translate(-50%, 6px); }
         }
 
         /* Watermark Welcome Background Text */
@@ -264,6 +301,13 @@
 </head>
 <body>
 
+<!-- Floating Black and Yellow Top Welcome Label -->
+<div class="floating-top-welcome">
+    <span class="yellow-dot"></span>
+    WELCOME
+    <span class="yellow-dot"></span>
+</div>
+
 <!-- Background Watermark -->
 <div class="bg-welcome-watermark">WELCOME</div>
 
@@ -489,7 +533,7 @@
         let practiceAllTime = 0;
         let lectureAllTime = 0;
         let practiceToday = 0;
-  let practiceAllTimeByStudent = { "Pranay": 0, "Abhigyan": 0, "Pranjal": 0, "Aayush": 0 };
+        let practiceAllTimeByStudent = { "Pranay": 0, "Abhigyan": 0, "Pranjal": 0, "Aayush": 0 };
         let practiceDates = new Set();
 
         logsSnap.forEach(doc => {
