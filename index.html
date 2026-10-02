@@ -11,147 +11,74 @@
     
     <style>
         :root {
-            --bg-dark: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.92); 
-            --accent-primary: #38bdf8;
-            --accent-saffron: #f97316;
-            --accent-green: #10b981;
-            --accent-edit: #eab308;
-            --accent-delete: #ef4444;
-            --text-main: #f8fafc;
-            --text-muted: #cbd5e1;
-            --error: #ef4444;
+            --bg-bright: #f0f4f8;
+            --card-bg: #ffffff;
+            --accent-primary: #2563eb;
+            --accent-saffron: #ea580c;
+            --accent-green: #16a34a;
+            --accent-edit: #d97706;
+            --accent-delete: #dc2626;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-subtle: #e2e8f0;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body { 
             font-family: system-ui, -apple-system, sans-serif; 
-            background: linear-gradient(180deg, #7c2d12 0%, #0f172a 50%, #064e3b 100%); 
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #e0f2fe 100%);
             background-attachment: fixed;
             min-height: 100vh;
             color: var(--text-main);
-            padding: 5rem 2rem 2rem 2rem; /* Added top padding to fit floating banner */
+            padding: 3.5rem 1.5rem 2rem 1.5rem;
             position: relative;
         }
 
-        /* Floating Top Black & Yellow Welcome Label */
-        .floating-top-welcome {
+        /* Fixed Top Marquee: Moving Left to Right */
+        .top-marquee-bar {
             position: fixed;
-            top: 14px;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 38px;
             background: #000000;
-            color: #fbbf24; /* Vibrant Yellow Text */
-            border: 2px solid #fbbf24; /* Yellow Outline */
-            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.4), 0 0 10px rgba(0, 0, 0, 0.8);
-            padding: 6px 24px;
-            border-radius: 30px;
-            font-size: 0.95rem;
-            font-weight: 900;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            z-index: 10000;
+            color: #fbbf24;
             display: flex;
             align-items: center;
-            gap: 8px;
-            animation: gentleFloat 3s ease-in-out infinite alternate;
-        }
-
-        .floating-top-welcome .yellow-dot {
-            width: 8px;
-            height: 8px;
-            background: #fbbf24;
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 8px #fbbf24;
-        }
-
-        @keyframes gentleFloat {
-            0% { transform: translate(-50%, 0px); }
-            100% { transform: translate(-50%, 6px); }
-        }
-
-        /* Watermark Welcome Background Text */
-        .bg-welcome-watermark {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: clamp(4rem, 15vw, 12rem);
-            font-weight: 900;
-            letter-spacing: 12px;
-            color: rgba(255, 255, 255, 0.03);
-            pointer-events: none;
-            z-index: 0;
-            user-select: none;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
-
-        /* 1-Month Milestone Celebration Card */
-        .celebration-card {
-            position: relative;
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(234, 88, 12, 0.1) 50%, rgba(16, 185, 129, 0.15) 100%);
-            border: 1px solid rgba(251, 191, 36, 0.4);
-            border-radius: 14px;
-            padding: 1.25rem;
-            text-align: center;
-            margin-bottom: 2rem;
             overflow: hidden;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 0 25px rgba(245, 158, 11, 0.15);
-            z-index: 2;
+            z-index: 10000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            border-bottom: 2px solid #fbbf24;
         }
 
-        .celebration-title {
-            font-size: 1.35rem;
-            font-weight: 800;
-            background: linear-gradient(90deg, #fbbf24, #f87171, #34d399);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 6px;
+        .marquee-track {
+            display: flex;
+            width: 200%;
+            animation: moveLeftToRight 16s linear infinite;
         }
 
-        .celebration-badge {
-            display: inline-block;
-            background: #fbbf24;
-            color: #0f172a;
-            font-size: 0.75rem;
+        .marquee-content {
+            display: flex;
+            gap: 2.5rem;
+            white-space: nowrap;
+            font-size: 0.85rem;
             font-weight: 800;
-            padding: 3px 10px;
-            border-radius: 20px;
-            letter-spacing: 0.5px;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            margin-bottom: 8px;
         }
 
-        .celebration-desc {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-
-        /* Confetti Sparkle Animation */
-        @keyframes floatUp {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
-        }
-
-        .sparkle {
-            position: fixed;
-            bottom: -10px;
-            font-size: 1.2rem;
-            pointer-events: none;
-            z-index: 1;
-            animation: floatUp 6s linear infinite;
+        @keyframes moveLeftToRight {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0%); }
         }
 
         .container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
-        header { text-align: center; margin-bottom: 1.5rem; }
+        
+        header { text-align: center; margin: 1rem 0 1.25rem 0; }
         h1 { 
-            font-size: 2.5rem; 
-            background: linear-gradient(90deg, #fb923c, #f8fafc, #4ade80);
+            font-size: 2.4rem; 
+            background: linear-gradient(90deg, #ea580c, #2563eb, #16a34a);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 800;
@@ -164,155 +91,232 @@
         }
 
         .admin-nav-btn {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            color: #f87171;
+            background: #ffffff;
+            border: 1px solid #ef4444;
+            color: #dc2626;
             padding: 6px 14px;
             border-radius: 8px;
-            font-size: 0.8rem;
+            font-size: 0.82rem;
             font-weight: 700;
             cursor: pointer;
+            box-shadow: 0 2px 6px rgba(220, 38, 38, 0.1);
             transition: all 0.2s;
         }
         .admin-nav-btn:hover {
-            background: #ef4444;
+            background: #dc2626;
             color: #ffffff;
         }
 
         .user-status-bar {
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
             font-size: 0.95rem;
             color: var(--text-muted);
         }
 
+        /* Presence Cards with Student Photos */
         .presence-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 14px;
+            margin-bottom: 1.75rem;
         }
 
         .presence-card {
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
             padding: 10px 14px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+        }
+
+        .student-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #2563eb;
+            background: #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .presence-info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
         }
 
         .presence-name {
             font-weight: 700;
             font-size: 0.95rem;
-            color: #38bdf8;
+            color: var(--text-main);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .pulse-dot {
             width: 8px;
             height: 8px;
-            background-color: #10b981;
+            background-color: #16a34a;
             border-radius: 50%;
             display: inline-block;
-            box-shadow: 0 0 8px #10b981;
+            box-shadow: 0 0 6px #16a34a;
         }
 
         .presence-time {
             font-size: 0.75rem;
-            color: #94a3b8;
+            color: var(--text-muted);
+            margin-top: 2px;
         }
-        
-        .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; }
+
+        /* YouTube Resource Section */
+        .resources-card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 1.25rem;
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
+            margin-bottom: 1.75rem;
+        }
+
+        .yt-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .yt-link-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 10px 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.88rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .yt-link-btn:hover {
+            border-color: #ef4444;
+            background: #fff5f5;
+            transform: translateY(-1px);
+        }
+
+        .yt-icon {
+            font-size: 1.2rem;
+            color: #ef4444;
+        }
+
+        .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 1.75rem; }
         @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
 
         .card { 
             background: var(--card-bg); 
             border-radius: 14px; 
             padding: 1.5rem; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4); 
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05); 
             height: fit-content;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.08);
+            border: 1px solid var(--border-subtle);
         }
 
-        h2 { font-size: 1.25rem; margin-bottom: 1rem; color: var(--text-main); }
+        h2 { font-size: 1.2rem; margin-bottom: 1rem; color: var(--text-main); font-weight: 700; }
         
-        .form-group { margin-bottom: 1.25rem; }
-        label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); }
+        .form-group { margin-bottom: 1.15rem; }
+        label { display: block; margin-bottom: 0.4rem; font-size: 0.88rem; color: var(--text-muted); font-weight: 600; }
         select, input {
             width: 100%; padding: 0.75rem; border-radius: 8px;
-            border: 1px solid #334155; background: #0f172a; color: white;
-            font-size: 1rem;
+            border: 1px solid #cbd5e1; background: #f8fafc; color: var(--text-main);
+            font-size: 0.95rem;
         }
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            background: #ffffff;
+        }
+
         button.btn-submit {
             width: 100%; padding: 0.85rem; border-radius: 8px; border: none;
             background: linear-gradient(90deg, #ea580c, #16a34a); color: white; font-size: 1rem;
             font-weight: 700; cursor: pointer; transition: opacity 0.2s;
+            box-shadow: 0 4px 10px rgba(22, 163, 74, 0.2);
         }
-        button.btn-submit:hover { opacity: 0.9; }
+        button.btn-submit:hover { opacity: 0.92; }
 
         .feed-box { max-height: 600px; overflow-y: auto; padding-right: 0.5rem; }
         .log-item {
-            background: #0f172a; padding: 1rem; border-radius: 8px;
+            background: #f8fafc; padding: 1.1rem; border-radius: 10px;
             margin-bottom: 1rem; border-left: 4px solid var(--accent-saffron);
-            border-right: 1px solid rgba(255,255,255,0.05);
+            border-top: 1px solid var(--border-subtle);
+            border-right: 1px solid var(--border-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
         }
-        .log-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-muted); margin-top: 0.75rem;}
+        .log-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; color: var(--text-muted); margin-top: 0.75rem;}
         .action-btns { display: flex; gap: 6px; }
         
         .tag { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
-        .tag-p { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
-        .tag-c { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-        .tag-m { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+        .tag-p { background: #ffedd5; color: #ea580c; border: 1px solid #fdba74; }
+        .tag-c { background: #dcfce7; color: #16a34a; border: 1px solid #86efac; }
+        .tag-m { background: #e0f2fe; color: #0284c7; border: 1px solid #7dd3fc; }
 
         .tag-activity {
-            background: rgba(168, 85, 247, 0.18);
-            color: #c084fc;
-            border: 1px solid rgba(168, 85, 247, 0.35);
+            background: #f3e8ff;
+            color: #7e22ce;
+            border: 1px solid #d8b4fe;
             margin-left: 6px;
         }
 
         .btn-edit {
-            background-color: var(--accent-edit);
-            color: #000;
-            border: none;
+            background-color: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fde68a;
             padding: 4px 10px;
             border-radius: 4px;
             font-size: 0.8rem;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
         }
         
         .btn-delete {
-            background-color: var(--accent-delete);
-            color: #fff;
-            border: none;
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
             padding: 4px 10px;
             border-radius: 4px;
             font-size: 0.8rem;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-<!-- Floating Black and Yellow Top Welcome Label -->
-<div class="floating-top-welcome">
-    <span class="yellow-dot"></span>
-    WELCOME
-    <span class="yellow-dot"></span>
+<!-- Fixed Top Marquee: Moving Left to Right -->
+<div class="top-marquee-bar">
+    <div class="marquee-track">
+        <div class="marquee-content">
+            <span>✨ WELCOME TO JEE TARGET TRACKER</span>
+            <span>⚡ CLASS 11 DAILY MISSION</span>
+            <span>🎯 CONSISTENCY BEATS TALENT</span>
+            <span>🔥 TARGET JEE 2028</span>
+        </div>
+        <div class="marquee-content">
+            <span>✨ WELCOME TO JEE TARGET TRACKER</span>
+            <span>⚡ CLASS 11 DAILY MISSION</span>
+            <span>🎯 CONSISTENCY BEATS TALENT</span>
+            <span>🔥 TARGET JEE 2028</span>
+        </div>
+    </div>
 </div>
-
-<!-- Background Watermark -->
-<div class="bg-welcome-watermark">WELCOME</div>
-
-<!-- Floating Celebration Particles -->
-<div id="confettiContainer"></div>
 
 <div class="container">
     <div class="header-top-bar">
@@ -321,75 +325,106 @@
 
     <header>
         <h1>🎯 JEE Target Tracker</h1>
-        <p style="color: var(--text-muted); margin-top: 0.5rem;">Class 11 Daily Log Dashboard</p>
+        <p style="color: var(--text-muted); margin-top: 0.35rem; font-weight: 500;">Class 11 Daily Log & Question Practice Dashboard</p>
     </header>
 
-    <!-- 1 Month Milestone Celebration Banner -->
-    <div class="celebration-card">
-        <div class="celebration-badge">🎉 Milestone Achieved</div>
-        <div class="celebration-title">🚀 1 Month of JEE Target Tracker!</div>
-        <p class="celebration-desc">
-            Celebrating consistent tracking, daily targets, and relentless question practice.<br>
-            Keep pushing forward toward JEE 2028! 🎯
-        </p>
-    </div>
-
     <div class="user-status-bar">
-        Welcome back, <strong id="currentIdentifiedUser" style="color: #38bdf8;">Authenticating...</strong>
+        Logged in as: <strong id="currentIdentifiedUser" style="color: #2563eb;">Authenticating...</strong>
     </div>
 
-    <!-- Active Presence -->
+    <!-- Active Presence Cards With Student Photos -->
     <div class="presence-container">
+        <!-- Pranay -->
         <div class="presence-card">
-            <span class="presence-name"><span class="pulse-dot"></span> Pranay</span>
-            <span class="presence-time" id="status-Pranay">Checking...</span>
+            <img class="student-avatar" id="avatar-Pranay" src="pranay.jpeg" alt="Pranay">
+            <div class="presence-info">
+                <span class="presence-name"><span class="pulse-dot"></span> Pranay</span>
+                <span class="presence-time" id="status-Pranay">Checking...</span>
+            </div>
         </div>
+        <!-- Abhigyan -->
         <div class="presence-card">
-            <span class="presence-name"><span class="pulse-dot"></span> Abhigyan</span>
-            <span class="presence-time" id="status-Abhigyan">Checking...</span>
+            <img class="student-avatar" id="avatar-Abhigyan" src="abhigyan.jpeg" alt="Abhigyan">
+            <div class="presence-info">
+                <span class="presence-name"><span class="pulse-dot"></span> Abhigyan</span>
+                <span class="presence-time" id="status-Abhigyan">Checking...</span>
+            </div>
         </div>
+        <!-- Pranjal -->
         <div class="presence-card">
-            <span class="presence-name"><span class="pulse-dot"></span> Pranjal</span>
-            <span class="presence-time" id="status-Pranjal">Checking...</span>
+            <img class="student-avatar" id="avatar-Pranjal" src="pranjal.jpeg" alt="Pranjal">
+            <div class="presence-info">
+                <span class="presence-name"><span class="pulse-dot"></span> Pranjal</span>
+                <span class="presence-time" id="status-Pranjal">Checking...</span>
+            </div>
         </div>
+        <!-- Aayush -->
         <div class="presence-card">
-            <span class="presence-name"><span class="pulse-dot"></span> Aayush</span>
-            <span class="presence-time" id="status-Aayush">Checking...</span>
+            <img class="student-avatar" id="avatar-Aayush" src="aayush.jpeg" alt="Aayush">
+            <div class="presence-info">
+                <span class="presence-name"><span class="pulse-dot"></span> Aayush</span>
+                <span class="presence-time" id="status-Aayush">Checking...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- YouTube & Learning Hub Section -->
+    <div class="resources-card">
+        <h2 style="margin-bottom: 0.5rem; display: flex; align-items: center; gap: 8px;">
+            <span style="color: #ef4444;">📺</span> Recommended Channels
+        </h2>
+        <div class="yt-grid">
+            <a href="https://www.youtube.com/@PhysicsWallah" target="_blank" class="yt-link-btn">
+                <span class="yt-icon">▶</span>
+                <span>Physics Wallah</span>
+            </a>
+            <a href="https://www.youtube.com/@KnowYourHolyBook" target="_blank" class="yt-link-btn">
+                <span class="yt-icon">▶</span>
+                <span>Know Your Holy Book</span>
+            </a>
+            <a href="https://www.youtube.com/@VedantuJEE" target="_blank" class="yt-link-btn">
+                <span class="yt-icon">▶</span>
+                <span>Vedantu JEE</span>
+            </a>
+            <a href="https://www.youtube.com/@UnacademyJEE" target="_blank" class="yt-link-btn">
+                <span class="yt-icon">▶</span>
+                <span>Unacademy JEE</span>
+            </a>
         </div>
     </div>
 
     <!-- Membership Rules Showcase -->
-    <div class="card" style="margin-bottom: 2rem;">
+    <div class="card" style="margin-bottom: 1.75rem;">
         <h2>🏆 Study Membership Passes & Leaderboard Privileges</h2>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 10px;">
             
-            <div style="background: #0f172a; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 12px;">
-                <div style="font-weight: bold; color: #f59e0b; font-size: 0.95rem;">🥉 Bronze Pass</div>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0;">≥3.0h Practice Today (Since 12 AM)</p>
-                <div style="font-size: 0.75rem; color: #34d399; font-weight: 600;">⚡ Validity: 2 Hours</div>
+            <div style="background: #f8fafc; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 12px; border: 1px solid var(--border-subtle); border-left-width: 4px;">
+                <div style="font-weight: bold; color: #d97706; font-size: 0.95rem;">🥉 Bronze Pass</div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0;">≥3.0h Practice Today (Resets 12 AM)</p>
+                <div style="font-size: 0.75rem; color: #16a34a; font-weight: 700;">⚡ Validity: 2 Hours</div>
             </div>
 
-            <div style="background: #0f172a; border-left: 4px solid #94a3b8; border-radius: 8px; padding: 12px;">
-                <div style="font-weight: bold; color: #cbd5e1; font-size: 0.95rem;">🥈 Silver Pass</div>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0;">15h Practice & 20h Lectures</p>
-                <div style="font-size: 0.75rem; color: #34d399; font-weight: 600;">⚡ Validity: 72 Hours (3 Days)</div>
+            <div style="background: #f8fafc; border-left: 4px solid #64748b; border-radius: 8px; padding: 12px; border: 1px solid var(--border-subtle); border-left-width: 4px;">
+                <div style="font-weight: bold; color: #475569; font-size: 0.95rem;">🥈 Silver Pass</div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0;">15h Practice & 20h Lectures This Week</p>
+                <div style="font-size: 0.75rem; color: #16a34a; font-weight: 700;">⚡ Validity: 72 Hours (Resets Mon)</div>
             </div>
 
-            <div style="background: #0f172a; border-left: 4px solid #10b981; border-radius: 8px; padding: 12px;">
-                <div style="font-weight: bold; color: #34d399; font-size: 0.95rem;">🔥 Streak Pass</div>
+            <div style="background: #f8fafc; border-left: 4px solid #16a34a; border-radius: 8px; padding: 12px; border: 1px solid var(--border-subtle); border-left-width: 4px;">
+                <div style="font-weight: bold; color: #16a34a; font-size: 0.95rem;">🔥 Streak Pass</div>
                 <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0;">7 Days Unbroken (≥2h/day)</p>
-                <div style="font-size: 0.75rem; color: #34d399; font-weight: 600;">⚡ Validity: 48 Hours</div>
+                <div style="font-size: 0.75rem; color: #16a34a; font-weight: 700;">⚡ Validity: 48 Hours</div>
             </div>
 
-            <div style="background: #0f172a; border-left: 4px solid #fbbf24; border-radius: 8px; padding: 12px;">
-                <div style="font-weight: bold; color: #fbbf24; font-size: 0.95rem;">🥇 Gold VIP Pass</div>
+            <div style="background: #f8fafc; border-left: 4px solid #eab308; border-radius: 8px; padding: 12px; border: 1px solid var(--border-subtle); border-left-width: 4px;">
+                <div style="font-weight: bold; color: #ca8a04; font-size: 0.95rem;">🥇 Gold VIP Pass</div>
                 <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0;">#1 All-Time Rank (≥5.0h Practice)</p>
-                <div style="font-size: 0.75rem; color: #34d399; font-weight: 600;">⚡ Validity: 24 Hours Daily Check</div>
+                <div style="font-size: 0.75rem; color: #16a34a; font-weight: 700;">⚡ Validity: 24 Hours Daily Check</div>
             </div>
 
         </div>
 
-        <div id="userMembershipStatus" style="margin-top: 14px; padding: 10px; background: rgba(56, 189, 248, 0.08); border-radius: 8px; font-size: 0.85rem; color: #cbd5e1;">
+        <div id="userMembershipStatus" style="margin-top: 14px; padding: 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; font-size: 0.85rem; color: #1e3a8a;">
             Checking active unlocked passes...
         </div>
     </div>
@@ -401,7 +436,7 @@
             <form id="trackerForm">
                 <div class="form-group">
                     <label for="student">Logged in User</label>
-                    <input type="text" id="student" readonly style="background: #1e293b; color: #38bdf8; font-weight: bold; cursor: not-allowed;">
+                    <input type="text" id="student" readonly style="background: #f1f5f9; color: #2563eb; font-weight: bold; cursor: not-allowed;">
                 </div>
                 <div class="form-group">
                     <label for="subject">Subject</label>
@@ -446,19 +481,39 @@
 </div>
 
 <!-- Modal Popup -->
-<div id="tierModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.95); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(8px);">
-  <div style="background:#1e293b; border:1px solid #334155; border-radius:16px; padding:24px; max-width:420px; width:90%; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
-    <h2 id="tierModalTitle" style="color:#38bdf8; font-size:1.25rem; margin-bottom:10px;">Membership Access Check</h2>
+<div id="tierModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.6); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(6px);">
+  <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:16px; padding:24px; max-width:420px; width:90%; text-align:center; box-shadow:0 12px 30px rgba(0,0,0,0.15);">
+    <h2 id="tierModalTitle" style="color:#0f172a; font-size:1.25rem; margin-bottom:10px;">Membership Access Check</h2>
     <div id="tierModalBadge" style="margin-bottom:12px;"></div>
-    <p id="tierModalMsg" style="color:#cbd5e1; font-size:0.9rem; margin-bottom:18px; line-height:1.5; text-align:left; background:#0f172a; padding:12px; border-radius:8px;"></p>
+    <p id="tierModalMsg" style="color:#334155; font-size:0.9rem; margin-bottom:18px; line-height:1.5; text-align:left; background:#f8fafc; border: 1px solid #e2e8f0; padding:12px; border-radius:8px;"></p>
     <div style="display:flex; gap:10px; justify-content:center;">
-      <button id="tierEnterBtn" style="display:none; padding:9px 18px; background:#10b981; color:#0f172a; font-weight:700; border:none; border-radius:6px; cursor:pointer;" onclick="openAdminDashboard()">Enter Dashboard</button>
-      <button style="padding:9px 18px; background:#334155; color:#fff; font-weight:600; border:none; border-radius:6px; cursor:pointer;" onclick="closeTierModal()">Close</button>
+      <button id="tierEnterBtn" style="display:none; padding:9px 18px; background:#16a34a; color:#ffffff; font-weight:700; border:none; border-radius:6px; cursor:pointer;" onclick="openAdminDashboard()">Enter Dashboard</button>
+      <button style="padding:9px 18px; background:#64748b; color:#fff; font-weight:600; border:none; border-radius:6px; cursor:pointer;" onclick="closeTierModal()">Close</button>
     </div>
   </div>
 </div>
 
 <script>
+    // Relative local image filenames placed next to index.html:
+    const studentAvatars = {
+        "Pranay": "./pranay.jpeg",
+        "Abhigyan": "./abhigyan.jpeg",
+        "Pranjal": "./pranjal.jpeg",
+        "Aayush": "./aayush.jpeg"
+    };
+
+    // Load local pictures into presence cards, falling back to avatars if not found
+    Object.keys(studentAvatars).forEach(name => {
+        const el = document.getElementById(`avatar-${name}`);
+        if (el) {
+            el.src = studentAvatars[name];
+            el.onerror = () => {
+                // Graceful fallback to avatar if the image is missing
+                el.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${name}`;
+            };
+        }
+    });
+
     const pinToUser = {
         "4440": "Pranay",
         "5670": "Abhigyan",
@@ -494,7 +549,7 @@
             sessionStorage.setItem("jee_authenticated_user", loggedInUser);
         } else {
             alert("❌ Incorrect PIN! Access Denied.");
-            document.body.innerHTML = "<div style='color:white; text-align:center; margin-top:20vh; font-family:sans-serif;'><h1>🔒 Access Denied</h1><p>Invalid PIN. Refresh the page to try again.</p></div>";
+            document.body.innerHTML = "<div style='color:#0f172a; text-align:center; margin-top:20vh; font-family:sans-serif;'><h1>🔒 Access Denied</h1><p>Invalid PIN. Refresh the page to try again.</p></div>";
             throw new Error("Unauthorized access stopped.");
         }
     }
@@ -506,33 +561,27 @@
         lastActive: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
-    // Floating celebration sparkles generator
-    function launchCelebrationSparkles() {
-        const container = document.getElementById("confettiContainer");
-        const icons = ["✨", "🎉", "🔥", "⭐", "🎯"];
-        
-        for (let i = 0; i < 18; i++) {
-            const span = document.createElement("span");
-            span.className = "sparkle";
-            span.innerText = icons[Math.floor(Math.random() * icons.length)];
-            span.style.left = Math.random() * 100 + "vw";
-            span.style.animationDuration = (4 + Math.random() * 4) + "s";
-            span.style.animationDelay = (Math.random() * 5) + "s";
-            span.style.fontSize = (0.8 + Math.random() * 0.8) + "rem";
-            container.appendChild(span);
-        }
-    }
-    launchCelebrationSparkles();
-
+    // Pass Evaluation Engine with Daily & Weekly Resets
     async function evaluateMemberPasses(user) {
+        const now = new Date();
+
+        // 1. Daily Reset (Midnight 12:00 AM) for Bronze Pass
         const startOfToday = new Date();
-        startOfToday.setHours(0, 0, 0, 0); // Strict Midnight Reset for Today's Practice (Bronze)
+        startOfToday.setHours(0, 0, 0, 0);
+
+        // 2. Weekly Reset (Monday 12:00 AM) for Silver Pass
+        const startOfWeek = new Date();
+        const dayOfWeek = now.getDay();
+        const distanceToMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
+        startOfWeek.setDate(now.getDate() - distanceToMonday);
+        startOfWeek.setHours(0, 0, 0, 0);
 
         const logsSnap = await db.collection("jee_logs").get();
 
         let practiceAllTime = 0;
-        let lectureAllTime = 0;
         let practiceToday = 0;
+        let practiceThisWeek = 0;
+        let lectureThisWeek = 0;
         let practiceAllTimeByStudent = { "Pranay": 0, "Abhigyan": 0, "Pranjal": 0, "Aayush": 0 };
         let practiceDates = new Set();
 
@@ -544,18 +593,20 @@
             const isLecture = act.includes("lecture");
             const logDate = d.timestamp ? d.timestamp.toDate() : new Date();
 
-            // All-Time Practice Accumulator for Gold VIP
             if (isPractice && practiceAllTimeByStudent[d.student] !== undefined) {
                 practiceAllTimeByStudent[d.student] += hours;
             }
 
             if (d.student === user) {
                 if (isPractice) practiceAllTime += hours;
-                if (isLecture) lectureAllTime += hours;
 
-                // Today's Practice (Strictly since 12 AM for Bronze)
                 if (isPractice && logDate >= startOfToday) {
                     practiceToday += hours;
+                }
+
+                if (logDate >= startOfWeek) {
+                    if (isPractice) practiceThisWeek += hours;
+                    if (isLecture) lectureThisWeek += hours;
                 }
 
                 if (isPractice && hours >= 2.0) {
@@ -565,8 +616,6 @@
         });
 
         let streakCount = practiceDates.size;
-
-        // Gold VIP is evaluated on ALL-TIME practice hours
         let sortedRank = Object.keys(practiceAllTimeByStudent).sort((a, b) => practiceAllTimeByStudent[b] - practiceAllTimeByStudent[a]);
         let isGold = sortedRank[0] === user && practiceAllTimeByStudent[user] >= 5.0;
 
@@ -578,9 +627,9 @@
             qualifiedTier = "🥇 Gold VIP Pass";
             badgeText = "👑 Study King VIP (All-Time Leader)";
             accessDuration = "24 Hours (Daily Leaderboard)";
-        } else if (practiceAllTime >= 15.0 && lectureAllTime >= 20.0) {
+        } else if (practiceThisWeek >= 15.0 && lectureThisWeek >= 20.0) {
             qualifiedTier = "🥈 Silver Pass";
-            badgeText = "🎖️ Continuity Achiever";
+            badgeText = "🎖️ Weekly Continuity Achiever";
             accessDuration = "72 Hours (3 Days)";
         } else if (streakCount >= 7) {
             qualifiedTier = "🔥 Streak Pass";
@@ -597,8 +646,9 @@
             badgeText,
             accessDuration,
             practiceToday,
+            practiceThisWeek,
+            lectureThisWeek,
             practiceAllTime,
-            lectureAllTime,
             streakCount
         };
     }
@@ -612,11 +662,12 @@
 
         if (passData.qualifiedTier) {
             title.innerText = `🎉 Pass Unlocked!`;
-            badge.innerHTML = `<span style="padding:5px 12px; background:#10b981; color:#0f172a; border-radius:20px; font-size:0.85rem; font-weight:700;">${passData.qualifiedTier} — ${passData.badgeText}</span>`;
+            badge.innerHTML = `<span style="padding:5px 12px; background:#dcfce7; color:#16a34a; border:1px solid #86efac; border-radius:20px; font-size:0.85rem; font-weight:700;">${passData.qualifiedTier} — ${passData.badgeText}</span>`;
             msg.innerHTML = `Great work <b>${user}</b>!<br><br>
             • Today's Practice (Since 12 AM): <b>${passData.practiceToday.toFixed(1)} hrs</b><br>
-            • Total Practice: <b>${passData.practiceAllTime.toFixed(1)} hrs</b><br>
-            • Total Lectures: <b>${passData.lectureAllTime.toFixed(1)} hrs</b><br><br>
+            • This Week's Practice: <b>${passData.practiceThisWeek.toFixed(1)} / 15.0 hrs</b><br>
+            • This Week's Lectures: <b>${passData.lectureThisWeek.toFixed(1)} / 20.0 hrs</b><br>
+            • All-Time Total Practice: <b>${passData.practiceAllTime.toFixed(1)} hrs</b><br><br>
             ✅ <b>Perk:</b> ${passData.accessDuration} Leaderboard Access.`;
             enterBtn.style.display = "inline-block";
 
@@ -628,8 +679,8 @@
             title.innerText = "🔒 Dashboard Locked";
             badge.innerHTML = "";
             msg.innerHTML = `You have not met any membership pass requirements yet:<br><br>
-            🥉 <b>Bronze (2h):</b> ≥3.0h practice today (You have: <b>${passData.practiceToday.toFixed(1)}h</b>)<br>
-            🥈 <b>Silver (72h):</b> 15h practice & 20h lectures (You: <b>${passData.practiceAllTime.toFixed(1)}h / ${passData.lectureAllTime.toFixed(1)}h</b>)<br>
+            🥉 <b>Bronze (2h):</b> ≥3.0h practice today (You: <b>${passData.practiceToday.toFixed(1)}h</b>)<br>
+            🥈 <b>Silver (72h):</b> 15h practice & 20h lectures THIS week (You: <b>${passData.practiceThisWeek.toFixed(1)}h / ${passData.lectureThisWeek.toFixed(1)}h</b>)<br>
             🔥 <b>Streak (48h):</b> 7 unbroken days (≥2h/day)<br>
             🥇 <b>Gold VIP (24h):</b> #1 All-Time Rank & ≥5.0h Total Practice`;
             enterBtn.style.display = "none";
@@ -638,7 +689,6 @@
         modal.style.display = "flex";
     }
 
-    // Top Navigation Admin Button
     window.goToAdmin = async function() {
         if (loggedInUser === "Pranay") {
             let choice = prompt("Enter Master Admin Password (or type 'VIEW' to see your earned Study Pass):");
@@ -711,14 +761,14 @@
               logElement.className = 'log-item';
               logElement.innerHTML = `
                   <div style="display: flex; justify-content: space-between; align-items: center;">
-                      <strong style="color: #38bdf8; font-size: 1.1rem;">${log.student}${hoursDisplay}</strong>
+                      <strong style="color: #2563eb; font-size: 1.05rem;">${log.student}${hoursDisplay}</strong>
                       <div>
                           <span class="tag ${tagClass}">${log.subject || 'General'}</span>
                           <span class="tag tag-activity">${activity}</span>
                       </div>
                   </div>
-                  <p style="margin: 0.5rem 0; font-weight: 500;">📖 ${log.topic}</p>
-                  <p style="color: var(--text-muted); font-size: 0.95rem;">✅ ${detailsDisplay}</p>
+                  <p style="margin: 0.5rem 0; font-weight: 600; color: #0f172a;">📖 ${log.topic}</p>
+                  <p style="color: var(--text-muted); font-size: 0.92rem;">✅ ${detailsDisplay}</p>
                   <div class="log-meta">
                       <span>🕒 ${formattedTime}</span>
                       <div class="action-btns">
@@ -739,14 +789,13 @@
           const statusBox = document.getElementById("userMembershipStatus");
           if (statusBox) {
               if (passData.qualifiedTier) {
-                  statusBox.innerHTML = `🎉 <b>${loggedInUser}'s Active Pass:</b> <span style="color:#10b981; font-weight:bold;">${passData.qualifiedTier} — ${passData.badgeText} (${passData.accessDuration})</span>`;
+                  statusBox.innerHTML = `🎉 <b>${loggedInUser}'s Active Pass:</b> <span style="color:#16a34a; font-weight:bold;">${passData.qualifiedTier} — ${passData.badgeText} (${passData.accessDuration})</span>`;
               } else {
                   statusBox.innerHTML = `🔒 <b>${loggedInUser}:</b> No active pass. Log <b>3.0h practice today</b> (Current: <b>${passData.practiceToday.toFixed(1)}h</b>) to unlock Bronze!`;
               }
           }
       });
 
-    // Form Submission: Publishes log and triggers immediate popup evaluation
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -772,7 +821,6 @@
             document.getElementById('topic').value = '';
             document.getElementById('details').value = '';
 
-            // Instant Evaluation and Popup Trigger
             setTimeout(async () => {
                 const passData = await evaluateMemberPasses(student);
                 showPassModal(passData, student);
