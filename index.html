@@ -185,8 +185,8 @@
 
         .yt-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
             margin-top: 10px;
         }
 
@@ -196,11 +196,11 @@
             gap: 10px;
             background: #f8fafc;
             border: 1px solid #cbd5e1;
-            padding: 10px 12px;
+            padding: 12px 14px;
             border-radius: 10px;
             text-decoration: none;
             color: var(--text-main);
-            font-size: 0.88rem;
+            font-size: 0.92rem;
             font-weight: 600;
             transition: all 0.2s;
         }
@@ -212,7 +212,7 @@
         }
 
         .yt-icon {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: #ef4444;
         }
 
@@ -251,16 +251,55 @@
         }
         button.btn-submit:hover { opacity: 0.92; }
 
-        .feed-box { max-height: 600px; overflow-y: auto; padding-right: 0.5rem; }
-        .log-item {
-            background: #f8fafc; padding: 1.1rem; border-radius: 10px;
-            margin-bottom: 1rem; border-left: 4px solid var(--accent-saffron);
-            border-top: 1px solid var(--border-subtle);
-            border-right: 1px solid var(--border-subtle);
-            border-bottom: 1px solid var(--border-subtle);
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+        /* --- Custom Dark Feed Container for Pranjal --- */
+        .card.feed-card-dark {
+            background: #090d16;
+            border: 1px solid #1e293b;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
         }
-        .log-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; color: var(--text-muted); margin-top: 0.75rem;}
+
+        .card.feed-card-dark h2 {
+            color: #f8fafc;
+        }
+
+        .feed-box { 
+            max-height: 600px; 
+            overflow-y: auto; 
+            padding-right: 0.5rem; 
+        }
+
+        .log-item {
+            background: #111827; 
+            padding: 1.1rem; 
+            border-radius: 10px;
+            margin-bottom: 1rem; 
+            border-left: 4px solid var(--accent-saffron);
+            border-top: 1px solid #1f2937;
+            border-right: 1px solid #1f2937;
+            border-bottom: 1px solid #1f2937;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+        }
+
+        .log-item p.topic-title {
+            margin: 0.5rem 0; 
+            font-weight: 600; 
+            color: #f8fafc;
+        }
+
+        .log-item p.details-text {
+            color: #94a3b8; 
+            font-size: 0.92rem;
+        }
+
+        .log-meta { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-size: 0.82rem; 
+            color: #64748b; 
+            margin-top: 0.75rem;
+        }
+        
         .action-btns { display: flex; gap: 6px; }
         
         .tag { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
@@ -336,7 +375,7 @@
     <div class="presence-container">
         <!-- Pranay -->
         <div class="presence-card">
-            <img class="student-avatar" id="avatar-Pranay" src="pranay.jpeg" alt="Pranay">
+            <img class="student-avatar" id="avatar-Pranay" src="./pranay.jpeg" alt="Pranay">
             <div class="presence-info">
                 <span class="presence-name"><span class="pulse-dot"></span> Pranay</span>
                 <span class="presence-time" id="status-Pranay">Checking...</span>
@@ -344,7 +383,7 @@
         </div>
         <!-- Abhigyan -->
         <div class="presence-card">
-            <img class="student-avatar" id="avatar-Abhigyan" src="abhigyan.jpeg" alt="Abhigyan">
+            <img class="student-avatar" id="avatar-Abhigyan" src="./abhigyan.jpeg" alt="Abhigyan">
             <div class="presence-info">
                 <span class="presence-name"><span class="pulse-dot"></span> Abhigyan</span>
                 <span class="presence-time" id="status-Abhigyan">Checking...</span>
@@ -352,7 +391,7 @@
         </div>
         <!-- Pranjal -->
         <div class="presence-card">
-            <img class="student-avatar" id="avatar-Pranjal" src="pranjal.jpeg" alt="Pranjal">
+            <img class="student-avatar" id="avatar-Pranjal" src="./pranjal.jpeg" alt="Pranjal">
             <div class="presence-info">
                 <span class="presence-name"><span class="pulse-dot"></span> Pranjal</span>
                 <span class="presence-time" id="status-Pranjal">Checking...</span>
@@ -360,7 +399,7 @@
         </div>
         <!-- Aayush -->
         <div class="presence-card">
-            <img class="student-avatar" id="avatar-Aayush" src="aayush.jpeg" alt="Aayush">
+            <img class="student-avatar" id="avatar-Aayush" src="./aayush.jpeg" alt="Aayush">
             <div class="presence-info">
                 <span class="presence-name"><span class="pulse-dot"></span> Aayush</span>
                 <span class="presence-time" id="status-Aayush">Checking...</span>
@@ -368,7 +407,7 @@
         </div>
     </div>
 
-    <!-- YouTube & Learning Hub Section -->
+    <!-- YouTube Hub: Physics Wallah & Know Your Holy Books Only -->
     <div class="resources-card">
         <h2 style="margin-bottom: 0.5rem; display: flex; align-items: center; gap: 8px;">
             <span style="color: #ef4444;">📺</span> Recommended Channels
@@ -380,7 +419,7 @@
             </a>
             <a href="https://www.youtube.com/@KnowYourHolyBook" target="_blank" class="yt-link-btn">
                 <span class="yt-icon">▶</span>
-                <span>Know Your Holy Book</span>
+                <span>Know Your Holy Books</span>
             </a>
         </div>
     </div>
@@ -463,10 +502,11 @@
             </form>
         </div>
 
-        <div class="card">
+        <!-- Custom Dark Section for Logs -->
+        <div class="card feed-card-dark">
             <h2>Group Update Feed</h2>
             <div id="feedContainer" class="feed-box">
-                <p style="color: var(--text-muted);">Connecting to database...</p>
+                <p style="color: #94a3b8;">Connecting to database...</p>
             </div>
         </div>
     </div>
@@ -486,7 +526,7 @@
 </div>
 
 <script>
-    // Relative local image filenames placed next to index.html:
+    // Relative local image filenames
     const studentAvatars = {
         "Pranay": "./pranay.jpeg",
         "Abhigyan": "./abhigyan.jpeg",
@@ -494,13 +534,12 @@
         "Aayush": "./aayush.jpeg"
     };
 
-    // Load local pictures into presence cards, falling back to avatars if not found
+    // Load local pictures with fallback
     Object.keys(studentAvatars).forEach(name => {
         const el = document.getElementById(`avatar-${name}`);
         if (el) {
             el.src = studentAvatars[name];
             el.onerror = () => {
-                // Graceful fallback to avatar if the image is missing
                 el.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${name}`;
             };
         }
@@ -557,11 +596,9 @@
     async function evaluateMemberPasses(user) {
         const now = new Date();
 
-        // 1. Daily Reset (Midnight 12:00 AM) for Bronze Pass
         const startOfToday = new Date();
         startOfToday.setHours(0, 0, 0, 0);
 
-        // 2. Weekly Reset (Monday 12:00 AM) for Silver Pass
         const startOfWeek = new Date();
         const dayOfWeek = now.getDay();
         const distanceToMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
@@ -729,7 +766,7 @@
       .onSnapshot(async (snapshot) => {
           feedContainer.innerHTML = '';
           if (snapshot.empty) {
-              feedContainer.innerHTML = '<p style="color: var(--text-muted);">No logs posted yet. Start studying!</p>';
+              feedContainer.innerHTML = '<p style="color: #94a3b8;">No logs posted yet. Start studying!</p>';
               return;
           }
           
@@ -753,14 +790,14 @@
               logElement.className = 'log-item';
               logElement.innerHTML = `
                   <div style="display: flex; justify-content: space-between; align-items: center;">
-                      <strong style="color: #2563eb; font-size: 1.05rem;">${log.student}${hoursDisplay}</strong>
+                      <strong style="color: #38bdf8; font-size: 1.05rem;">${log.student}${hoursDisplay}</strong>
                       <div>
                           <span class="tag ${tagClass}">${log.subject || 'General'}</span>
                           <span class="tag tag-activity">${activity}</span>
                       </div>
                   </div>
-                  <p style="margin: 0.5rem 0; font-weight: 600; color: #0f172a;">📖 ${log.topic}</p>
-                  <p style="color: var(--text-muted); font-size: 0.92rem;">✅ ${detailsDisplay}</p>
+                  <p class="topic-title">📖 ${log.topic}</p>
+                  <p class="details-text">✅ ${detailsDisplay}</p>
                   <div class="log-meta">
                       <span>🕒 ${formattedTime}</span>
                       <div class="action-btns">
