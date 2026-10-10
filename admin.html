@@ -42,10 +42,11 @@
             background: linear-gradient(90deg, #ea580c, #2563eb, #16a34a);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            display: inline-block;
         }
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 14px;
             margin-bottom: 2rem;
         }
@@ -53,17 +54,17 @@
             background: var(--card-bg);
             border: 1px solid var(--border-subtle);
             border-radius: 12px;
-            padding: 1.2rem;
+            padding: 1.25rem;
             box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
         }
         .stat-card h3 {
-            font-size: 0.82rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         .stat-val {
-            font-size: 1.7rem;
+            font-size: 1.8rem;
             font-weight: 800;
             margin: 6px 0;
         }
@@ -129,94 +130,87 @@
             cursor: pointer;
         }
 
-        /* Distraction meter styling */
-        .meter-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 14px;
-            margin-top: 10px;
+        /* Chupa hua trigger button */
+        .secret-trigger {
+            cursor: pointer;
+            user-select: none;
+            opacity: 0.3;
+            transition: opacity 0.2s;
+            font-size: 1.1rem;
+            vertical-align: middle;
+            margin-left: 8px;
         }
-        .meter-box {
-            background: #f8fafc;
-            border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 14px;
+        .secret-trigger:hover {
+            opacity: 1;
         }
-        .meter-bar-bg {
-            background: #e2e8f0;
-            height: 10px;
-            border-radius: 6px;
-            overflow: hidden;
-            margin: 8px 0;
+
+        /* Hidden Mobile Card (Default me display: none) */
+        #secretMobileCard {
+            display: none;
+            border-left: 5px solid #dc2626;
+            animation: fadeIn 0.3s ease;
         }
-        .meter-bar-fill {
-            height: 100%;
-            transition: width 0.3s ease;
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .status-badge {
-            display: inline-block;
-            font-size: 0.75rem;
-            font-weight: 800;
-            padding: 2px 8px;
-            border-radius: 6px;
-        }
-        .status-safe { background: #dcfce7; color: #16a34a; border: 1px solid #86efac; }
-        .status-mid { background: #fef9c3; color: #a16207; border: 1px solid #fde047; }
-        .status-danger { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <a href="index.html" class="nav-back">← Back to Tracker Dashboard</a>
-    <h1>🛠️ JEE Admin Analytics & Control Panel</h1>
-    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Study hours, revision analytics, screen time distraction meter, aur master logs control.</p>
+    
+    <div>
+        <h1>🛠️ JEE Admin Analytics & Control Panel</h1>
+        <!-- Secret button hidden in plain sight -->
+        <span class="secret-trigger" onclick="toggleSecretMobile()" title="Options">🤫</span>
+    </div>
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+        <p style="color: var(--text-muted);">Study hours, revision analytics, mock test scoreboard, aur database control.</p>
+        <span id="roleBadge" style="font-size:0.8rem; font-weight:700; padding:4px 10px; border-radius:20px; background:#e2e8f0; color:#334155;">Checking role...</span>
+    </div>
 
     <!-- Overview Stats Grid -->
     <div class="stats-grid">
-        <!-- 1. Mobile Screen Time (Distraction) -->
-        <div class="stat-card" style="border-left: 5px solid #dc2626;">
-            <h3>📱 Total Mobile Screen Time</h3>
-            <div id="statTotalMobile" class="stat-val" style="color: #dc2626;">0.0 hrs</div>
-            <div id="statMobileBreakdown" class="stat-breakdown">Calculating screen time...</div>
-        </div>
-
-        <!-- 2. Revision Hours -->
+        <!-- 1. Total Revision Hours -->
         <div class="stat-card" style="border-left: 5px solid #7e22ce;">
             <h3>📖 Total Revision Done</h3>
             <div id="statTotalRevision" class="stat-val" style="color: #7e22ce;">0.0 hrs</div>
             <div id="statRevisionBreakdown" class="stat-breakdown">Calculating revision hours...</div>
         </div>
 
-        <!-- 3. Practice Hours -->
+        <!-- 2. Total Practice Hours -->
         <div class="stat-card" style="border-left: 5px solid #ea580c;">
-            <h3>✍️ Practice Hours</h3>
+            <h3>✍️ Total Practice Hours</h3>
             <div id="statTotalPractice" class="stat-val" style="color: #ea580c;">0.0 hrs</div>
             <div id="statPracticeBreakdown" class="stat-breakdown">Calculating practice hours...</div>
         </div>
 
-        <!-- 4. Questions Solved -->
+        <!-- 3. Total Questions Solved -->
         <div class="stat-card" style="border-left: 5px solid #ca8a04;">
             <h3>🎯 Questions Solved</h3>
             <div id="statTotalQuestions" class="stat-val" style="color: #ca8a04;">0 Qs</div>
             <div id="statQuestionsBreakdown" class="stat-breakdown">Calculating problem sets...</div>
         </div>
 
-        <!-- 5. Lecture Hours -->
+        <!-- 4. Total Lectures Watched -->
         <div class="stat-card" style="border-left: 5px solid #2563eb;">
             <h3>🎥 Lecture Hours</h3>
             <div id="statTotalLectures" class="stat-val" style="color: #2563eb;">0.0 hrs</div>
             <div id="statLectureBreakdown" class="stat-breakdown">Calculating lecture hours...</div>
         </div>
-    </div>
 
-    <!-- Live Distraction Level Meter Section -->
-    <div class="card">
-        <h2 style="font-size: 1.2rem; margin-bottom: 0.4rem;">🚨 Student Distraction Level Meter</h2>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Mobile Screen Time vs Total Active Time Ratio (Padhai vs Mobile Distraction)</p>
-        
-        <div id="distractionMetersContainer" class="meter-container">
-            <p style="color:var(--text-muted);">Calculating distraction metrics...</p>
+        <!-- 5. CHUPA HUA CARD: Mobile Screen Time (Clicking 🤫 unlocks it) -->
+        <div class="stat-card" id="secretMobileCard">
+            <div style="display:flex; justify-content:space-between;">
+                <h3>📱 Mobile Screen Time (Secret)</h3>
+                <span onclick="toggleSecretMobile()" style="cursor:pointer; font-size:0.8rem; color:#dc2626; font-weight:bold;">✖ Hide</span>
+            </div>
+            <div id="statTotalMobile" class="stat-val" style="color: #dc2626;">0.0 hrs</div>
+            <div id="statMobileBreakdown" class="stat-breakdown">Calculating screen time...</div>
         </div>
     </div>
 
@@ -231,13 +225,13 @@
                         <th>Practice (Hrs)</th>
                         <th>Revision (Hrs)</th>
                         <th>Lectures (Hrs)</th>
-                        <th>📱 Screen Time</th>
+                        <th id="thScreenTime" style="display:none; color:#dc2626;">📱 Screen Time</th>
                         <th>Questions Solved</th>
                         <th>Total Study Time</th>
                     </tr>
                 </thead>
                 <tbody id="memberTableBody">
-                    <tr><td colspan="7" style="text-align:center; color:var(--text-muted);">Loading member records...</td></tr>
+                    <tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Loading member records...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -293,20 +287,54 @@
 </div>
 
 <script>
-    // Password protection check
+    // 1. Authentication & Role Limiting (Master vs Viewer)
     let adminAuth = sessionStorage.getItem("admin_auth");
 
-    if (adminAuth !== "master" && adminAuth !== "viewer") {
-        let enteredPass = prompt("🔐 Enter Master Admin Password:");
+    if (!adminAuth || (adminAuth !== "master" && adminAuth !== "viewer")) {
+        let enteredPass = prompt("🔐 Enter Master Admin Password (or type 'VIEW' for Study Pass):");
         if (enteredPass === "Pran4444") {
+            adminAuth = "master";
             sessionStorage.setItem("admin_auth", "master");
-            sessionStorage.setItem("viewer_user", "Pranay");
+        } else if (enteredPass && enteredPass.toUpperCase() === "VIEW") {
+            adminAuth = "viewer";
+            sessionStorage.setItem("admin_auth", "viewer");
         } else {
-            alert("❌ Incorrect Password! Access Denied.");
-            document.body.innerHTML = "<div style='color:#0f172a; text-align:center; margin-top:20vh; font-family:sans-serif;'><h1>🔒 Access Denied</h1><p>Incorrect password. <a href='index.html'>Go back</a></p></div>";
+            alert("❌ Incorrect Password / Access Denied!");
+            window.location.href = "index.html";
             throw new Error("Unauthorized access stopped.");
         }
     }
+
+    const isMasterAdmin = (adminAuth === "master");
+    const roleBadge = document.getElementById("roleBadge");
+    if (isMasterAdmin) {
+        roleBadge.innerText = "👑 Master Admin (Full Control)";
+        roleBadge.style.background = "#dcfce7";
+        roleBadge.style.color = "#16a34a";
+    } else {
+        roleBadge.innerText = "👀 Pass Holder (Read-Only)";
+        roleBadge.style.background = "#eff6ff";
+        roleBadge.style.color = "#2563eb";
+    }
+
+    // Secret Toggle for Mobile Screen Time
+    let isMobileVisible = false;
+    window.toggleSecretMobile = function() {
+        isMobileVisible = !isMobileVisible;
+        const card = document.getElementById("secretMobileCard");
+        const th = document.getElementById("thScreenTime");
+        const tds = document.querySelectorAll(".td-screentime");
+
+        if (isMobileVisible) {
+            card.style.display = "block";
+            if (th) th.style.display = "";
+            tds.forEach(td => td.style.display = "");
+        } else {
+            card.style.display = "none";
+            if (th) th.style.display = "none";
+            tds.forEach(td => td.style.display = "none");
+        }
+    };
 
     const firebaseConfig = {
         apiKey: "AIzaSyAB6FbsDLh4xq6ikvsSFFrDLYFVDaYB978",
@@ -317,10 +345,12 @@
         appId: "1:14514591368:web:9e72203c576dfaa5e9713d"
     };
 
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
     const db = firebase.firestore();
 
-    // Logs, Metrics & Distraction Listener
+    // 2. Study Logs Listener
     db.collection("jee_logs").orderBy("timestamp", "desc").onSnapshot(snapshot => {
         let totalRevision = 0;
         let totalPractice = 0;
@@ -383,6 +413,12 @@
             if (subject === 'Math') subTag = 'tag-m';
             if (subject === 'General' || actLower.includes("mobile")) subTag = 'tag-mobile';
 
+            // Agar Master Admin hai toh Edit & Delete, warna View Only lock
+            const logActions = isMasterAdmin 
+                ? `<button class="btn-edit" onclick="adminEditLog('${logId}', '${hours}', '${topic.replace(/'/g, "\\'")}', '${details.replace(/'/g, "\\'")}', '${qs}')">✏️ Edit</button>
+                   <button class="btn-delete" onclick="adminDeleteLog('${logId}', '${student}')">🗑️ Delete</button>`
+                : `<span style="color:#64748b; font-size:0.75rem;">🔒 View Only</span>`;
+
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td style="color:#64748b; font-size:0.8rem; white-space:nowrap;">${dateStr}</td>
@@ -395,15 +431,12 @@
                     <div style="font-weight:600; color:#0f172a;">${topic}</div>
                     <div style="font-size:0.8rem; color:#64748b;">${details}</div>
                 </td>
-                <td style="white-space:nowrap;">
-                    <button class="btn-edit" onclick="adminEditLog('${logId}', '${hours}', '${topic.replace(/'/g, "\\'")}', '${details.replace(/'/g, "\\'")}', '${qs}')">✏️ Edit</button>
-                    <button class="btn-delete" onclick="adminDeleteLog('${logId}', '${student}')">🗑️ Delete</button>
-                </td>
+                <td style="white-space:nowrap;">${logActions}</td>
             `;
             logsBody.appendChild(row);
         });
 
-        // Update Overview Stat Cards
+        // Overview Numbers
         document.getElementById("statTotalMobile").innerText = totalMobile.toFixed(1) + " hrs";
         document.getElementById("statMobileBreakdown").innerHTML = 
             `Pranay: <b>${members['Pranay'].mobile.toFixed(1)}h</b> | ` +
@@ -439,56 +472,7 @@
             `Pranjal: <b>${members['Pranjal'].lectures.toFixed(1)}h</b> | ` +
             `Aayush: <b>${members['Aayush'].lectures.toFixed(1)}h</b>`;
 
-        // Render Distraction Meters
-        const meterBoxContainer = document.getElementById("distractionMetersContainer");
-        meterBoxContainer.innerHTML = '';
-
-        Object.keys(members).forEach(name => {
-            const m = members[name];
-            const studyH = m.totalStudy;
-            const mobileH = m.mobile;
-            const totalActive = studyH + mobileH;
-
-            // Distraction Ratio
-            let percentage = 0;
-            if (totalActive > 0) {
-                percentage = Math.round((mobileH / totalActive) * 100);
-            }
-
-            let statusText = "🟢 Safe Focus";
-            let statusClass = "status-safe";
-            let barColor = "#16a34a";
-
-            if (percentage >= 40) {
-                statusText = "🔴 Danger Zone";
-                statusClass = "status-danger";
-                barColor = "#dc2626";
-            } else if (percentage >= 20) {
-                statusText = "🟡 Caution";
-                statusClass = "status-mid";
-                barColor = "#ca8a04";
-            }
-
-            const box = document.createElement("div");
-            box.className = "meter-box";
-            box.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <strong style="color:#0f172a; font-size:1rem;">${name}</strong>
-                    <span class="status-badge ${statusClass}">${statusText}</span>
-                </div>
-                <div class="meter-bar-bg">
-                    <div class="meter-bar-fill" style="width: ${percentage}%; background: ${barColor};"></div>
-                </div>
-                <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:#64748b;">
-                    <span>📱 Screen: <b>${mobileH.toFixed(1)}h</b></span>
-                    <span>📚 Study: <b>${studyH.toFixed(1)}h</b></span>
-                    <span style="color:#0f172a; font-weight:700;">${percentage}% Distracted</span>
-                </div>
-            `;
-            meterBoxContainer.appendChild(box);
-        });
-
-        // Render Individual Member Metrics Table
+        // Individual Member Metrics Table
         const tbody = document.getElementById("memberTableBody");
         tbody.innerHTML = '';
         Object.keys(members).forEach(name => {
@@ -499,7 +483,7 @@
                 <td>${m.practice.toFixed(1)} hrs</td>
                 <td><span style="color:#7e22ce; font-weight:700;">${m.revision.toFixed(1)} hrs</span></td>
                 <td>${m.lectures.toFixed(1)} hrs</td>
-                <td><span style="color:#dc2626; font-weight:700;">${m.mobile.toFixed(1)} hrs</span></td>
+                <td class="td-screentime" style="${isMobileVisible ? '' : 'display:none;'} color:#dc2626; font-weight:700;">${m.mobile.toFixed(1)} hrs</td>
                 <td><span style="color:#ca8a04; font-weight:700;">${m.questions} Qs</span></td>
                 <td><strong>${m.totalStudy.toFixed(1)} hrs</strong></td>
             `;
@@ -507,7 +491,7 @@
         });
     });
 
-    // Mock Test Scores Listener
+    // 3. Mock Test Scores Listener
     db.collection("jee_mock_scores").orderBy("timestamp", "desc").onSnapshot(snapshot => {
         const scoresBody = document.getElementById("adminScoresTableBody");
         scoresBody.innerHTML = '';
@@ -521,6 +505,12 @@
             const d = doc.data();
             const scoreId = doc.id;
             const dateStr = d.timestamp ? d.timestamp.toDate().toLocaleDateString([], { month: 'short', day: 'numeric' }) : 'Recent';
+            
+            const scoreActions = isMasterAdmin 
+                ? `<button class="btn-edit" onclick="adminEditScore('${scoreId}', '${d.testTitle.replace(/'/g, "\\'")}', '${d.physics}', '${d.chemistry}', '${d.math}')">✏️ Edit</button>
+                   <button class="btn-delete" onclick="adminDeleteScore('${scoreId}', '${d.testTitle.replace(/'/g, "\\'")}')">🗑️ Delete</button>`
+                : `<span style="color:#64748b; font-size:0.75rem;">🔒 View Only</span>`;
+
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td>${dateStr}</td>
@@ -530,24 +520,25 @@
                 <td>${d.chemistry}</td>
                 <td>${d.math}</td>
                 <td><strong style="color:#16a34a;">${d.total} / 300</strong></td>
-                <td style="white-space:nowrap;">
-                    <button class="btn-edit" onclick="adminEditScore('${scoreId}', '${d.testTitle.replace(/'/g, "\\'")}', '${d.physics}', '${d.chemistry}', '${d.math}')">✏️ Edit</button>
-                    <button class="btn-delete" onclick="adminDeleteScore('${scoreId}', '${d.testTitle.replace(/'/g, "\\'")}')">🗑️ Delete</button>
-                </td>
+                <td style="white-space:nowrap;">${scoreActions}</td>
             `;
             scoresBody.appendChild(row);
         });
     });
 
-    // Admin Edit Log
+    // Master Admin Actions (Strictly Checked)
     window.adminEditLog = async function(docId, oldHours, oldTopic, oldDetails, oldQs) {
-        let newHours = prompt("✏️ [Admin] Update hours (study or mobile):", oldHours);
+        if (!isMasterAdmin) {
+            alert("⛔ Permission Denied: Pass viewers can only view analytics!");
+            return;
+        }
+        let newHours = prompt("✏️ [Admin] Update study hours:", oldHours);
         if (newHours === null) return;
 
         let newQs = prompt("🎯 [Admin] Update questions count:", oldQs);
         if (newQs === null) return;
 
-        let newTopic = prompt("✏️ [Admin] Update topic/app:", oldTopic);
+        let newTopic = prompt("✏️ [Admin] Update topic name:", oldTopic);
         if (newTopic === null) return;
 
         let newDetails = prompt("✏️ [Admin] Update details:", oldDetails);
@@ -567,9 +558,12 @@
         }
     };
 
-    // Admin Delete Log
     window.adminDeleteLog = async function(docId, studentName) {
-        if (confirm(`⚠️ Are you sure you want to permanently delete this log posted by ${studentName}?`)) {
+        if (!isMasterAdmin) {
+            alert("⛔ Permission Denied: Pass viewers can only view analytics!");
+            return;
+        }
+        if (confirm(`⚠️ Are you sure you want to permanently delete log posted by ${studentName}?`)) {
             try {
                 await db.collection("jee_logs").doc(docId).delete();
                 alert("🗑️ Log permanently deleted!");
@@ -579,18 +573,21 @@
         }
     };
 
-    // Admin Edit Mock Score
     window.adminEditScore = async function(docId, oldTitle, oldP, oldC, oldM) {
+        if (!isMasterAdmin) {
+            alert("⛔ Permission Denied: Pass viewers cannot edit test scores!");
+            return;
+        }
         let newTitle = prompt("✏️ [Admin] Update test title:", oldTitle);
         if (newTitle === null) return;
 
-        let newP = prompt("⚛️ [Admin] Physics marks (/100):", oldP);
+        let newP = prompt("⚛️ [Admin] Physics score (/100):", oldP);
         if (newP === null) return;
 
-        let newC = prompt("🧪 [Admin] Chemistry marks (/100):", oldC);
+        let newC = prompt("🧪 [Admin] Chemistry score (/100):", oldC);
         if (newC === null) return;
 
-        let newM = prompt("📐 [Admin] Math marks (/100):", oldM);
+        let newM = prompt("📐 [Admin] Math score (/100):", oldM);
         if (newM === null) return;
 
         const pNum = parseInt(newP, 10) || 0;
@@ -607,18 +604,21 @@
                 total: total,
                 adminEditedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            alert("✅ Score updated!");
+            alert("✅ Test score updated!");
         } catch (error) {
             alert("❌ Failed to update score: " + error.message);
         }
     };
 
-    // Admin Delete Mock Score
     window.adminDeleteScore = async function(docId, testTitle) {
+        if (!isMasterAdmin) {
+            alert("⛔ Permission Denied: Pass viewers cannot delete test scores!");
+            return;
+        }
         if (confirm(`⚠️ Are you sure you want to delete score for "${testTitle}"?`)) {
             try {
                 await db.collection("jee_mock_scores").doc(docId).delete();
-                alert("🗑️ Mock score deleted!");
+                alert("🗑️ Test score deleted!");
             } catch (error) {
                 alert("❌ Failed to delete score: " + error.message);
             }
