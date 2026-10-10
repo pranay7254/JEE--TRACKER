@@ -3,191 +3,289 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JEE Trio - Leaderboard & Dashboard</title>
+    <title>JEE Trio - Admin Analytics & Control</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    
+
     <style>
         :root {
-            --bg: #090d16;
-            --card-bg: #131d31;
-            --accent-blue: #3b82f6;
-            --accent-green: #10b981;
-            --text: #f8fafc;
-            --text-muted: #94a3b8;
+            --bg-bright: #f0f4f8;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-subtle: #e2e8f0;
+            --accent-edit: #d97706;
+            --accent-delete: #dc2626;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { 
-            font-family: system-ui, -apple-system, sans-serif; 
-            background: linear-gradient(180deg, #1e1124 0%, #090d16 100%);
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #e0f2fe 100%);
+            color: var(--text-main);
+            padding: 2rem 1.5rem;
             min-height: 100vh;
-            color: var(--text);
-            padding: 2rem;
         }
-
-        .container { max-width: 1100px; margin: 0 auto; }
-        
-        header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 2rem;
-            border-bottom: 1px solid #1e293b;
-            padding-bottom: 1rem;
-        }
-
-        h1 { color: #f87171; font-size: 1.8rem; }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            border: 1px solid rgba(255,255,255,0.05);
-            text-align: center;
-        }
-
-        .stat-val { font-size: 2rem; font-weight: bold; color: var(--accent-blue); margin-top: 5px; }
-
-        .section-title { font-size: 1.25rem; margin-bottom: 1rem; color: #cbd5e1; }
-        .member-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .member-card {
-            background: var(--card-bg);
-            border-radius: 10px;
-            padding: 1.2rem;
-            border-left: 4px solid var(--accent-green);
-        }
-
-        .practice-box-container {
-            margin-top: 10px;
-            padding: 10px 12px;
-            background: rgba(16, 185, 129, 0.08);
-            border: 1px solid rgba(16, 185, 129, 0.25);
-            border-radius: 8px;
-        }
-
-        .practice-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-
-        .subject-breakdown {
-            display: flex;
-            justify-content: space-between;
-            background: rgba(15, 23, 42, 0.8);
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-        }
-
-        .log-table {
-            width: 100%;
-            background: var(--card-bg);
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #1e293b;
-            border-collapse: collapse;
-        }
-
-        .log-table th, .log-table td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid #1e293b;
+        .container { max-width: 1200px; margin: 0 auto; }
+        .nav-back {
+            display: inline-block;
+            margin-bottom: 1rem;
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: 700;
             font-size: 0.9rem;
         }
-
-        .log-table th { background: #0f172a; color: var(--text-muted); font-weight: 600; }
-        .log-table tr:hover { background: rgba(255,255,255,0.02); }
-
-        .tag { padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
-        .tag-Physics { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-        .tag-Chemistry { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-        .tag-Math { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-
-        .tag-activity {
-            background: rgba(168, 85, 247, 0.18);
-            color: #c084fc;
-            border: 1px solid rgba(168, 85, 247, 0.35);
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #ea580c, #2563eb, #16a34a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1.2rem;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+        }
+        .stat-card h3 {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-val {
+            font-size: 1.7rem;
+            font-weight: 800;
+            margin: 6px 0;
+        }
+        .stat-breakdown {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        th {
+            background: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+        .tag {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: bold;
+        }
+        .tag-p { background: #ffedd5; color: #ea580c; border: 1px solid #fdba74; }
+        .tag-c { background: #dcfce7; color: #16a34a; border: 1px solid #86efac; }
+        .tag-m { background: #e0f2fe; color: #0284c7; border: 1px solid #7dd3fc; }
+        .tag-mobile { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
 
-        .btn-action {
+        .btn-edit {
+            background-color: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fde68a;
             padding: 4px 8px;
             border-radius: 4px;
-            border: none;
+            font-size: 0.78rem;
+            font-weight: 700;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 0.75rem;
             margin-right: 4px;
         }
-        .btn-edit { background: #eab308; color: #000; }
-        .btn-del { background: #ef4444; color: #fff; }
+        .btn-delete {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* Distraction meter styling */
+        .meter-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+            margin-top: 10px;
+        }
+        .meter-box {
+            background: #f8fafc;
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 14px;
+        }
+        .meter-bar-bg {
+            background: #e2e8f0;
+            height: 10px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+        .meter-bar-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        .status-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+        .status-safe { background: #dcfce7; color: #16a34a; border: 1px solid #86efac; }
+        .status-mid { background: #fef9c3; color: #a16207; border: 1px solid #fde047; }
+        .status-danger { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header>
-        <div>
-            <h1 id="dashTitle">🛠️ Master Admin Dashboard</h1>
-            <p id="dashSub" style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">JEE Target Tracker Control Panel</p>
-        </div>
-        <button onclick="logoutAdmin()" style="padding: 8px 16px; background: #334155; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">🔒 Exit</button>
-    </header>
+    <a href="index.html" class="nav-back">← Back to Tracker Dashboard</a>
+    <h1>🛠️ JEE Admin Analytics & Control Panel</h1>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Study hours, revision analytics, screen time distraction meter, aur master logs control.</p>
 
-    <!-- Global Stats -->
+    <!-- Overview Stats Grid -->
     <div class="stats-grid">
-        <div class="stat-card">
-            <p style="color: var(--text-muted); font-size: 0.85rem;">Total Group Study Hours</p>
-            <div class="stat-val" id="totalHoursCount">0 hrs</div>
+        <!-- 1. Mobile Screen Time (Distraction) -->
+        <div class="stat-card" style="border-left: 5px solid #dc2626;">
+            <h3>📱 Total Mobile Screen Time</h3>
+            <div id="statTotalMobile" class="stat-val" style="color: #dc2626;">0.0 hrs</div>
+            <div id="statMobileBreakdown" class="stat-breakdown">Calculating screen time...</div>
         </div>
-        <div class="stat-card">
-            <p style="color: var(--text-muted); font-size: 0.85rem;">Total Practice & Self Study</p>
-            <div class="stat-val" id="totalPracticeCount" style="color: var(--accent-green);">0 hrs</div>
+
+        <!-- 2. Revision Hours -->
+        <div class="stat-card" style="border-left: 5px solid #7e22ce;">
+            <h3>📖 Total Revision Done</h3>
+            <div id="statTotalRevision" class="stat-val" style="color: #7e22ce;">0.0 hrs</div>
+            <div id="statRevisionBreakdown" class="stat-breakdown">Calculating revision hours...</div>
         </div>
-        <div class="stat-card">
-            <p style="color: var(--text-muted); font-size: 0.85rem;">Total Updates Logged</p>
-            <div class="stat-val" id="totalLogsCount" style="color: #38bdf8;">0</div>
+
+        <!-- 3. Practice Hours -->
+        <div class="stat-card" style="border-left: 5px solid #ea580c;">
+            <h3>✍️ Practice Hours</h3>
+            <div id="statTotalPractice" class="stat-val" style="color: #ea580c;">0.0 hrs</div>
+            <div id="statPracticeBreakdown" class="stat-breakdown">Calculating practice hours...</div>
+        </div>
+
+        <!-- 4. Questions Solved -->
+        <div class="stat-card" style="border-left: 5px solid #ca8a04;">
+            <h3>🎯 Questions Solved</h3>
+            <div id="statTotalQuestions" class="stat-val" style="color: #ca8a04;">0 Qs</div>
+            <div id="statQuestionsBreakdown" class="stat-breakdown">Calculating problem sets...</div>
+        </div>
+
+        <!-- 5. Lecture Hours -->
+        <div class="stat-card" style="border-left: 5px solid #2563eb;">
+            <h3>🎥 Lecture Hours</h3>
+            <div id="statTotalLectures" class="stat-val" style="color: #2563eb;">0.0 hrs</div>
+            <div id="statLectureBreakdown" class="stat-breakdown">Calculating lecture hours...</div>
         </div>
     </div>
 
-    <!-- Leaderboard Cards -->
-    <h2 class="section-title">👥 Member Performance & Subject Breakdown</h2>
-    <div class="member-grid" id="memberCards"></div>
+    <!-- Live Distraction Level Meter Section -->
+    <div class="card">
+        <h2 style="font-size: 1.2rem; margin-bottom: 0.4rem;">🚨 Student Distraction Level Meter</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Mobile Screen Time vs Total Active Time Ratio (Padhai vs Mobile Distraction)</p>
+        
+        <div id="distractionMetersContainer" class="meter-container">
+            <p style="color:var(--text-muted);">Calculating distraction metrics...</p>
+        </div>
+    </div>
 
-    <!-- Master Database Log Table (Strictly Hidden for Pass-Holders) -->
-    <div id="masterLogSection" style="display: none;">
-        <h2 class="section-title">📋 Master Database Controls (Edit / Delete Any Record)</h2>
-        <div style="overflow-x: auto;">
-            <table class="log-table">
+    <!-- Student Performance Summary Table -->
+    <div class="card">
+        <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">👥 Individual Member Metrics</h2>
+        <div style="overflow-x:auto;">
+            <table>
                 <thead>
                     <tr>
+                        <th>Student</th>
+                        <th>Practice (Hrs)</th>
+                        <th>Revision (Hrs)</th>
+                        <th>Lectures (Hrs)</th>
+                        <th>📱 Screen Time</th>
+                        <th>Questions Solved</th>
+                        <th>Total Study Time</th>
+                    </tr>
+                </thead>
+                <tbody id="memberTableBody">
+                    <tr><td colspan="7" style="text-align:center; color:var(--text-muted);">Loading member records...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Mock Test & DPP Scores Management Table -->
+    <div class="card">
+        <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">📊 Mock Test & DPP Scores (Edit & Delete)</h2>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Student</th>
+                        <th>Test Title</th>
+                        <th>Physics</th>
+                        <th>Chemistry</th>
+                        <th>Math</th>
+                        <th>Total (/300)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="adminScoresTableBody">
+                    <tr><td colspan="8" style="text-align:center; color:var(--text-muted);">Loading test scores...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Master Logs Table with Edit & Delete Options -->
+    <div class="card">
+        <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">📋 All Group Logs (Master Control)</h2>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
                         <th>Student</th>
                         <th>Subject</th>
                         <th>Activity</th>
                         <th>Hours</th>
-                        <th>Topic / Task</th>
-                        <th>Timestamp</th>
-                        <th>Master Actions</th>
+                        <th>Questions</th>
+                        <th>Topic & Accomplishment / App</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody id="masterLogsBody">
-                    <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading database logs...</td></tr>
+                <tbody id="logsTableBody">
+                    <tr><td colspan="8" style="text-align:center; color:var(--text-muted);">Loading all logs...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -195,40 +293,19 @@
 </div>
 
 <script>
-    const MASTER_ADMIN_PASS = "Pran4444";
-    const authType = sessionStorage.getItem("admin_auth");
-    const viewerUser = sessionStorage.getItem("viewer_user") || "Guest";
-    const viewerTier = sessionStorage.getItem("viewer_tier") || "";
-    const viewerBadge = sessionStorage.getItem("viewer_badge") || "";
+    // Password protection check
+    let adminAuth = sessionStorage.getItem("admin_auth");
 
-    if (!authType) {
-        let entered = prompt("🔐 Enter Master Admin Password:");
-        if (entered === MASTER_ADMIN_PASS) {
+    if (adminAuth !== "master" && adminAuth !== "viewer") {
+        let enteredPass = prompt("🔐 Enter Master Admin Password:");
+        if (enteredPass === "Pran4444") {
             sessionStorage.setItem("admin_auth", "master");
             sessionStorage.setItem("viewer_user", "Pranay");
         } else {
-            alert("❌ Access Denied! Complete a study pass target to view.");
-            window.location.href = "index.html";
-            throw new Error("Unauthorized");
+            alert("❌ Incorrect Password! Access Denied.");
+            document.body.innerHTML = "<div style='color:#0f172a; text-align:center; margin-top:20vh; font-family:sans-serif;'><h1>🔒 Access Denied</h1><p>Incorrect password. <a href='index.html'>Go back</a></p></div>";
+            throw new Error("Unauthorized access stopped.");
         }
-    }
-
-    const isMasterAdmin = (sessionStorage.getItem("admin_auth") === "master");
-
-    if (!isMasterAdmin) {
-        document.getElementById("dashTitle").innerText = "🏆 JEE Trio - Hall of Fame Leaderboard";
-        document.getElementById("dashSub").innerHTML = `Unlocked by <b>${viewerUser}</b> via <span style="color:#fbbf24;">${viewerTier}</span> (${viewerBadge})`;
-        document.getElementById("masterLogSection").style.display = "none";
-    } else {
-        document.getElementById("masterLogSection").style.display = "block";
-    }
-
-    function logoutAdmin() {
-        sessionStorage.removeItem("admin_auth");
-        sessionStorage.removeItem("viewer_user");
-        sessionStorage.removeItem("viewer_tier");
-        sessionStorage.removeItem("viewer_badge");
-        window.location.href = "index.html";
     }
 
     const firebaseConfig = {
@@ -243,181 +320,307 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const students = ["Pranay", "Abhigyan", "Pranjal", "Aayush"];
-    let memberStats = {};
-    let studentPresence = {};
+    // Logs, Metrics & Distraction Listener
+    db.collection("jee_logs").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+        let totalRevision = 0;
+        let totalPractice = 0;
+        let totalLectures = 0;
+        let totalMobile = 0;
+        let totalQs = 0;
 
-    function initMemberStats() {
-        memberStats = {};
-        students.forEach(name => {
-            memberStats[name] = {
-                total: 0,
-                practiceTotal: 0,
-                practicePhysics: 0,
-                practiceChemistry: 0,
-                practiceMath: 0
-            };
-        });
-    }
+        let members = {
+            "Pranay": { practice: 0, revision: 0, lectures: 0, mobile: 0, questions: 0, totalStudy: 0 },
+            "Abhigyan": { practice: 0, revision: 0, lectures: 0, mobile: 0, questions: 0, totalStudy: 0 },
+            "Pranjal": { practice: 0, revision: 0, lectures: 0, mobile: 0, questions: 0, totalStudy: 0 },
+            "Aayush": { practice: 0, revision: 0, lectures: 0, mobile: 0, questions: 0, totalStudy: 0 }
+        };
 
-    db.collection("user_presence").onSnapshot((snapshot) => {
-        snapshot.forEach((doc) => {
-            if (doc.data().lastActive) {
-                studentPresence[doc.id] = doc.data().lastActive.toDate();
-            }
-        });
-        renderMemberCards();
-    });
+        const logsBody = document.getElementById("logsTableBody");
+        logsBody.innerHTML = '';
 
-    db.collection("jee_logs").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-        const tbody = document.getElementById("masterLogsBody");
-        if (tbody) tbody.innerHTML = "";
+        if (snapshot.empty) {
+            logsBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--text-muted);">No study logs found in the database.</td></tr>';
+        }
 
-        initMemberStats();
-        let totalAllHours = 0;
-        let totalPracticeHours = 0;
+        snapshot.forEach(doc => {
+            const d = doc.data();
+            const logId = doc.id;
+            const student = d.student || 'Unknown';
+            const hours = parseFloat(d.studyHours || d.hours || 0);
+            const qs = parseInt(d.questionsSolved || 0, 10);
+            const act = (d.activityType || 'Self Study');
+            const actLower = act.toLowerCase();
+            const topic = d.topic || 'General';
+            const details = d.details || d.accomplishment || '';
+            const subject = d.subject || 'General';
+            const dateStr = d.timestamp ? d.timestamp.toDate().toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent';
 
-        document.getElementById("totalLogsCount").innerText = snapshot.size;
+            totalQs += qs;
 
-        snapshot.forEach((docSnap) => {
-            const log = docSnap.data();
-            const id = docSnap.id;
-            const hours = parseFloat(log.studyHours || log.hours || 0);
-            const activity = log.activityType || 'Unassigned';
-            const actLower = activity.toLowerCase();
-            const isPracticeOrSelf = actLower.includes("practice") || actLower.includes("self study") || actLower.includes("self");
+            if (actLower.includes("mobile")) {
+                totalMobile += hours;
+                if (members[student]) members[student].mobile += hours;
+            } else {
+                if (members[student]) {
+                    members[student].totalStudy += hours;
+                    members[student].questions += qs;
+                }
 
-            if (memberStats[log.student]) {
-                memberStats[log.student].total += hours;
-                totalAllHours += hours;
-
-                if (isPracticeOrSelf) {
-                    memberStats[log.student].practiceTotal += hours;
-                    totalPracticeHours += hours;
-
-                    if (log.subject === "Physics") {
-                        memberStats[log.student].practicePhysics += hours;
-                    } else if (log.subject === "Chemistry") {
-                        memberStats[log.student].practiceChemistry += hours;
-                    } else if (log.subject === "Math" || log.subject === "Mathematics") {
-                        memberStats[log.student].practiceMath += hours;
-                    }
+                if (actLower.includes("revision")) {
+                    totalRevision += hours;
+                    if (members[student]) members[student].revision += hours;
+                } else if (actLower.includes("practice") || actLower.includes("self study") || actLower.includes("self")) {
+                    totalPractice += hours;
+                    if (members[student]) members[student].practice += hours;
+                } else if (actLower.includes("lecture")) {
+                    totalLectures += hours;
+                    if (members[student]) members[student].lectures += hours;
                 }
             }
 
-            if (isMasterAdmin && tbody) {
-                const formattedTime = log.timestamp ? new Date(log.timestamp.seconds * 1000).toLocaleString([], {
-                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                }) : 'Recently';
+            let subTag = 'tag-p';
+            if (subject === 'Chemistry') subTag = 'tag-c';
+            if (subject === 'Math') subTag = 'tag-m';
+            if (subject === 'General' || actLower.includes("mobile")) subTag = 'tag-mobile';
 
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td><strong style="color: #38bdf8;">${log.student}</strong></td>
-                    <td><span class="tag tag-${log.subject}">${log.subject || 'General'}</span></td>
-                    <td><span class="tag tag-activity">${activity}</span></td>
-                    <td><strong>${hours} hrs</strong></td>
-                    <td>
-                        <b>${log.topic}</b>
-                        <br><small style="color: var(--text-muted);">${log.details || log.accomplishment || ''}</small>
-                    </td>
-                    <td style="color: var(--text-muted);">${formattedTime}</td>
-                    <td>
-                        <button class="btn-action btn-edit" onclick="adminEdit('${id}', '${(log.topic || '').replace(/'/g, "\\'")}', '${hours}', '${(log.details || '').replace(/'/g, "\\'")}', '${activity.replace(/'/g, "\\'")}')">Edit</button>
-                        <button class="btn-action btn-del" onclick="adminDelete('${id}')">Delete</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            }
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td style="color:#64748b; font-size:0.8rem; white-space:nowrap;">${dateStr}</td>
+                <td><strong style="color:#2563eb;">${student}</strong></td>
+                <td><span class="tag ${subTag}">${subject}</span></td>
+                <td><span style="font-weight:600; color:${actLower.includes('mobile') ? '#dc2626' : '#475569'};">${act}</span></td>
+                <td><strong>${hours}h</strong></td>
+                <td><span style="color:#ca8a04; font-weight:700;">${qs > 0 ? qs + ' Qs' : '-'}</span></td>
+                <td>
+                    <div style="font-weight:600; color:#0f172a;">${topic}</div>
+                    <div style="font-size:0.8rem; color:#64748b;">${details}</div>
+                </td>
+                <td style="white-space:nowrap;">
+                    <button class="btn-edit" onclick="adminEditLog('${logId}', '${hours}', '${topic.replace(/'/g, "\\'")}', '${details.replace(/'/g, "\\'")}', '${qs}')">✏️ Edit</button>
+                    <button class="btn-delete" onclick="adminDeleteLog('${logId}', '${student}')">🗑️ Delete</button>
+                </td>
+            `;
+            logsBody.appendChild(row);
         });
 
-        document.getElementById("totalHoursCount").innerText = `${totalAllHours.toFixed(1)} hrs`;
-        document.getElementById("totalPracticeCount").innerText = `${totalPracticeHours.toFixed(1)} hrs`;
-        renderMemberCards();
-    });
+        // Update Overview Stat Cards
+        document.getElementById("statTotalMobile").innerText = totalMobile.toFixed(1) + " hrs";
+        document.getElementById("statMobileBreakdown").innerHTML = 
+            `Pranay: <b>${members['Pranay'].mobile.toFixed(1)}h</b> | ` +
+            `Abhigyan: <b>${members['Abhigyan'].mobile.toFixed(1)}h</b><br>` +
+            `Pranjal: <b>${members['Pranjal'].mobile.toFixed(1)}h</b> | ` +
+            `Aayush: <b>${members['Aayush'].mobile.toFixed(1)}h</b>`;
 
-    function renderMemberCards() {
-        const container = document.getElementById("memberCards");
-        container.innerHTML = "";
+        document.getElementById("statTotalRevision").innerText = totalRevision.toFixed(1) + " hrs";
+        document.getElementById("statRevisionBreakdown").innerHTML = 
+            `Pranay: <b>${members['Pranay'].revision.toFixed(1)}h</b> | ` +
+            `Abhigyan: <b>${members['Abhigyan'].revision.toFixed(1)}h</b><br>` +
+            `Pranjal: <b>${members['Pranjal'].revision.toFixed(1)}h</b> | ` +
+            `Aayush: <b>${members['Aayush'].revision.toFixed(1)}h</b>`;
 
-        const sortedStudents = [...students].sort((a, b) => {
-            const statA = memberStats[a] ? memberStats[a].practiceTotal : 0;
-            const statB = memberStats[b] ? memberStats[b].practiceTotal : 0;
-            return statB - statA;
-        });
+        document.getElementById("statTotalPractice").innerText = totalPractice.toFixed(1) + " hrs";
+        document.getElementById("statPracticeBreakdown").innerHTML = 
+            `Pranay: <b>${members['Pranay'].practice.toFixed(1)}h</b> | ` +
+            `Abhigyan: <b>${members['Abhigyan'].practice.toFixed(1)}h</b><br>` +
+            `Pranjal: <b>${members['Pranjal'].practice.toFixed(1)}h</b> | ` +
+            `Aayush: <b>${members['Aayush'].practice.toFixed(1)}h</b>`;
 
-        sortedStudents.forEach((name, idx) => {
-            const stats = memberStats[name] || { total: 0, practiceTotal: 0, practicePhysics: 0, practiceChemistry: 0, practiceMath: 0 };
-            let lastSeenStr = "Never";
-            if (studentPresence[name]) {
-                lastSeenStr = studentPresence[name].toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + 
-                              " (" + studentPresence[name].toLocaleDateString([], { month: 'short', day: 'numeric' }) + ")";
+        document.getElementById("statTotalQuestions").innerText = totalQs + " Qs";
+        document.getElementById("statQuestionsBreakdown").innerHTML = 
+            `Pranay: <b>${members['Pranay'].questions} Qs</b> | ` +
+            `Abhigyan: <b>${members['Abhigyan'].questions} Qs</b><br>` +
+            `Pranjal: <b>${members['Pranjal'].questions} Qs</b> | ` +
+            `Aayush: <b>${members['Aayush'].questions} Qs</b>`;
+
+        document.getElementById("statTotalLectures").innerText = totalLectures.toFixed(1) + " hrs";
+        document.getElementById("statLectureBreakdown").innerHTML = 
+            `Pranay: <b>${members['Pranay'].lectures.toFixed(1)}h</b> | ` +
+            `Abhigyan: <b>${members['Abhigyan'].lectures.toFixed(1)}h</b><br>` +
+            `Pranjal: <b>${members['Pranjal'].lectures.toFixed(1)}h</b> | ` +
+            `Aayush: <b>${members['Aayush'].lectures.toFixed(1)}h</b>`;
+
+        // Render Distraction Meters
+        const meterBoxContainer = document.getElementById("distractionMetersContainer");
+        meterBoxContainer.innerHTML = '';
+
+        Object.keys(members).forEach(name => {
+            const m = members[name];
+            const studyH = m.totalStudy;
+            const mobileH = m.mobile;
+            const totalActive = studyH + mobileH;
+
+            // Distraction Ratio
+            let percentage = 0;
+            if (totalActive > 0) {
+                percentage = Math.round((mobileH / totalActive) * 100);
             }
 
-            const rankBadge = idx === 0 && stats.practiceTotal > 0 ? "👑 Rank #1 Leader" : `Rank #${idx + 1}`;
+            let statusText = "🟢 Safe Focus";
+            let statusClass = "status-safe";
+            let barColor = "#16a34a";
 
-            container.innerHTML += `
-                <div class="member-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <strong style="font-size: 1.1rem; color: #38bdf8;">${name} <span style="font-size: 0.75rem; color: #fbbf24;">(${rankBadge})</span></strong>
-                        <span style="font-weight: bold; color: #fbbf24; font-size: 1.05rem;">${stats.total.toFixed(1)} hrs Total</span>
-                    </div>
+            if (percentage >= 40) {
+                statusText = "🔴 Danger Zone";
+                statusClass = "status-danger";
+                barColor = "#dc2626";
+            } else if (percentage >= 20) {
+                statusText = "🟡 Caution";
+                statusClass = "status-mid";
+                barColor = "#ca8a04";
+            }
 
-                    <div class="practice-box-container">
-                        <div class="practice-header">
-                            <span style="font-size: 0.85rem; color: #10b981; font-weight: 600;">✍️ Practice / Self Study:</span>
-                            <strong style="color: #10b981; font-size: 0.95rem;">${stats.practiceTotal.toFixed(1)} hrs</strong>
-                        </div>
-                        <div class="subject-breakdown">
-                            <span style="color: #60a5fa;">⚡ <b>P:</b> ${stats.practicePhysics.toFixed(1)}h</span>
-                            <span style="color: #34d399;">🧪 <b>C:</b> ${stats.practiceChemistry.toFixed(1)}h</span>
-                            <span style="color: #fbbf24;">📐 <b>M:</b> ${stats.practiceMath.toFixed(1)}h</span>
-                        </div>
-                    </div>
-
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
-                        🕒 Last Seen: <span style="color: #cbd5e1;">${lastSeenStr}</span>
-                    </p>
+            const box = document.createElement("div");
+            box.className = "meter-box";
+            box.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong style="color:#0f172a; font-size:1rem;">${name}</strong>
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </div>
+                <div class="meter-bar-bg">
+                    <div class="meter-bar-fill" style="width: ${percentage}%; background: ${barColor};"></div>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:#64748b;">
+                    <span>📱 Screen: <b>${mobileH.toFixed(1)}h</b></span>
+                    <span>📚 Study: <b>${studyH.toFixed(1)}h</b></span>
+                    <span style="color:#0f172a; font-weight:700;">${percentage}% Distracted</span>
                 </div>
             `;
+            meterBoxContainer.appendChild(box);
         });
-    }
 
-    window.adminEdit = async function(id, oldTopic, oldHours, oldDetails, oldActivity) {
-        if (!isMasterAdmin) return;
-        let newHours = prompt("🛠️ [Master] Update Study Hours:", oldHours);
+        // Render Individual Member Metrics Table
+        const tbody = document.getElementById("memberTableBody");
+        tbody.innerHTML = '';
+        Object.keys(members).forEach(name => {
+            const m = members[name];
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><strong style="color:#2563eb;">${name}</strong></td>
+                <td>${m.practice.toFixed(1)} hrs</td>
+                <td><span style="color:#7e22ce; font-weight:700;">${m.revision.toFixed(1)} hrs</span></td>
+                <td>${m.lectures.toFixed(1)} hrs</td>
+                <td><span style="color:#dc2626; font-weight:700;">${m.mobile.toFixed(1)} hrs</span></td>
+                <td><span style="color:#ca8a04; font-weight:700;">${m.questions} Qs</span></td>
+                <td><strong>${m.totalStudy.toFixed(1)} hrs</strong></td>
+            `;
+            tbody.appendChild(row);
+        });
+    });
+
+    // Mock Test Scores Listener
+    db.collection("jee_mock_scores").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+        const scoresBody = document.getElementById("adminScoresTableBody");
+        scoresBody.innerHTML = '';
+
+        if (snapshot.empty) {
+            scoresBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--text-muted);">No mock scores found.</td></tr>';
+            return;
+        }
+
+        snapshot.forEach(doc => {
+            const d = doc.data();
+            const scoreId = doc.id;
+            const dateStr = d.timestamp ? d.timestamp.toDate().toLocaleDateString([], { month: 'short', day: 'numeric' }) : 'Recent';
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${dateStr}</td>
+                <td><strong style="color:#2563eb;">${d.student}</strong></td>
+                <td>${d.testTitle}</td>
+                <td>${d.physics}</td>
+                <td>${d.chemistry}</td>
+                <td>${d.math}</td>
+                <td><strong style="color:#16a34a;">${d.total} / 300</strong></td>
+                <td style="white-space:nowrap;">
+                    <button class="btn-edit" onclick="adminEditScore('${scoreId}', '${d.testTitle.replace(/'/g, "\\'")}', '${d.physics}', '${d.chemistry}', '${d.math}')">✏️ Edit</button>
+                    <button class="btn-delete" onclick="adminDeleteScore('${scoreId}', '${d.testTitle.replace(/'/g, "\\'")}')">🗑️ Delete</button>
+                </td>
+            `;
+            scoresBody.appendChild(row);
+        });
+    });
+
+    // Admin Edit Log
+    window.adminEditLog = async function(docId, oldHours, oldTopic, oldDetails, oldQs) {
+        let newHours = prompt("✏️ [Admin] Update hours (study or mobile):", oldHours);
         if (newHours === null) return;
 
-        let newActivity = prompt("🛠️ [Master] Update Activity Type:", oldActivity || "Question Practice");
-        if (newActivity === null) return;
+        let newQs = prompt("🎯 [Admin] Update questions count:", oldQs);
+        if (newQs === null) return;
 
-        let newTopic = prompt("🛠️ [Master] Update Topic/Chapter:", oldTopic);
+        let newTopic = prompt("✏️ [Admin] Update topic/app:", oldTopic);
         if (newTopic === null) return;
 
-        let newDetails = prompt("🛠️ [Master] Update Accomplishment details:", oldDetails);
+        let newDetails = prompt("✏️ [Admin] Update details:", oldDetails);
         if (newDetails === null) return;
 
         try {
-            await db.collection("jee_logs").doc(id).update({
+            await db.collection("jee_logs").doc(docId).update({
                 studyHours: parseFloat(newHours),
-                activityType: newActivity,
+                questionsSolved: parseInt(newQs || 0, 10),
                 topic: newTopic,
                 details: newDetails,
-                adminEdited: true
+                adminEditedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            alert("✅ [Master] Log updated successfully!");
-        } catch (e) {
-            alert("❌ Failed to update: " + e.message);
+            alert("✅ Log updated!");
+        } catch (error) {
+            alert("❌ Update failed: " + error.message);
         }
     };
 
-    window.adminDelete = async function(id) {
-        if (!isMasterAdmin) return;
-        if (confirm("⚠️ [Master] Are you sure you want to permanently delete this log record?")) {
+    // Admin Delete Log
+    window.adminDeleteLog = async function(docId, studentName) {
+        if (confirm(`⚠️ Are you sure you want to permanently delete this log posted by ${studentName}?`)) {
             try {
-                await db.collection("jee_logs").doc(id).delete();
-                alert("🗑️ [Master] Log deleted successfully!");
-            } catch (e) {
-                alert("❌ Failed to delete: " + e.message);
+                await db.collection("jee_logs").doc(docId).delete();
+                alert("🗑️ Log permanently deleted!");
+            } catch (error) {
+                alert("❌ Delete failed: " + error.message);
+            }
+        }
+    };
+
+    // Admin Edit Mock Score
+    window.adminEditScore = async function(docId, oldTitle, oldP, oldC, oldM) {
+        let newTitle = prompt("✏️ [Admin] Update test title:", oldTitle);
+        if (newTitle === null) return;
+
+        let newP = prompt("⚛️ [Admin] Physics marks (/100):", oldP);
+        if (newP === null) return;
+
+        let newC = prompt("🧪 [Admin] Chemistry marks (/100):", oldC);
+        if (newC === null) return;
+
+        let newM = prompt("📐 [Admin] Math marks (/100):", oldM);
+        if (newM === null) return;
+
+        const pNum = parseInt(newP, 10) || 0;
+        const cNum = parseInt(newC, 10) || 0;
+        const mNum = parseInt(newM, 10) || 0;
+        const total = pNum + cNum + mNum;
+
+        try {
+            await db.collection("jee_mock_scores").doc(docId).update({
+                testTitle: newTitle,
+                physics: pNum,
+                chemistry: cNum,
+                math: mNum,
+                total: total,
+                adminEditedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            alert("✅ Score updated!");
+        } catch (error) {
+            alert("❌ Failed to update score: " + error.message);
+        }
+    };
+
+    // Admin Delete Mock Score
+    window.adminDeleteScore = async function(docId, testTitle) {
+        if (confirm(`⚠️ Are you sure you want to delete score for "${testTitle}"?`)) {
+            try {
+                await db.collection("jee_mock_scores").doc(docId).delete();
+                alert("🗑️ Mock score deleted!");
+            } catch (error) {
+                alert("❌ Failed to delete score: " + error.message);
             }
         }
     };
