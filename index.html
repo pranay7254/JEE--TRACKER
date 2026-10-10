@@ -7,7 +7,6 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js"></script>
     
     <style>
         :root {
@@ -16,6 +15,7 @@
             --accent-primary: #2563eb;
             --accent-saffron: #ea580c;
             --accent-green: #16a34a;
+            --accent-purple: #7e22ce;
             --accent-edit: #d97706;
             --accent-delete: #dc2626;
             --text-main: #0f172a;
@@ -31,7 +31,7 @@
             background-attachment: fixed;
             min-height: 100vh;
             color: var(--text-main);
-            padding: 3.5rem 1.5rem 2rem 1.5rem;
+            padding: 3.5rem 1.5rem 2.5rem 1.5rem;
             position: relative;
         }
 
@@ -226,6 +226,7 @@
             box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05); 
             height: fit-content;
             border: 1px solid var(--border-subtle);
+            margin-bottom: 1.5rem;
         }
 
         h2 { font-size: 1.2rem; margin-bottom: 1rem; color: var(--text-main); font-weight: 700; }
@@ -251,7 +252,7 @@
         }
         button.btn-submit:hover { opacity: 0.92; }
 
-        /* --- Custom Dark Feed Container for Pranjal --- */
+        /* Dark Feed Container */
         .card.feed-card-dark {
             background: #090d16;
             border: 1px solid #1e293b;
@@ -260,6 +261,37 @@
 
         .card.feed-card-dark h2 {
             color: #f8fafc;
+        }
+
+        /* Filter Controls */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: #1e293b;
+            color: #94a3b8;
+            border: 1px solid #334155;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            color: #f8fafc;
+            background: #334155;
+        }
+
+        .filter-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #3b82f6;
         }
 
         .feed-box { 
@@ -314,6 +346,20 @@
             margin-left: 6px;
         }
 
+        .tag-mobile {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+            margin-left: 6px;
+        }
+
+        .tag-questions {
+            background: #fef08a;
+            color: #854d0e;
+            border: 1px solid #facc15;
+            margin-left: 6px;
+        }
+
         .btn-edit {
             background-color: #fef3c7;
             color: #b45309;
@@ -335,6 +381,101 @@
             font-weight: 700;
             cursor: pointer;
         }
+
+        /* 11th & 12th Syllabus Checklist */
+        .chapter-section-header {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin: 1.2rem 0 0.6rem 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid var(--border-subtle);
+            padding-bottom: 4px;
+        }
+
+        .chapter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .chapter-col {
+            background: #f8fafc;
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 14px 16px;
+            max-height: 480px;
+            overflow-y: auto;
+        }
+
+        .chapter-col h3 {
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            position: sticky;
+            top: 0;
+            background: #f8fafc;
+            padding: 4px 0;
+            z-index: 5;
+        }
+
+        .chapter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.84rem;
+            color: #334155;
+            margin-bottom: 7px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .chapter-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #2563eb;
+        }
+
+        .chapter-badge-11 {
+            background: #e0e7ff;
+            color: #3730a3;
+            font-size: 0.68rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .chapter-badge-12 {
+            background: #fce7f3;
+            color: #9d174d;
+            font-size: 0.68rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        /* Scoreboard styling */
+        .score-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.88rem;
+        }
+
+        .score-table th, .score-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .score-table th {
+            background: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
@@ -344,15 +485,15 @@
     <div class="marquee-track">
         <div class="marquee-content">
             <span>✨ WELCOME TO JEE TARGET TRACKER</span>
-            <span>⚡ CLASS 11 DAILY MISSION</span>
-            <span>🎯 CONSISTENCY BEATS TALENT</span>
-            <span>🔥 TARGET JEE 2028</span>
+            <span>⚡ MISSION JEE 2028</span>
+            <span>🎯 COMPLETE 11th & 12th SYLLABUS TRACKER</span>
+            <span>🔥 CONSISTENCY BEATS TALENT</span>
         </div>
         <div class="marquee-content">
             <span>✨ WELCOME TO JEE TARGET TRACKER</span>
-            <span>⚡ CLASS 11 DAILY MISSION</span>
-            <span>🎯 CONSISTENCY BEATS TALENT</span>
-            <span>🔥 TARGET JEE 2028</span>
+            <span>⚡ MISSION JEE 2028</span>
+            <span>🎯 COMPLETE 11th & 12th SYLLABUS TRACKER</span>
+            <span>🔥 CONSISTENCY BEATS TALENT</span>
         </div>
     </div>
 </div>
@@ -364,7 +505,7 @@
 
     <header>
         <h1>🎯 JEE Target Tracker</h1>
-        <p style="color: var(--text-muted); margin-top: 0.35rem; font-weight: 500;">Class 11 Daily Log & Question Practice Dashboard</p>
+        <p style="color: var(--text-muted); margin-top: 0.35rem; font-weight: 500;">Class 11 & 12 Complete Syllabus, Practice Log, Screen Time & Scoreboard</p>
     </header>
 
     <div class="user-status-bar">
@@ -373,7 +514,6 @@
 
     <!-- Active Presence Cards With Student Photos -->
     <div class="presence-container">
-        <!-- Pranay -->
         <div class="presence-card">
             <img class="student-avatar" id="avatar-Pranay" src="./pranay.jpeg" alt="Pranay">
             <div class="presence-info">
@@ -381,7 +521,6 @@
                 <span class="presence-time" id="status-Pranay">Checking...</span>
             </div>
         </div>
-        <!-- Abhigyan -->
         <div class="presence-card">
             <img class="student-avatar" id="avatar-Abhigyan" src="./abhigyan.jpeg" alt="Abhigyan">
             <div class="presence-info">
@@ -389,7 +528,6 @@
                 <span class="presence-time" id="status-Abhigyan">Checking...</span>
             </div>
         </div>
-        <!-- Pranjal -->
         <div class="presence-card">
             <img class="student-avatar" id="avatar-Pranjal" src="./pranjal.jpeg" alt="Pranjal">
             <div class="presence-info">
@@ -397,7 +535,6 @@
                 <span class="presence-time" id="status-Pranjal">Checking...</span>
             </div>
         </div>
-        <!-- Aayush -->
         <div class="presence-card">
             <img class="student-avatar" id="avatar-Aayush" src="./aayush.jpeg" alt="Aayush">
             <div class="presence-info">
@@ -407,19 +544,15 @@
         </div>
     </div>
 
-    <!-- YouTube Hub: Physics Wallah & Know Your Holy Books Only -->
+    <!-- YouTube Hub -->
     <div class="resources-card">
         <h2 style="margin-bottom: 0.5rem; display: flex; align-items: center; gap: 8px;">
-            <span style="color: #ef4444;">📺</span> Recommended Channels
+            <span style="color: #ef4444;">📺</span> Recommended Channel
         </h2>
         <div class="yt-grid">
-            <a href="https://www.youtube.com/@PhysicsWallah" target="_blank" class="yt-link-btn">
-                <span class="yt-icon">▶</span>
-                <span>Physics Wallah</span>
-            </a>
             <a href="https://www.youtube.com/@KnowYourHolyBook" target="_blank" class="yt-link-btn">
                 <span class="yt-icon">▶</span>
-                <span>Know Your Holy Books</span>
+                <span>Know Your Holy Book</span>
             </a>
         </div>
     </div>
@@ -470,11 +603,12 @@
                     <input type="text" id="student" readonly style="background: #f1f5f9; color: #2563eb; font-weight: bold; cursor: not-allowed;">
                 </div>
                 <div class="form-group">
-                    <label for="subject">Subject</label>
+                    <label for="subject">Subject / Category</label>
                     <select id="subject" required>
                         <option value="Physics">Physics</option>
                         <option value="Chemistry">Chemistry</option>
                         <option value="Math">Mathematics</option>
+                        <option value="General">General / Others</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -484,30 +618,203 @@
                         <option value="Self Study">📚 Self Study</option>
                         <option value="Lecture">🎥 Lecture</option>
                         <option value="Revision">📖 Revision</option>
+                        <option value="Watching Mobile">📱 Watching Mobile (Screen Time)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="studyHours">Study Hours</label>
+                    <label for="studyHours">Hours (Study or Screen Time)</label>
                     <input type="number" id="studyHours" step="0.5" min="0.5" max="24" placeholder="e.g., 2.5" required>
                 </div>
                 <div class="form-group">
-                    <label for="topic">Topic/Chapter Name</label>
-                    <input type="text" id="topic" placeholder="e.g., Kinematics, Mole Concept" required>
+                    <label for="questionsSolved">Questions Solved (Optional - For Practice)</label>
+                    <input type="number" id="questionsSolved" min="0" placeholder="e.g., 25 or 40 questions">
                 </div>
                 <div class="form-group">
-                    <label for="details">What did you accomplish?</label>
-                    <input type="text" id="details" placeholder="e.g., Solved 30 HC Verma questions" required>
+                    <label for="topic">Topic / Apps Used</label>
+                    <input type="text" id="topic" placeholder="e.g., Kinematics OR YouTube / Instagram" required>
+                </div>
+                <div class="form-group">
+                    <label for="details">What did you accomplish or watch?</label>
+                    <input type="text" id="details" placeholder="e.g., Solved 30 HC Verma Qs OR Reels / Social Media" required>
                 </div>
                 <button type="submit" class="btn-submit">Publish Update</button>
             </form>
         </div>
 
-        <!-- Custom Dark Section for Logs -->
+        <!-- Custom Dark Section for Logs with Time Filter -->
         <div class="card feed-card-dark">
             <h2>Group Update Feed</h2>
+            
+            <div class="filter-bar">
+                <button class="filter-btn active" onclick="setFeedFilter('all', this)">All Time</button>
+                <button class="filter-btn" onclick="setFeedFilter('today', this)">Today</button>
+                <button class="filter-btn" onclick="setFeedFilter('week', this)">Last 7 Days</button>
+            </div>
+
             <div id="feedContainer" class="feed-box">
                 <p style="color: #94a3b8;">Connecting to database...</p>
             </div>
+        </div>
+    </div>
+
+    <!-- Complete Class 11th + 12th JEE Chapter Checklist -->
+    <div class="card">
+        <h2>📚 Complete JEE Syllabus Checklist (Class 11 + 12)</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Track team completion across all PCM chapters for JEE Main & Advanced.</p>
+
+        <!-- CLASS 11TH SECTION -->
+        <div class="chapter-section-header">
+            <span>⚡ Class 11th Syllabus</span>
+            <span class="chapter-badge-11">Foundation</span>
+        </div>
+        <div class="chapter-grid">
+            <div class="chapter-col">
+                <h3 style="color:#ea580c;">⚛️ Physics (11th)</h3>
+                <label class="chapter-item"><input type="checkbox" id="chk_p11_1" onchange="toggleChapter('chk_p11_1')"> Units, Dimensions & Measurement</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p11_2" onchange="toggleChapter('chk_p11_2')"> Vectors & Basic Mathematics</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p11_3" onchange="toggleChapter('chk_p11_3')"> Motion in 1D (Kinematics 1D)</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p11_4" onchange="toggleChapter('chk_p11_4')"> Motion in 2D (Projectile & Relative)</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p11_5" onchange="toggleChapter('chk_p11_5')"> Laws of Motion & Friction</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p11_6" onchange="toggleChapter('chk_p11_6')"> Work, Energy & Power</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p11_7" onchange="toggleChapter('chk_p11_7')"> Circular Motion</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p11_8" onchange="toggleChapter('chk_p11_8')"> Center of Mass & Momentum</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p11_9" onchange="toggleChapter('chk_p11_9')"> Rotational Motion & Dynamics</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p11_10" onchange="toggleChapter('chk_p11_10')"> Gravitation</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p11_11" onchange="toggleChapter('chk_p11_11')"> Mechanical Properties of Solids</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p11_12" onchange="toggleChapter('chk_p11_12')"> Fluid Mechanics</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p11_13" onchange="toggleChapter('chk_p11_13')"> Thermal Properties & Calorimetry</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p11_14" onchange="toggleChapter('chk_p11_14')"> Thermodynamics & Heat Transfer</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p11_15" onchange="toggleChapter('chk_p11_15')"> Kinetic Theory of Gases (KTG)</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p11_16" onchange="toggleChapter('chk_p11_16')"> Simple Harmonic Motion (SHM)</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p11_17" onchange="toggleChapter('chk_p11_17')"> Waves & Sound</label>
+            </div>
+
+            <div class="chapter-col">
+                <h3 style="color:#16a34a;">🧪 Chemistry (11th)</h3>
+                <label class="chapter-item"><input type="checkbox" id="chk_c11_1" onchange="toggleChapter('chk_c11_1')"> Some Basic Concepts (Mole Concept)</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c11_2" onchange="toggleChapter('chk_c11_2')"> Structure of Atom</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c11_3" onchange="toggleChapter('chk_c11_3')"> Periodic Classification</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c11_4" onchange="toggleChapter('chk_c11_4')"> Chemical Bonding</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c11_5" onchange="toggleChapter('chk_c11_5')"> States of Matter</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c11_6" onchange="toggleChapter('chk_c11_6')"> Chemical Thermodynamics</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c11_7" onchange="toggleChapter('chk_c11_7')"> Chemical Equilibrium</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c11_8" onchange="toggleChapter('chk_c11_8')"> Ionic Equilibrium</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c11_9" onchange="toggleChapter('chk_c11_9')"> Redox Reactions</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c11_10" onchange="toggleChapter('chk_c11_10')"> Hydrogen & s-Block</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c11_11" onchange="toggleChapter('chk_c11_11')"> p-Block (Group 13 & 14)</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c11_12" onchange="toggleChapter('chk_c11_12')"> General Organic Chemistry (GOC)</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c11_13" onchange="toggleChapter('chk_c11_13')"> Hydrocarbons</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c11_14" onchange="toggleChapter('chk_c11_14')"> Environmental Chemistry</label>
+            </div>
+
+            <div class="chapter-col">
+                <h3 style="color:#0284c7;">📐 Mathematics (11th)</h3>
+                <label class="chapter-item"><input type="checkbox" id="chk_m11_1" onchange="toggleChapter('chk_m11_1')"> Sets & Relations</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m11_2" onchange="toggleChapter('chk_m11_2')"> Functions (Basics & Graphs)</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m11_3" onchange="toggleChapter('chk_m11_3')"> Trigonometric Ratios & Identities</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m11_4" onchange="toggleChapter('chk_m11_4')"> Trigonometric Equations</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m11_5" onchange="toggleChapter('chk_m11_5')"> Quadratic Equations</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m11_6" onchange="toggleChapter('chk_m11_6')"> Complex Numbers</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m11_7" onchange="toggleChapter('chk_m11_7')"> Sequences & Series</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m11_8" onchange="toggleChapter('chk_m11_8')"> Permutations & Combinations (P&C)</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m11_9" onchange="toggleChapter('chk_m11_9')"> Binomial Theorem</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m11_10" onchange="toggleChapter('chk_m11_10')"> Straight Lines</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m11_11" onchange="toggleChapter('chk_m11_11')"> Circles</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m11_12" onchange="toggleChapter('chk_m11_12')"> Conic Sections</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m11_13" onchange="toggleChapter('chk_m11_13')"> Limits & Derivatives</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m11_14" onchange="toggleChapter('chk_m11_14')"> Statistics</label>
+            </div>
+        </div>
+
+        <!-- CLASS 12TH SECTION -->
+        <div class="chapter-section-header" style="margin-top: 2rem;">
+            <span>🚀 Class 12th Syllabus</span>
+            <span class="chapter-badge-12">Advanced</span>
+        </div>
+        <div class="chapter-grid">
+            <div class="chapter-col">
+                <h3 style="color:#ea580c;">⚛️ Physics (12th)</h3>
+                <label class="chapter-item"><input type="checkbox" id="chk_p12_1" onchange="toggleChapter('chk_p12_1')"> Electrostatics</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p12_2" onchange="toggleChapter('chk_p12_2')"> Capacitance</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p12_3" onchange="toggleChapter('chk_p12_3')"> Current Electricity</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p12_4" onchange="toggleChapter('chk_p12_4')"> Moving Charges & Magnetism</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p12_5" onchange="toggleChapter('chk_p12_5')"> Magnetism & Matter</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p12_6" onchange="toggleChapter('chk_p12_6')"> Electromagnetic Induction (EMI)</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p12_7" onchange="toggleChapter('chk_p12_7')"> Alternating Current (AC)</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p12_8" onchange="toggleChapter('chk_p12_8')"> EM Waves</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p12_9" onchange="toggleChapter('chk_p12_9')"> Ray Optics</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p12_10" onchange="toggleChapter('chk_p12_10')"> Wave Optics</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p12_11" onchange="toggleChapter('chk_p12_11')"> Dual Nature of Radiation</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p12_12" onchange="toggleChapter('chk_p12_12')"> Atoms & Nuclei</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p12_13" onchange="toggleChapter('chk_p12_13')"> Semiconductors</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_p12_14" onchange="toggleChapter('chk_p12_14')"> Communication Systems</label>
+            </div>
+
+            <div class="chapter-col">
+                <h3 style="color:#16a34a;">🧪 Chemistry (12th)</h3>
+                <label class="chapter-item"><input type="checkbox" id="chk_c12_1" onchange="toggleChapter('chk_c12_1')"> Solid State</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c12_2" onchange="toggleChapter('chk_c12_2')"> Solutions</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c12_3" onchange="toggleChapter('chk_c12_3')"> Electrochemistry</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c12_4" onchange="toggleChapter('chk_c12_4')"> Chemical Kinetics</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c12_5" onchange="toggleChapter('chk_c12_5')"> Surface Chemistry</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c12_6" onchange="toggleChapter('chk_c12_6')"> Metallurgy</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c12_7" onchange="toggleChapter('chk_c12_7')"> p-Block (15-18)</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c12_8" onchange="toggleChapter('chk_c12_8')"> d- and f-Block</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c12_9" onchange="toggleChapter('chk_c12_9')"> Coordination Compounds</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c12_10" onchange="toggleChapter('chk_c12_10')"> Haloalkanes & Haloarenes</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c12_11" onchange="toggleChapter('chk_c12_11')"> Alcohols, Phenols & Ethers</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c12_12" onchange="toggleChapter('chk_c12_12')"> Aldehydes, Ketones & Acids</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c12_13" onchange="toggleChapter('chk_c12_13')"> Amines & Diazonium</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_c12_14" onchange="toggleChapter('chk_c12_14')"> Biomolecules & Polymers</label>
+            </div>
+
+            <div class="chapter-col">
+                <h3 style="color:#0284c7;">📐 Mathematics (12th)</h3>
+                <label class="chapter-item"><input type="checkbox" id="chk_m12_1" onchange="toggleChapter('chk_m12_1')"> Relations & Functions</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m12_2" onchange="toggleChapter('chk_m12_2')"> Inverse Trigonometry (ITF)</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m12_3" onchange="toggleChapter('chk_m12_3')"> Matrices & Determinants</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m12_4" onchange="toggleChapter('chk_m12_4')"> Continuity & Differentiability</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m12_5" onchange="toggleChapter('chk_m12_5')"> Application of Derivatives (AOD)</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m12_6" onchange="toggleChapter('chk_m12_6')"> Indefinite Integration</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m12_7" onchange="toggleChapter('chk_m12_7')"> Definite Integration</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m12_8" onchange="toggleChapter('chk_m12_8')"> Differential Equations</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m12_9" onchange="toggleChapter('chk_m12_9')"> Area Under Curve (AUC)</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m12_10" onchange="toggleChapter('chk_m12_10')"> Vector Algebra</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m12_11" onchange="toggleChapter('chk_m12_11')"> 3D Geometry</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m12_12" onchange="toggleChapter('chk_m12_12')"> Probability</label>
+                <label class="chapter-item"><input type="checkbox" id="chk_m12_13" onchange="toggleChapter('chk_m12_13')"> Linear Programming</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mock Test & DPP Scoreboard -->
+    <div class="card">
+        <h2>📊 Mock Test / DPP Scoreboard</h2>
+        <form id="scoreForm" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:1.25rem;">
+            <input type="text" id="testTitle" placeholder="Test Name (e.g. Allen Part Test 1)" style="flex:2; min-width:180px;" required>
+            <input type="number" id="scoreP" placeholder="Physics (/100)" min="0" max="100" style="flex:1; min-width:90px;" required>
+            <input type="number" id="scoreC" placeholder="Chem (/100)" min="0" max="100" style="flex:1; min-width:90px;" required>
+            <input type="number" id="scoreM" placeholder="Math (/100)" min="0" max="100" style="flex:1; min-width:90px;" required>
+            <button type="submit" style="padding:10px 18px; background:#2563eb; color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer;">Save Score</button>
+        </form>
+
+        <div style="overflow-x:auto;">
+            <table class="score-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Student</th>
+                        <th>Test Title</th>
+                        <th>Physics</th>
+                        <th>Chemistry</th>
+                        <th>Math</th>
+                        <th>Total (/300)</th>
+                    </tr>
+                </thead>
+                <tbody id="scoresTableBody">
+                    <tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No mock scores posted yet.</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -526,25 +833,7 @@
 </div>
 
 <script>
-    // Relative local image filenames
-    const studentAvatars = {
-        "Pranay": "./pranay.jpeg",
-        "Abhigyan": "./abhigyan.jpeg",
-        "Pranjal": "./pranjal.jpeg",
-        "Aayush": "./aayush.jpeg"
-    };
-
-    // Load local pictures with fallback
-    Object.keys(studentAvatars).forEach(name => {
-        const el = document.getElementById(`avatar-${name}`);
-        if (el) {
-            el.src = studentAvatars[name];
-            el.onerror = () => {
-                el.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${name}`;
-            };
-        }
-    });
-
+    // 1. PIN & User Configuration
     const pinToUser = {
         "4440": "Pranay",
         "5670": "Abhigyan",
@@ -559,18 +848,7 @@
         "Aayush": "2340"
     };
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAB6FbsDLh4xq6ikvsSFFrDLYFVDaYB978",
-        authDomain: "jee-tracker-6b67d.firebaseapp.com",
-        projectId: "jee-tracker-6b67d",
-        storageBucket: "jee-tracker-6b67d.firebasestorage.app",
-        messagingSenderId: "14514591368",
-        appId: "1:14514591368:web:9e72203c576dfaa5e9713d"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
+    // 2. Authentication Handling
     let loggedInUser = sessionStorage.getItem("jee_authenticated_user");
 
     if (!loggedInUser || !userToPin[loggedInUser]) {
@@ -588,14 +866,59 @@
     document.getElementById("currentIdentifiedUser").innerText = loggedInUser;
     document.getElementById("student").value = loggedInUser;
 
+    // 3. Avatars
+    const studentAvatars = {
+        "Pranay": "./pranay.jpeg",
+        "Abhigyan": "./abhigyan.jpeg",
+        "Pranjal": "./pranjal.jpeg",
+        "Aayush": "./aayush.jpeg"
+    };
+
+    Object.keys(studentAvatars).forEach(name => {
+        const el = document.getElementById(`avatar-${name}`);
+        if (el) {
+            el.src = studentAvatars[name];
+            el.onerror = () => {
+                el.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${name}`;
+            };
+        }
+    });
+
+    // 4. Firebase Initialization
+    const firebaseConfig = {
+        apiKey: "AIzaSyAB6FbsDLh4xq6ikvsSFFrDLYFVDaYB978",
+        authDomain: "jee-tracker-6b67d.firebaseapp.com",
+        projectId: "jee-tracker-6b67d",
+        storageBucket: "jee-tracker-6b67d.firebasestorage.app",
+        messagingSenderId: "14514591368",
+        appId: "1:14514591368:web:9e72203c576dfaa5e9713d"
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    // 5. Update Presence
     db.collection("user_presence").doc(loggedInUser).set({
         lastActive: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
-    // Pass Evaluation Engine with Daily & Weekly Resets
+    db.collection("user_presence").onSnapshot(snapshot => {
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const memberId = doc.id;
+            const statusEl = document.getElementById(`status-${memberId}`);
+            if (statusEl && data.lastActive) {
+                const dateObj = data.lastActive.toDate();
+                statusEl.innerText = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " (" + dateObj.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ")";
+            }
+        });
+    });
+
+    // 6. Pass Evaluation Logic
     async function evaluateMemberPasses(user) {
         const now = new Date();
-
         const startOfToday = new Date();
         startOfToday.setHours(0, 0, 0, 0);
 
@@ -618,7 +941,7 @@
             const d = doc.data();
             const hours = parseFloat(d.studyHours || d.hours || 0);
             const act = (d.activityType || '').toLowerCase();
-            const isPractice = act.includes("practice") || act.includes("self study") || act.includes("self");
+            const isPractice = (act.includes("practice") || act.includes("self study") || act.includes("self")) && !act.includes("mobile");
             const isLecture = act.includes("lecture");
             const logDate = d.timestamp ? d.timestamp.toDate() : new Date();
 
@@ -628,16 +951,11 @@
 
             if (d.student === user) {
                 if (isPractice) practiceAllTime += hours;
-
-                if (isPractice && logDate >= startOfToday) {
-                    practiceToday += hours;
-                }
-
+                if (isPractice && logDate >= startOfToday) practiceToday += hours;
                 if (logDate >= startOfWeek) {
                     if (isPractice) practiceThisWeek += hours;
                     if (isLecture) lectureThisWeek += hours;
                 }
-
                 if (isPractice && hours >= 2.0) {
                     practiceDates.add(logDate.toDateString());
                 }
@@ -743,77 +1061,107 @@
         document.getElementById("tierModal").style.display = "none";
     };
 
-    const form = document.getElementById('trackerForm');
+    // 7. Feed Management & Filtering
     const feedContainer = document.getElementById('feedContainer');
+    let currentFilter = 'all';
+    let cachedLogs = [];
 
-    db.collection("user_presence").onSnapshot((snapshot) => {
-        snapshot.forEach((doc) => {
-            const data = doc.data();
-            const memberId = doc.id;
-            const statusEl = document.getElementById(`status-${memberId}`);
-            if (statusEl && data.lastActive) {
-                const dateObj = data.lastActive.toDate();
-                statusEl.innerText = dateObj.toLocaleTimeString([], { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                }) + " (" + dateObj.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ")";
-            }
+    window.setFeedFilter = function(filterMode, btn) {
+        currentFilter = filterMode;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        renderLogs();
+    };
+
+    function renderLogs() {
+        feedContainer.innerHTML = '';
+
+        const now = new Date();
+        const startOfToday = new Date();
+        startOfToday.setHours(0,0,0,0);
+
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(now.getDate() - 7);
+
+        let filtered = cachedLogs.filter(log => {
+            const d = log.dateObj;
+            if (currentFilter === 'today') return d >= startOfToday;
+            if (currentFilter === 'week') return d >= sevenDaysAgo;
+            return true;
         });
-    });
+
+        if (filtered.length === 0) {
+            feedContainer.innerHTML = '<p style="color: #94a3b8;">No logs found for this filter range.</p>';
+            return;
+        }
+
+        filtered.forEach(item => {
+            const log = item.data;
+            const logId = item.id;
+
+            let tagClass = 'tag-p';
+            if(log.subject === 'Chemistry') tagClass = 'tag-c';
+            if(log.subject === 'Math') tagClass = 'tag-m';
+            if(log.subject === 'General') tagClass = 'tag-mobile';
+
+            const activity = log.activityType || 'Self Study';
+            let activityClass = 'tag-activity';
+            if (activity.toLowerCase().includes("mobile")) {
+                activityClass = 'tag-mobile';
+            }
+
+            const formattedTime = item.dateObj ? item.dateObj.toLocaleString([], { 
+                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+            }) : 'Just now';
+
+            const hoursDisplay = log.studyHours ? ` — <strong>${log.studyHours} hrs</strong>` : '';
+            const questionsDisplay = log.questionsSolved ? `<span class="tag tag-questions">🎯 ${log.questionsSolved} Qs</span>` : '';
+            const detailsDisplay = log.details || log.accomplishment || '';
+
+            const logElement = document.createElement('div');
+            logElement.className = 'log-item';
+            logElement.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong style="color: #38bdf8; font-size: 1.05rem;">${log.student}${hoursDisplay}</strong>
+                    <div>
+                        <span class="tag ${tagClass}">${log.subject || 'General'}</span>
+                        <span class="tag ${activityClass}">${activity}</span>
+                        ${questionsDisplay}
+                    </div>
+                </div>
+                <p class="topic-title">📖 ${log.topic}</p>
+                <p class="details-text">✅ ${detailsDisplay}</p>
+                <div class="log-meta">
+                    <span>🕒 ${formattedTime}</span>
+                    <div class="action-btns">
+                        <button class="btn-edit" onclick="editLog('${logId}', '${log.student}', '${log.studyHours || 0}', '${(log.topic || '').replace(/'/g, "\\'")}', '${detailsDisplay.replace(/'/g, "\\'")}', '${log.questionsSolved || 0}')">
+                            ✏️ Edit
+                        </button>
+                        <button class="btn-delete" onclick="deleteLog('${logId}', '${log.student}')">
+                            🗑️ Delete
+                        </button>
+                    </div>
+                </div>
+            `;
+            feedContainer.appendChild(logElement);
+        });
+    }
 
     db.collection("jee_logs")
       .orderBy("timestamp", "desc")
       .onSnapshot(async (snapshot) => {
-          feedContainer.innerHTML = '';
-          if (snapshot.empty) {
-              feedContainer.innerHTML = '<p style="color: #94a3b8;">No logs posted yet. Start studying!</p>';
-              return;
-          }
-          
+          cachedLogs = [];
           snapshot.forEach((docSnap) => {
-              const log = docSnap.data();
-              const logId = docSnap.id;
-
-              let tagClass = 'tag-p';
-              if(log.subject === 'Chemistry') tagClass = 'tag-c';
-              if(log.subject === 'Math') tagClass = 'tag-m';
-
-              const activity = log.activityType || 'Self Study';
-              const formattedTime = log.timestamp ? new Date(log.timestamp.seconds * 1000).toLocaleString([], { 
-                  month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
-              }) : 'Just now';
-
-              const hoursDisplay = log.studyHours ? ` — <strong>${log.studyHours} hrs</strong>` : '';
-              const detailsDisplay = log.details || log.accomplishment || '';
-
-              const logElement = document.createElement('div');
-              logElement.className = 'log-item';
-              logElement.innerHTML = `
-                  <div style="display: flex; justify-content: space-between; align-items: center;">
-                      <strong style="color: #38bdf8; font-size: 1.05rem;">${log.student}${hoursDisplay}</strong>
-                      <div>
-                          <span class="tag ${tagClass}">${log.subject || 'General'}</span>
-                          <span class="tag tag-activity">${activity}</span>
-                      </div>
-                  </div>
-                  <p class="topic-title">📖 ${log.topic}</p>
-                  <p class="details-text">✅ ${detailsDisplay}</p>
-                  <div class="log-meta">
-                      <span>🕒 ${formattedTime}</span>
-                      <div class="action-btns">
-                          <button class="btn-edit" onclick="editLog('${logId}', '${log.student}', '${log.studyHours || 0}', '${(log.topic || '').replace(/'/g, "\\'")}', '${detailsDisplay.replace(/'/g, "\\'")}')">
-                              ✏️ Edit
-                          </button>
-                          <button class="btn-delete" onclick="deleteLog('${logId}', '${log.student}')">
-                              🗑️ Delete
-                          </button>
-                      </div>
-                  </div>
-              `;
-              feedContainer.appendChild(logElement);
+              const data = docSnap.data();
+              cachedLogs.push({
+                  id: docSnap.id,
+                  data: data,
+                  dateObj: data.timestamp ? data.timestamp.toDate() : new Date()
+              });
           });
 
-          // Live Pass Status Update on Main Page
+          renderLogs();
+
           const passData = await evaluateMemberPasses(loggedInUser);
           const statusBox = document.getElementById("userMembershipStatus");
           if (statusBox) {
@@ -825,6 +1173,8 @@
           }
       });
 
+    // 8. Log Work Submission
+    const form = document.getElementById('trackerForm');
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -832,6 +1182,8 @@
         const subject = document.getElementById('subject').value;
         const activityType = document.getElementById('activityType').value;
         const studyHours = parseFloat(document.getElementById('studyHours').value);
+        const questionsVal = document.getElementById('questionsSolved').value;
+        const questionsSolved = questionsVal ? parseInt(questionsVal, 10) : 0;
         const topic = document.getElementById('topic').value;
         const details = document.getElementById('details').value;
 
@@ -841,12 +1193,14 @@
                 subject: subject,
                 activityType: activityType,
                 studyHours: studyHours,
+                questionsSolved: questionsSolved,
                 topic: topic,
                 details: details,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
 
             document.getElementById('studyHours').value = '';
+            document.getElementById('questionsSolved').value = '';
             document.getElementById('topic').value = '';
             document.getElementById('details').value = '';
 
@@ -860,7 +1214,7 @@
         }
     });
 
-    window.editLog = async function(docId, studentName, oldHours, oldTopic, oldDetails) {
+    window.editLog = async function(docId, studentName, oldHours, oldTopic, oldDetails, oldQs) {
         if (studentName !== loggedInUser) {
             alert(`❌ You cannot edit logs belonging to ${studentName}!`);
             return;
@@ -872,18 +1226,22 @@
             return;
         }
 
-        let newHours = prompt("✏️ Enter updated study hours:", oldHours);
+        let newHours = prompt("✏️ Enter updated hours:", oldHours);
         if (newHours === null) return;
 
-        let newTopic = prompt("✏️ Enter updated Topic/Chapter:", oldTopic);
+        let newQs = prompt("🎯 Enter updated questions count:", oldQs);
+        if (newQs === null) return;
+
+        let newTopic = prompt("✏️ Enter updated Topic / App:", oldTopic);
         if (newTopic === null) return;
 
-        let newDetails = prompt("✏️ Enter updated Accomplishment details:", oldDetails);
+        let newDetails = prompt("✏️ Enter updated details:", oldDetails);
         if (newDetails === null) return;
 
         try {
             await db.collection("jee_logs").doc(docId).update({
                 studyHours: parseFloat(newHours),
+                questionsSolved: parseInt(newQs || 0, 10),
                 topic: newTopic,
                 details: newDetails,
                 editedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -915,6 +1273,83 @@
             }
         }
     };
+
+    // 9. Safe Checklist Toggle Function
+    window.toggleChapter = async function(chkId) {
+        const el = document.getElementById(chkId);
+        if (!el) return;
+        await db.collection("jee_chapters").doc(chkId).set({
+            checked: el.checked,
+            updatedBy: loggedInUser,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+    };
+
+    // Safe live sync for checklists (Ignores deleted or mismatched chapter IDs)
+    db.collection("jee_chapters").onSnapshot(snapshot => {
+        snapshot.forEach(doc => {
+            const chk = document.getElementById(doc.id);
+            if (chk && doc.data() && doc.data().checked !== undefined) {
+                chk.checked = doc.data().checked;
+            }
+        });
+    });
+
+    // 10. Mock Test Scores Handling
+    const scoreForm = document.getElementById('scoreForm');
+    scoreForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const title = document.getElementById('testTitle').value;
+        const p = parseInt(document.getElementById('scoreP').value, 10);
+        const c = parseInt(document.getElementById('scoreC').value, 10);
+        const m = parseInt(document.getElementById('scoreM').value, 10);
+        const total = p + c + m;
+
+        try {
+            await db.collection("jee_mock_scores").add({
+                student: loggedInUser,
+                testTitle: title,
+                physics: p,
+                chemistry: c,
+                math: m,
+                total: total,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            document.getElementById('testTitle').value = '';
+            document.getElementById('scoreP').value = '';
+            document.getElementById('scoreC').value = '';
+            document.getElementById('scoreM').value = '';
+            alert("✅ Mock Test score recorded!");
+        } catch (err) {
+            alert("Failed to save score: " + err.message);
+        }
+    });
+
+    db.collection("jee_mock_scores").orderBy("timestamp", "desc").limit(10).onSnapshot(snapshot => {
+        const tbody = document.getElementById("scoresTableBody");
+        tbody.innerHTML = '';
+        if (snapshot.empty) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No mock scores posted yet.</td></tr>';
+            return;
+        }
+
+        snapshot.forEach(doc => {
+            const d = doc.data();
+            const dateStr = d.timestamp ? d.timestamp.toDate().toLocaleDateString([], { month: 'short', day: 'numeric' }) : 'Today';
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${dateStr}</td>
+                <td><strong style="color:#2563eb;">${d.student}</strong></td>
+                <td>${d.testTitle}</td>
+                <td>${d.physics}</td>
+                <td>${d.chemistry}</td>
+                <td>${d.math}</td>
+                <td><strong style="color:#16a34a;">${d.total} / 300</strong></td>
+            `;
+            tbody.appendChild(row);
+        });
+    });
 </script>
 </body>
 </html>
