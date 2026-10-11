@@ -44,32 +44,41 @@
             -webkit-text-fill-color: transparent;
             display: inline-block;
         }
+        .section-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            margin: 1.5rem 0 0.8rem 0;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
             gap: 14px;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
         .stat-card {
             background: var(--card-bg);
             border: 1px solid var(--border-subtle);
             border-radius: 12px;
-            padding: 1.25rem;
+            padding: 1.15rem;
             box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
         }
         .stat-card h3 {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         .stat-val {
-            font-size: 1.8rem;
+            font-size: 1.7rem;
             font-weight: 800;
             margin: 6px 0;
         }
         .stat-breakdown {
-            font-size: 0.78rem;
+            font-size: 0.76rem;
             color: var(--text-muted);
             line-height: 1.4;
         }
@@ -130,26 +139,60 @@
             cursor: pointer;
         }
 
-        /* Chupa hua trigger button */
+        /* 🤫 Secret Trigger (Hamesha visible aur clickable rahega) */
         .secret-trigger {
             cursor: pointer;
             user-select: none;
-            opacity: 0.3;
+            opacity: 0.45;
             transition: opacity 0.2s;
-            font-size: 1.1rem;
+            font-size: 1.25rem;
             vertical-align: middle;
             margin-left: 8px;
+            display: inline-block !important;
         }
         .secret-trigger:hover {
             opacity: 1;
         }
 
-        /* Hidden Mobile Card (Default me display: none) */
         #secretMobileCard {
             display: none;
             border-left: 5px solid #dc2626;
             animation: fadeIn 0.3s ease;
         }
+
+        .meter-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+            margin-top: 10px;
+        }
+        .meter-box {
+            background: #f8fafc;
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 14px;
+        }
+        .meter-bar-bg {
+            background: #e2e8f0;
+            height: 10px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+        .meter-bar-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        .status-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+        .status-safe { background: #dcfce7; color: #16a34a; border: 1px solid #86efac; }
+        .status-mid { background: #fef9c3; color: #a16207; border: 1px solid #fde047; }
+        .status-danger { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-5px); }
@@ -164,49 +207,46 @@
     
     <div>
         <h1>🛠️ JEE Admin Analytics & Control Panel</h1>
-        <!-- Secret button hidden in plain sight -->
-        <span class="secret-trigger" onclick="toggleSecretMobile()" title="Options">🤫</span>
+        <!-- 🤫 Emoji hamesha yahan rahega chahe Master ho ya Read-Only -->
+        <span id="secretIconBtn" class="secret-trigger" onclick="toggleSecretMobile()" title="Secret Options">🤫</span>
     </div>
     
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
-        <p style="color: var(--text-muted);">Study hours, revision analytics, mock test scoreboard, aur database control.</p>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <p style="color: var(--text-muted);">Exact study metrics, subject-wise analytics (PCM), mock scoreboard & logs control.</p>
         <span id="roleBadge" style="font-size:0.8rem; font-weight:700; padding:4px 10px; border-radius:20px; background:#e2e8f0; color:#334155;">Checking role...</span>
     </div>
 
-    <!-- Overview Stats Grid -->
+    <!-- 1. OVERALL ACTIVITY STATS -->
+    <div class="section-title">📊 Activity Overview</div>
     <div class="stats-grid">
-        <!-- 1. Total Revision Hours -->
-        <div class="stat-card" style="border-left: 5px solid #7e22ce;">
-            <h3>📖 Total Revision Done</h3>
-            <div id="statTotalRevision" class="stat-val" style="color: #7e22ce;">0.0 hrs</div>
-            <div id="statRevisionBreakdown" class="stat-breakdown">Calculating revision hours...</div>
-        </div>
-
-        <!-- 2. Total Practice Hours -->
         <div class="stat-card" style="border-left: 5px solid #ea580c;">
             <h3>✍️ Total Practice Hours</h3>
             <div id="statTotalPractice" class="stat-val" style="color: #ea580c;">0.0 hrs</div>
             <div id="statPracticeBreakdown" class="stat-breakdown">Calculating practice hours...</div>
         </div>
 
-        <!-- 3. Total Questions Solved -->
-        <div class="stat-card" style="border-left: 5px solid #ca8a04;">
-            <h3>🎯 Questions Solved</h3>
-            <div id="statTotalQuestions" class="stat-val" style="color: #ca8a04;">0 Qs</div>
-            <div id="statQuestionsBreakdown" class="stat-breakdown">Calculating problem sets...</div>
+        <div class="stat-card" style="border-left: 5px solid #7e22ce;">
+            <h3>📖 Total Revision Done</h3>
+            <div id="statTotalRevision" class="stat-val" style="color: #7e22ce;">0.0 hrs</div>
+            <div id="statRevisionBreakdown" class="stat-breakdown">Calculating revision hours...</div>
         </div>
 
-        <!-- 4. Total Lectures Watched -->
         <div class="stat-card" style="border-left: 5px solid #2563eb;">
             <h3>🎥 Lecture Hours</h3>
             <div id="statTotalLectures" class="stat-val" style="color: #2563eb;">0.0 hrs</div>
             <div id="statLectureBreakdown" class="stat-breakdown">Calculating lecture hours...</div>
         </div>
 
-        <!-- 5. CHUPA HUA CARD: Mobile Screen Time (Clicking 🤫 unlocks it) -->
+        <div class="stat-card" style="border-left: 5px solid #ca8a04;">
+            <h3>🎯 Questions Solved</h3>
+            <div id="statTotalQuestions" class="stat-val" style="color: #ca8a04;">0 Qs</div>
+            <div id="statQuestionsBreakdown" class="stat-breakdown">Calculating problem sets...</div>
+        </div>
+
+        <!-- Secret Mobile Screen Time Card (🤫 dabane par khulega) -->
         <div class="stat-card" id="secretMobileCard">
             <div style="display:flex; justify-content:space-between;">
-                <h3>📱 Mobile Screen Time (Secret)</h3>
+                <h3>📱 Mobile Screen Time</h3>
                 <span onclick="toggleSecretMobile()" style="cursor:pointer; font-size:0.8rem; color:#dc2626; font-weight:bold;">✖ Hide</span>
             </div>
             <div id="statTotalMobile" class="stat-val" style="color: #dc2626;">0.0 hrs</div>
@@ -214,15 +254,68 @@
         </div>
     </div>
 
-    <!-- Student Performance Summary Table -->
+    <!-- 2. SUBJECT-WISE BREAKDOWN CARDS (PCM ANALYTICS) -->
+    <div class="section-title">🧪 Subject-Wise Analysis (PCM)</div>
+    <div class="stats-grid">
+        <div class="stat-card" style="border-left: 5px solid #ea580c;">
+            <h3>⚛️ Physics Total Time</h3>
+            <div id="statTotalPhysics" class="stat-val" style="color: #ea580c;">0.0 hrs</div>
+            <div id="statPhysicsBreakdown" class="stat-breakdown">Calculating Physics hours...</div>
+        </div>
+
+        <div class="stat-card" style="border-left: 5px solid #16a34a;">
+            <h3>🧪 Chemistry Total Time</h3>
+            <div id="statTotalChemistry" class="stat-val" style="color: #16a34a;">0.0 hrs</div>
+            <div id="statChemistryBreakdown" class="stat-breakdown">Calculating Chemistry hours...</div>
+        </div>
+
+        <div class="stat-card" style="border-left: 5px solid #0284c7;">
+            <h3>📐 Mathematics Total Time</h3>
+            <div id="statTotalMath" class="stat-val" style="color: #0284c7;">0.0 hrs</div>
+            <div id="statMathBreakdown" class="stat-breakdown">Calculating Mathematics hours...</div>
+        </div>
+    </div>
+
+    <!-- Subject-Wise Member Comparison Table -->
     <div class="card">
-        <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">👥 Individual Member Metrics</h2>
+        <h2 style="font-size: 1.15rem; margin-bottom: 0.8rem;">🎯 Member Subject Balance Sheet</h2>
         <div style="overflow-x:auto;">
             <table>
                 <thead>
                     <tr>
                         <th>Student</th>
-                        <th>Practice (Hrs)</th>
+                        <th>⚛️ Physics (Hrs)</th>
+                        <th>🧪 Chemistry (Hrs)</th>
+                        <th>📐 Math (Hrs)</th>
+                        <th>Strongest Focus</th>
+                    </tr>
+                </thead>
+                <tbody id="subjectBalanceTableBody">
+                    <tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Calculating subject distribution...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- DISTRACTION METER (Visible Only To Master Admin) -->
+    <div class="card" id="distractionMeterSection" style="display:none;">
+        <h2 style="font-size: 1.2rem; margin-bottom: 0.4rem; color:#dc2626;">🚨 Master Distraction Level Meter</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Mobile Screen Time vs Study Time Ratio (Visible only to Master Admin)</p>
+        
+        <div id="distractionMetersContainer" class="meter-container">
+            <p style="color:var(--text-muted);">Calculating distraction metrics...</p>
+        </div>
+    </div>
+
+    <!-- Overall Activity Comparison Table -->
+    <div class="card">
+        <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">👥 Individual Member Activity Metrics</h2>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Practice (Hrs) [Exact Pop-Up Match]</th>
                         <th>Revision (Hrs)</th>
                         <th>Lectures (Hrs)</th>
                         <th id="thScreenTime" style="display:none; color:#dc2626;">📱 Screen Time</th>
@@ -231,7 +324,7 @@
                     </tr>
                 </thead>
                 <tbody id="memberTableBody">
-                    <tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Loading member records...</td></tr>
+                    <tr><td colspan="7" style="text-align:center; color:var(--text-muted);">Loading member records...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -287,7 +380,7 @@
 </div>
 
 <script>
-    // 1. Authentication & Role Limiting (Master vs Viewer)
+    // 1. Role Verification
     let adminAuth = sessionStorage.getItem("admin_auth");
 
     if (!adminAuth || (adminAuth !== "master" && adminAuth !== "viewer")) {
@@ -307,17 +400,25 @@
 
     const isMasterAdmin = (adminAuth === "master");
     const roleBadge = document.getElementById("roleBadge");
+    const secretIconBtn = document.getElementById("secretIconBtn");
+    const meterSection = document.getElementById("distractionMeterSection");
+
+    // 🤫 Emoji sabko dikhega chahe master ho ya viewer!
+    secretIconBtn.style.display = "inline-block";
+
     if (isMasterAdmin) {
         roleBadge.innerText = "👑 Master Admin (Full Control)";
         roleBadge.style.background = "#dcfce7";
         roleBadge.style.color = "#16a34a";
+        meterSection.style.display = "block";
     } else {
         roleBadge.innerText = "👀 Pass Holder (Read-Only)";
         roleBadge.style.background = "#eff6ff";
         roleBadge.style.color = "#2563eb";
+        meterSection.style.display = "none";
     }
 
-    // Secret Toggle for Mobile Screen Time
+    // 🤫 Secret Toggle Function (Ab dono modes me kaam karega)
     let isMobileVisible = false;
     window.toggleSecretMobile = function() {
         isMobileVisible = !isMobileVisible;
@@ -350,7 +451,7 @@
     }
     const db = firebase.firestore();
 
-    // 2. Study Logs Listener
+    // 2. Study Logs Listener (EXACT VERBATIM SYNC WITH index.html evaluateMemberPasses)
     db.collection("jee_logs").orderBy("timestamp", "desc").onSnapshot(snapshot => {
         let totalRevision = 0;
         let totalPractice = 0;
@@ -358,11 +459,15 @@
         let totalMobile = 0;
         let totalQs = 0;
 
+        let totalPhysics = 0;
+        let totalChemistry = 0;
+        let totalMath = 0;
+
         let members = {
-            "Pranay": { practice: 0, revision: 0, lectures: 0, mobile: 0, questions: 0, totalStudy: 0 },
-            "Abhigyan": { practice: 0, revision: 0, lectures: 0, mobile: 0, questions: 0, totalStudy: 0 },
-            "Pranjal": { practice: 0, revision: 0, lectures: 0, mobile: 0, questions: 0, totalStudy: 0 },
-            "Aayush": { practice: 0, revision: 0, lectures: 0, mobile: 0, questions: 0, totalStudy: 0 }
+            "Pranay": { practice: 0, revision: 0, lectures: 0, mobile: 0, questions: 0, totalStudy: 0, physics: 0, chemistry: 0, math: 0 },
+            "Abhigyan": { practice: 0, revision: 0, lectures: 0, mobile: 0, questions: 0, totalStudy: 0, physics: 0, chemistry: 0, math: 0 },
+            "Pranjal": { practice: 0, revision: 0, lectures: 0, mobile: 0, questions: 0, totalStudy: 0, physics: 0, chemistry: 0, math: 0 },
+            "Aayush": { practice: 0, revision: 0, lectures: 0, mobile: 0, questions: 0, totalStudy: 0, physics: 0, chemistry: 0, math: 0 }
         };
 
         const logsBody = document.getElementById("logsTableBody");
@@ -375,11 +480,20 @@
         snapshot.forEach(doc => {
             const d = doc.data();
             const logId = doc.id;
-            const student = d.student || 'Unknown';
+            const student = d.student;
             const hours = parseFloat(d.studyHours || d.hours || 0);
             const qs = parseInt(d.questionsSolved || 0, 10);
-            const act = (d.activityType || 'Self Study');
-            const actLower = act.toLowerCase();
+            
+            // EXACT SAME STRING PARSING AS index.html evaluateMemberPasses:
+            const rawAct = d.activityType || d.activity || '';
+            const act = rawAct.toLowerCase();
+
+            const isMobile = act.includes("mobile");
+            // YAHI EXACT FORMULA index.html me hai jo 110.5h banata hai:
+            const isPractice = (act.includes("practice") || act.includes("self study") || act.includes("self")) && !isMobile;
+            const isLecture = act.includes("lecture");
+            const isRevision = act.includes("revision");
+
             const topic = d.topic || 'General';
             const details = d.details || d.accomplishment || '';
             const subject = d.subject || 'General';
@@ -387,33 +501,44 @@
 
             totalQs += qs;
 
-            if (actLower.includes("mobile")) {
+            if (isMobile) {
                 totalMobile += hours;
                 if (members[student]) members[student].mobile += hours;
             } else {
                 if (members[student]) {
-                    members[student].totalStudy += hours;
                     members[student].questions += qs;
+                    members[student].totalStudy += hours;
                 }
 
-                if (actLower.includes("revision")) {
-                    totalRevision += hours;
-                    if (members[student]) members[student].revision += hours;
-                } else if (actLower.includes("practice") || actLower.includes("self study") || actLower.includes("self")) {
+                if (isPractice) {
                     totalPractice += hours;
                     if (members[student]) members[student].practice += hours;
-                } else if (actLower.includes("lecture")) {
+                } else if (isRevision) {
+                    totalRevision += hours;
+                    if (members[student]) members[student].revision += hours;
+                } else if (isLecture) {
                     totalLectures += hours;
                     if (members[student]) members[student].lectures += hours;
+                }
+
+                // Subject-wise tracking
+                if (subject === 'Physics') {
+                    totalPhysics += hours;
+                    if (members[student]) members[student].physics += hours;
+                } else if (subject === 'Chemistry') {
+                    totalChemistry += hours;
+                    if (members[student]) members[student].chemistry += hours;
+                } else if (subject === 'Math' || subject === 'Mathematics') {
+                    totalMath += hours;
+                    if (members[student]) members[student].math += hours;
                 }
             }
 
             let subTag = 'tag-p';
             if (subject === 'Chemistry') subTag = 'tag-c';
-            if (subject === 'Math') subTag = 'tag-m';
-            if (subject === 'General' || actLower.includes("mobile")) subTag = 'tag-mobile';
+            if (subject === 'Math' || subject === 'Mathematics') subTag = 'tag-m';
+            if (subject === 'General' || isMobile) subTag = 'tag-mobile';
 
-            // Agar Master Admin hai toh Edit & Delete, warna View Only lock
             const logActions = isMasterAdmin 
                 ? `<button class="btn-edit" onclick="adminEditLog('${logId}', '${hours}', '${topic.replace(/'/g, "\\'")}', '${details.replace(/'/g, "\\'")}', '${qs}')">✏️ Edit</button>
                    <button class="btn-delete" onclick="adminDeleteLog('${logId}', '${student}')">🗑️ Delete</button>`
@@ -422,9 +547,9 @@
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td style="color:#64748b; font-size:0.8rem; white-space:nowrap;">${dateStr}</td>
-                <td><strong style="color:#2563eb;">${student}</strong></td>
+                <td><strong style="color:#2563eb;">${student || 'Unknown'}</strong></td>
                 <td><span class="tag ${subTag}">${subject}</span></td>
-                <td><span style="font-weight:600; color:${actLower.includes('mobile') ? '#dc2626' : '#475569'};">${act}</span></td>
+                <td><span style="font-weight:600; color:${isMobile ? '#dc2626' : '#475569'};">${rawAct || 'General'}</span></td>
                 <td><strong>${hours}h</strong></td>
                 <td><span style="color:#ca8a04; font-weight:700;">${qs > 0 ? qs + ' Qs' : '-'}</span></td>
                 <td>
@@ -436,13 +561,13 @@
             logsBody.appendChild(row);
         });
 
-        // Overview Numbers
-        document.getElementById("statTotalMobile").innerText = totalMobile.toFixed(1) + " hrs";
-        document.getElementById("statMobileBreakdown").innerHTML = 
-            `Pranay: <b>${members['Pranay'].mobile.toFixed(1)}h</b> | ` +
-            `Abhigyan: <b>${members['Abhigyan'].mobile.toFixed(1)}h</b><br>` +
-            `Pranjal: <b>${members['Pranjal'].mobile.toFixed(1)}h</b> | ` +
-            `Aayush: <b>${members['Aayush'].mobile.toFixed(1)}h</b>`;
+        // 1. Exact Activity Overview Numbers (100% matched with pop-up)
+        document.getElementById("statTotalPractice").innerText = totalPractice.toFixed(1) + " hrs";
+        document.getElementById("statPracticeBreakdown").innerHTML = 
+            `Pranay: <b>${members['Pranay'].practice.toFixed(1)}h</b> | ` +
+            `Abhigyan: <b>${members['Abhigyan'].practice.toFixed(1)}h</b><br>` +
+            `Pranjal: <b>${members['Pranjal'].practice.toFixed(1)}h</b> | ` +
+            `Aayush: <b>${members['Aayush'].practice.toFixed(1)}h</b>`;
 
         document.getElementById("statTotalRevision").innerText = totalRevision.toFixed(1) + " hrs";
         document.getElementById("statRevisionBreakdown").innerHTML = 
@@ -451,12 +576,12 @@
             `Pranjal: <b>${members['Pranjal'].revision.toFixed(1)}h</b> | ` +
             `Aayush: <b>${members['Aayush'].revision.toFixed(1)}h</b>`;
 
-        document.getElementById("statTotalPractice").innerText = totalPractice.toFixed(1) + " hrs";
-        document.getElementById("statPracticeBreakdown").innerHTML = 
-            `Pranay: <b>${members['Pranay'].practice.toFixed(1)}h</b> | ` +
-            `Abhigyan: <b>${members['Abhigyan'].practice.toFixed(1)}h</b><br>` +
-            `Pranjal: <b>${members['Pranjal'].practice.toFixed(1)}h</b> | ` +
-            `Aayush: <b>${members['Aayush'].practice.toFixed(1)}h</b>`;
+        document.getElementById("statTotalLectures").innerText = totalLectures.toFixed(1) + " hrs";
+        document.getElementById("statLectureBreakdown").innerHTML = 
+            `Pranay: <b>${members['Pranay'].lectures.toFixed(1)}h</b> | ` +
+            `Abhigyan: <b>${members['Abhigyan'].lectures.toFixed(1)}h</b><br>` +
+            `Pranjal: <b>${members['Pranjal'].lectures.toFixed(1)}h</b> | ` +
+            `Aayush: <b>${members['Aayush'].lectures.toFixed(1)}h</b>`;
 
         document.getElementById("statTotalQuestions").innerText = totalQs + " Qs";
         document.getElementById("statQuestionsBreakdown").innerHTML = 
@@ -465,14 +590,107 @@
             `Pranjal: <b>${members['Pranjal'].questions} Qs</b> | ` +
             `Aayush: <b>${members['Aayush'].questions} Qs</b>`;
 
-        document.getElementById("statTotalLectures").innerText = totalLectures.toFixed(1) + " hrs";
-        document.getElementById("statLectureBreakdown").innerHTML = 
-            `Pranay: <b>${members['Pranay'].lectures.toFixed(1)}h</b> | ` +
-            `Abhigyan: <b>${members['Abhigyan'].lectures.toFixed(1)}h</b><br>` +
-            `Pranjal: <b>${members['Pranjal'].lectures.toFixed(1)}h</b> | ` +
-            `Aayush: <b>${members['Aayush'].lectures.toFixed(1)}h</b>`;
+        document.getElementById("statTotalMobile").innerText = totalMobile.toFixed(1) + " hrs";
+        document.getElementById("statMobileBreakdown").innerHTML = 
+            `Pranay: <b>${members['Pranay'].mobile.toFixed(1)}h</b> | ` +
+            `Abhigyan: <b>${members['Abhigyan'].mobile.toFixed(1)}h</b><br>` +
+            `Pranjal: <b>${members['Pranjal'].mobile.toFixed(1)}h</b> | ` +
+            `Aayush: <b>${members['Aayush'].mobile.toFixed(1)}h</b>`;
 
-        // Individual Member Metrics Table
+        // 2. Subject-Wise Numbers
+        document.getElementById("statTotalPhysics").innerText = totalPhysics.toFixed(1) + " hrs";
+        document.getElementById("statPhysicsBreakdown").innerHTML = 
+            `Pranay: <b>${members['Pranay'].physics.toFixed(1)}h</b> | ` +
+            `Abhigyan: <b>${members['Abhigyan'].physics.toFixed(1)}h</b><br>` +
+            `Pranjal: <b>${members['Pranjal'].physics.toFixed(1)}h</b> | ` +
+            `Aayush: <b>${members['Aayush'].physics.toFixed(1)}h</b>`;
+
+        document.getElementById("statTotalChemistry").innerText = totalChemistry.toFixed(1) + " hrs";
+        document.getElementById("statChemistryBreakdown").innerHTML = 
+            `Pranay: <b>${members['Pranay'].chemistry.toFixed(1)}h</b> | ` +
+            `Abhigyan: <b>${members['Abhigyan'].chemistry.toFixed(1)}h</b><br>` +
+            `Pranjal: <b>${members['Pranjal'].chemistry.toFixed(1)}h</b> | ` +
+            `Aayush: <b>${members['Aayush'].chemistry.toFixed(1)}h</b>`;
+
+        document.getElementById("statTotalMath").innerText = totalMath.toFixed(1) + " hrs";
+        document.getElementById("statMathBreakdown").innerHTML = 
+            `Pranay: <b>${members['Pranay'].math.toFixed(1)}h</b> | ` +
+            `Abhigyan: <b>${members['Abhigyan'].math.toFixed(1)}h</b><br>` +
+            `Pranjal: <b>${members['Pranjal'].math.toFixed(1)}h</b> | ` +
+            `Aayush: <b>${members['Aayush'].math.toFixed(1)}h</b>`;
+
+        // 3. Subject Balance Table
+        const subTableBody = document.getElementById("subjectBalanceTableBody");
+        subTableBody.innerHTML = '';
+        Object.keys(members).forEach(name => {
+            const m = members[name];
+            let topSubject = "Balanced";
+            if (m.physics >= m.chemistry && m.physics >= m.math && m.physics > 0) topSubject = "⚛️ Physics";
+            else if (m.chemistry >= m.physics && m.chemistry >= m.math && m.chemistry > 0) topSubject = "🧪 Chemistry";
+            else if (m.math >= m.physics && m.math >= m.chemistry && m.math > 0) topSubject = "📐 Mathematics";
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><strong style="color:#2563eb;">${name}</strong></td>
+                <td><span style="color:#ea580c; font-weight:700;">${m.physics.toFixed(1)} hrs</span></td>
+                <td><span style="color:#16a34a; font-weight:700;">${m.chemistry.toFixed(1)} hrs</span></td>
+                <td><span style="color:#0284c7; font-weight:700;">${m.math.toFixed(1)} hrs</span></td>
+                <td><span class="tag" style="background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1;">${topSubject}</span></td>
+            `;
+            subTableBody.appendChild(row);
+        });
+
+        // 4. Distraction Meter (Only Master)
+        if (isMasterAdmin) {
+            const meterBoxContainer = document.getElementById("distractionMetersContainer");
+            meterBoxContainer.innerHTML = '';
+
+            Object.keys(members).forEach(name => {
+                const m = members[name];
+                const studyH = m.totalStudy;
+                const mobileH = m.mobile;
+                const totalActive = studyH + mobileH;
+
+                let percentage = 0;
+                if (totalActive > 0) {
+                    percentage = Math.round((mobileH / totalActive) * 100);
+                }
+
+                let statusText = "🟢 Safe Focus";
+                let statusClass = "status-safe";
+                let barColor = "#16a34a";
+
+                if (percentage >= 40) {
+                    statusText = "🔴 Danger Zone";
+                    statusClass = "status-danger";
+                    barColor = "#dc2626";
+                } else if (percentage >= 20) {
+                    statusText = "🟡 Caution";
+                    statusClass = "status-mid";
+                    barColor = "#ca8a04";
+                }
+
+                const box = document.createElement("div");
+                box.className = "meter-box";
+                box.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <strong style="color:#0f172a; font-size:1rem;">${name}</strong>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="meter-bar-bg">
+                        <div class="meter-bar-fill" style="width: ${percentage}%; background: ${barColor};"></div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:#64748b;">
+                        <span>📱 Screen: <b>${mobileH.toFixed(1)}h</b></span>
+                        <span>📚 Study: <b>${studyH.toFixed(1)}h</b></span>
+                        <span style="color:#0f172a; font-weight:700;">${percentage}% Distracted</span>
+                    </div>
+                `;
+                meterBoxContainer.appendChild(box);
+            });
+        }
+
+        // 5. Activity Table (Practice column exactly matches pop-up)
         const tbody = document.getElementById("memberTableBody");
         tbody.innerHTML = '';
         Object.keys(members).forEach(name => {
@@ -480,7 +698,7 @@
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td><strong style="color:#2563eb;">${name}</strong></td>
-                <td>${m.practice.toFixed(1)} hrs</td>
+                <td><strong style="color:#ea580c;">${m.practice.toFixed(1)} hrs</strong></td>
                 <td><span style="color:#7e22ce; font-weight:700;">${m.revision.toFixed(1)} hrs</span></td>
                 <td>${m.lectures.toFixed(1)} hrs</td>
                 <td class="td-screentime" style="${isMobileVisible ? '' : 'display:none;'} color:#dc2626; font-weight:700;">${m.mobile.toFixed(1)} hrs</td>
@@ -526,7 +744,7 @@
         });
     });
 
-    // Master Admin Actions (Strictly Checked)
+    // Admin Controls
     window.adminEditLog = async function(docId, oldHours, oldTopic, oldDetails, oldQs) {
         if (!isMasterAdmin) {
             alert("⛔ Permission Denied: Pass viewers can only view analytics!");
