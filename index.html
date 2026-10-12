@@ -1049,7 +1049,22 @@
 
     let loggedInUser = sessionStorage.getItem("jee_authenticated_user");
 
-    // Initialize custom lock screen
+    // 2. Firebase Initialization
+    const firebaseConfig = {
+        apiKey: "AIzaSyAB6FbsDLh4xq6ikvsSFFrDLYFVDaYB978",
+        authDomain: "jee-tracker-6b67d.firebaseapp.com",
+        projectId: "jee-tracker-6b67d",
+        storageBucket: "jee-tracker-6b67d.firebasestorage.app",
+        messagingSenderId: "14514591368",
+        appId: "1:14514591368:web:9e72203c576dfaa5e9713d"
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    // Check Auth Status on Load
     function checkAuthLock() {
         const overlay = document.getElementById("authLockOverlay");
         if (loggedInUser && userToPin[loggedInUser]) {
@@ -1079,7 +1094,6 @@
             sessionStorage.setItem("jee_authenticated_user", loggedInUser);
             errDisp.innerText = "";
             
-            // Fade out modal smoothly
             const overlay = document.getElementById("authLockOverlay");
             overlay.style.transition = "opacity 0.25s ease";
             overlay.style.opacity = "0";
@@ -1090,6 +1104,7 @@
             document.getElementById("currentIdentifiedUser").innerText = loggedInUser;
             document.getElementById("student").value = loggedInUser;
             initAppAfterAuth();
+            updatePassBadgeUI(); // Immediate pass refresh
         } else {
             errDisp.innerText = "❌ Incorrect PIN! Try again.";
             cardBox.classList.add("shake-animation");
@@ -1101,12 +1116,9 @@
         }
     };
 
-    // Run auth check on page load
     window.addEventListener("DOMContentLoaded", checkAuthLock);
 
-    // Function to run after successful login
     function initAppAfterAuth() {
-        // 2. Birthday Trigger
         const todayDate = new Date();
         const isPranjalBirthday = (todayDate.getDate() === 22 && todayDate.getMonth() === 9);
 
@@ -1137,13 +1149,14 @@
             }
         }
 
-        // 3. Update Presence
         db.collection("user_presence").doc(loggedInUser).set({
             lastActive: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
+
+        updatePassBadgeUI();
     }
 
-    // 4. Avatars
+    // Avatars Setup
     const studentAvatars = {
         "Pranay": "./pranay.jpeg",
         "Abhigyan": "./abhigyan.jpeg",
@@ -1161,21 +1174,7 @@
         }
     });
 
-    // 5. Firebase Initialization
-    const firebaseConfig = {
-        apiKey: "AIzaSyAB6FbsDLh4xq6ikvsSFFrDLYFVDaYB978",
-        authDomain: "jee-tracker-6b67d.firebaseapp.com",
-        projectId: "jee-tracker-6b67d",
-        storageBucket: "jee-tracker-6b67d.firebasestorage.app",
-        messagingSenderId: "14514591368",
-        appId: "1:14514591368:web:9e72203c576dfaa5e9713d"
-    };
-
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    const db = firebase.firestore();
-
+    // User Presence Live
     db.collection("user_presence").onSnapshot(snapshot => {
         snapshot.forEach(doc => {
             const data = doc.data();
@@ -1188,8 +1187,10 @@
         });
     });
 
-    // 6. Pass Evaluation Logic
+    // Solid & Reliable Pass Evaluator
     async function evaluateMemberPasses(user) {
+        if (!user) return null;
+
         const todayDate = new Date();
         const isPranjalBirthday = (todayDate.getDate() === 22 && todayDate.getMonth() === 9);
 
@@ -1216,8 +1217,6 @@
         startOfWeek.setDate(now.getDate() - distanceToMonday);
         startOfWeek.setHours(0, 0, 0, 0);
 
-        const logsSnap = await db.collection("jee_logs").get();
-
         let practiceAllTime = 0;
         let practiceToday = 0;
         let practiceThisWeek = 0;
@@ -1225,30 +1224,39 @@
         let practiceAllTimeByStudent = { "Pranay": 0, "Abhigyan": 0, "Pranjal": 0, "Aayush": 0 };
         let practiceDates = new Set();
 
-        logsSnap.forEach(doc => {
-            const d = doc.data();
-            const hours = parseFloat(d.studyHours || d.hours || 0);
-            const act = (d.activityType || d.activity || '').toLowerCase();
-            const isPractice = (act.includes("practice") || act.includes("self study") || act.includes("self")) && !act.includes("mobile");
-            const isLecture = act.includes("lecture");
-            const logDate = d.timestamp ? d.timestamp.toDate() : new Date();
+        try {
+            const logsSnap = await db.collection("jee_logs").get();
 
-            if (isPractice && practiceAllTimeByStudent[d.student] !== undefined) {
-                practiceAllTimeByStudent[d.student] += hours;
-            }
+            logsSnap.forEach(doc => {
+                const d = doc.data();
+                const hours = parseFloat(d.studyHours || d.hours || 0);
+                const rawAct = d.activityType || d.activity || '';
+                const act = rawAct.toLowerCase();
 
-            if (d.student === user) {
-                if (isPractice) practiceAllTime += hours;
-                if (isPractice && logDate >= startOfToday) practiceToday += hours;
-                if (logDate >= startOfWeek) {
-                    if (isPractice) practiceThisWeek += hours;
-                    if (isLecture) lectureThisWeek += hours;
+                const isMobile = act.includes("mobile");
+                const isPractice = (act.includes("practice") || act.includes("self study") || act.includes("self")) && !isMobile;
+                const isLecture = act.includes("lecture");
+                const logDate = d.timestamp ? d.timestamp.toDate() : new Date();
+
+                if (isPractice && practiceAllTimeByStudent[d.student] !== undefined) {
+                    practiceAllTimeByStudent[d.student] += hours;
                 }
-                if (isPractice && hours >= 2.0) {
-                    practiceDates.add(logDate.toDateString());
+
+                if (d.student === user) {
+                    if (isPractice) practiceAllTime += hours;
+                    if (isPractice && logDate >= startOfToday) practiceToday += hours;
+                    if (logDate >= startOfWeek) {
+                        if (isPractice) practiceThisWeek += hours;
+                        if (isLecture) lectureThisWeek += hours;
+                    }
+                    if (isPractice && hours >= 2.0) {
+                        practiceDates.add(logDate.toDateString());
+                    }
                 }
-            }
-        });
+            });
+        } catch (err) {
+            console.error("Pass evaluation fetch error:", err);
+        }
 
         let streakCount = practiceDates.size;
         let sortedRank = Object.keys(practiceAllTimeByStudent).sort((a, b) => practiceAllTimeByStudent[b] - practiceAllTimeByStudent[a]);
@@ -1286,6 +1294,22 @@
             practiceAllTime,
             streakCount
         };
+    }
+
+    // Real-Time Pass Box Updater
+    async function updatePassBadgeUI() {
+        const user = loggedInUser || sessionStorage.getItem("jee_authenticated_user");
+        const statusBox = document.getElementById("userMembershipStatus");
+        if (!user || !statusBox) return;
+
+        const passData = await evaluateMemberPasses(user);
+        if (!passData) return;
+
+        if (passData.qualifiedTier) {
+            statusBox.innerHTML = `🎉 <b>${user}'s Active Pass:</b> <span style="color:#16a34a; font-weight:bold;">${passData.qualifiedTier} — ${passData.badgeText} (${passData.accessDuration})</span>`;
+        } else {
+            statusBox.innerHTML = `🔒 <b>${user}:</b> No active pass. Log <b>3.0h practice today</b> (Current: <b>${passData.practiceToday.toFixed(1)}h</b>) to unlock Bronze!`;
+        }
     }
 
     function showPassModal(passData, user) {
@@ -1338,7 +1362,7 @@
         }
 
         const passData = await evaluateMemberPasses(loggedInUser);
-        showPassModal(passData, loggedInUser);
+        if (passData) showPassModal(passData, loggedInUser);
     };
 
     window.openAdminDashboard = function() {
@@ -1349,7 +1373,7 @@
         document.getElementById("tierModal").style.display = "none";
     };
 
-    // 7. Feed Management
+    // Feed Filter & Render
     const feedContainer = document.getElementById('feedContainer');
     let currentFilter = 'all';
     let cachedLogs = [];
@@ -1437,7 +1461,7 @@
 
     db.collection("jee_logs")
       .orderBy("timestamp", "desc")
-      .onSnapshot(async (snapshot) => {
+      .onSnapshot((snapshot) => {
           cachedLogs = [];
           snapshot.forEach((docSnap) => {
               const data = docSnap.data();
@@ -1449,26 +1473,15 @@
           });
 
           renderLogs();
-
-          if (loggedInUser) {
-              const passData = await evaluateMemberPasses(loggedInUser);
-              const statusBox = document.getElementById("userMembershipStatus");
-              if (statusBox) {
-                  if (passData.qualifiedTier) {
-                      statusBox.innerHTML = `🎉 <b>${loggedInUser}'s Active Pass:</b> <span style="color:#16a34a; font-weight:bold;">${passData.qualifiedTier} — ${passData.badgeText} (${passData.accessDuration})</span>`;
-                  } else {
-                      statusBox.innerHTML = `🔒 <b>${loggedInUser}:</b> No active pass. Log <b>3.0h practice today</b> (Current: <b>${passData.practiceToday.toFixed(1)}h</b>) to unlock Bronze!`;
-                  }
-              }
-          }
+          updatePassBadgeUI(); // Auto refresh pass state on log changes
       });
 
-    // 8. Log Work Submission
+    // Form Submit
     const form = document.getElementById('trackerForm');
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-       const student = loggedInUser;
+        const student = loggedInUser;
         const subject = document.getElementById('subject').value;
         const activityType = document.getElementById('activityType').value;
         const studyHours = parseFloat(document.getElementById('studyHours').value);
@@ -1496,7 +1509,8 @@
 
             setTimeout(async () => {
                 const passData = await evaluateMemberPasses(student);
-                showPassModal(passData, student);
+                if (passData) showPassModal(passData, student);
+                updatePassBadgeUI();
             }, 600);
 
         } catch (error) {
@@ -1564,7 +1578,7 @@
         }
     };
 
-    // 9. Safe Chapter Toggle
+    // Safe Chapter Toggle
     window.toggleChapter = async function(chkId) {
         const el = document.getElementById(chkId);
         if (!el) return;
@@ -1584,7 +1598,7 @@
         });
     });
 
-    // 10. Mock Test Score Submission
+    // Mock Test Scores
     const scoreForm = document.getElementById('scoreForm');
     scoreForm.addEventListener('submit', async (e) => {
         e.preventDefault();
