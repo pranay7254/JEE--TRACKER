@@ -139,7 +139,6 @@
             cursor: pointer;
         }
 
-        /* 🤫 Secret Trigger (Hamesha visible aur clickable rahega) */
         .secret-trigger {
             cursor: pointer;
             user-select: none;
@@ -207,12 +206,11 @@
     
     <div>
         <h1>🛠️ JEE Admin Analytics & Control Panel</h1>
-        <!-- 🤫 Emoji hamesha yahan rahega chahe Master ho ya Read-Only -->
         <span id="secretIconBtn" class="secret-trigger" onclick="toggleSecretMobile()" title="Secret Options">🤫</span>
     </div>
     
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-        <p style="color: var(--text-muted);">Exact study metrics, subject-wise analytics (PCM), mock scoreboard & logs control.</p>
+        <p style="color: var(--text-muted);">Exact study metrics, pure self-study subject breakdown (PCM), mock scoreboard & logs control.</p>
         <span id="roleBadge" style="font-size:0.8rem; font-weight:700; padding:4px 10px; border-radius:20px; background:#e2e8f0; color:#334155;">Checking role...</span>
     </div>
 
@@ -232,7 +230,7 @@
         </div>
 
         <div class="stat-card" style="border-left: 5px solid #2563eb;">
-            <h3>🎥 Lecture Hours</h3>
+            <h3>🎥 Lecture Hours (Excluded from Self-Study)</h3>
             <div id="statTotalLectures" class="stat-val" style="color: #2563eb;">0.0 hrs</div>
             <div id="statLectureBreakdown" class="stat-breakdown">Calculating lecture hours...</div>
         </div>
@@ -243,7 +241,7 @@
             <div id="statQuestionsBreakdown" class="stat-breakdown">Calculating problem sets...</div>
         </div>
 
-        <!-- Secret Mobile Screen Time Card (🤫 dabane par khulega) -->
+        <!-- Secret Mobile Screen Time Card -->
         <div class="stat-card" id="secretMobileCard">
             <div style="display:flex; justify-content:space-between;">
                 <h3>📱 Mobile Screen Time</h3>
@@ -254,31 +252,32 @@
         </div>
     </div>
 
-    <!-- 2. SUBJECT-WISE BREAKDOWN CARDS (PCM ANALYTICS) -->
-    <div class="section-title">🧪 Subject-Wise Analysis (PCM)</div>
+    <!-- 2. SUBJECT-WISE BREAKDOWN CARDS (PURE PRACTICE + REVISION ONLY) -->
+    <div class="section-title">🧪 Subject-Wise Self-Study Analysis (PCM - Lectures Excluded)</div>
     <div class="stats-grid">
         <div class="stat-card" style="border-left: 5px solid #ea580c;">
-            <h3>⚛️ Physics Total Time</h3>
+            <h3>⚛️ Physics (Practice + Revision)</h3>
             <div id="statTotalPhysics" class="stat-val" style="color: #ea580c;">0.0 hrs</div>
-            <div id="statPhysicsBreakdown" class="stat-breakdown">Calculating Physics hours...</div>
+            <div id="statPhysicsBreakdown" class="stat-breakdown">Calculating Physics pure study...</div>
         </div>
 
         <div class="stat-card" style="border-left: 5px solid #16a34a;">
-            <h3>🧪 Chemistry Total Time</h3>
+            <h3>🧪 Chemistry (Practice + Revision)</h3>
             <div id="statTotalChemistry" class="stat-val" style="color: #16a34a;">0.0 hrs</div>
-            <div id="statChemistryBreakdown" class="stat-breakdown">Calculating Chemistry hours...</div>
+            <div id="statChemistryBreakdown" class="stat-breakdown">Calculating Chemistry pure study...</div>
         </div>
 
         <div class="stat-card" style="border-left: 5px solid #0284c7;">
-            <h3>📐 Mathematics Total Time</h3>
+            <h3>📐 Mathematics (Practice + Revision)</h3>
             <div id="statTotalMath" class="stat-val" style="color: #0284c7;">0.0 hrs</div>
-            <div id="statMathBreakdown" class="stat-breakdown">Calculating Mathematics hours...</div>
+            <div id="statMathBreakdown" class="stat-breakdown">Calculating Math pure study...</div>
         </div>
     </div>
 
-    <!-- Subject-Wise Member Comparison Table -->
+    <!-- Subject-Wise Pure Self-Study Balance Table -->
     <div class="card">
-        <h2 style="font-size: 1.15rem; margin-bottom: 0.8rem;">🎯 Member Subject Balance Sheet</h2>
+        <h2 style="font-size: 1.15rem; margin-bottom: 0.8rem;">🎯 Member Subject Balance Sheet (Pure Self-Study)</h2>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">Yeh table sirf actual problem practice aur revision ko count karta hai (Lectures excluded).</p>
         <div style="overflow-x:auto;">
             <table>
                 <thead>
@@ -297,10 +296,10 @@
         </div>
     </div>
 
-    <!-- DISTRACTION METER (Visible Only To Master Admin) -->
+    <!-- DISTRACTION METER (Master Admin Only) -->
     <div class="card" id="distractionMeterSection" style="display:none;">
         <h2 style="font-size: 1.2rem; margin-bottom: 0.4rem; color:#dc2626;">🚨 Master Distraction Level Meter</h2>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Mobile Screen Time vs Study Time Ratio (Visible only to Master Admin)</p>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Mobile Screen Time vs Pure Self-Study Ratio (Visible only to Master Admin)</p>
         
         <div id="distractionMetersContainer" class="meter-container">
             <p style="color:var(--text-muted);">Calculating distraction metrics...</p>
@@ -315,12 +314,12 @@
                 <thead>
                     <tr>
                         <th>Student</th>
-                        <th>Practice (Hrs) [Exact Pop-Up Match]</th>
+                        <th>Practice (Hrs)</th>
                         <th>Revision (Hrs)</th>
                         <th>Lectures (Hrs)</th>
                         <th id="thScreenTime" style="display:none; color:#dc2626;">📱 Screen Time</th>
                         <th>Questions Solved</th>
-                        <th>Total Study Time</th>
+                        <th style="color:#16a34a;">Total Study (Practice + Revision)</th>
                     </tr>
                 </thead>
                 <tbody id="memberTableBody">
@@ -330,7 +329,7 @@
         </div>
     </div>
 
-    <!-- Mock Test & DPP Scores Management Table -->
+    <!-- Mock Test Scores Management Table -->
     <div class="card">
         <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">📊 Mock Test & DPP Scores (Edit & Delete)</h2>
         <div style="overflow-x:auto;">
@@ -354,7 +353,7 @@
         </div>
     </div>
 
-    <!-- Master Logs Table with Edit & Delete Options -->
+    <!-- Master Logs Table -->
     <div class="card">
         <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">📋 All Group Logs (Master Control)</h2>
         <div style="overflow-x:auto;">
@@ -380,7 +379,6 @@
 </div>
 
 <script>
-    // 1. Role Verification
     let adminAuth = sessionStorage.getItem("admin_auth");
 
     if (!adminAuth || (adminAuth !== "master" && adminAuth !== "viewer")) {
@@ -403,7 +401,6 @@
     const secretIconBtn = document.getElementById("secretIconBtn");
     const meterSection = document.getElementById("distractionMeterSection");
 
-    // 🤫 Emoji sabko dikhega chahe master ho ya viewer!
     secretIconBtn.style.display = "inline-block";
 
     if (isMasterAdmin) {
@@ -418,7 +415,6 @@
         meterSection.style.display = "none";
     }
 
-    // 🤫 Secret Toggle Function (Ab dono modes me kaam karega)
     let isMobileVisible = false;
     window.toggleSecretMobile = function() {
         isMobileVisible = !isMobileVisible;
@@ -451,7 +447,6 @@
     }
     const db = firebase.firestore();
 
-    // 2. Study Logs Listener (EXACT VERBATIM SYNC WITH index.html evaluateMemberPasses)
     db.collection("jee_logs").orderBy("timestamp", "desc").onSnapshot(snapshot => {
         let totalRevision = 0;
         let totalPractice = 0;
@@ -459,6 +454,7 @@
         let totalMobile = 0;
         let totalQs = 0;
 
+        // Subject totals (PURE SELF-STUDY: PRACTICE + REVISION ONLY)
         let totalPhysics = 0;
         let totalChemistry = 0;
         let totalMath = 0;
@@ -484,12 +480,10 @@
             const hours = parseFloat(d.studyHours || d.hours || 0);
             const qs = parseInt(d.questionsSolved || 0, 10);
             
-            // EXACT SAME STRING PARSING AS index.html evaluateMemberPasses:
             const rawAct = d.activityType || d.activity || '';
             const act = rawAct.toLowerCase();
 
             const isMobile = act.includes("mobile");
-            // YAHI EXACT FORMULA index.html me hai jo 110.5h banata hai:
             const isPractice = (act.includes("practice") || act.includes("self study") || act.includes("self")) && !isMobile;
             const isLecture = act.includes("lecture");
             const isRevision = act.includes("revision");
@@ -507,30 +501,40 @@
             } else {
                 if (members[student]) {
                     members[student].questions += qs;
-                    members[student].totalStudy += hours;
                 }
 
                 if (isPractice) {
                     totalPractice += hours;
-                    if (members[student]) members[student].practice += hours;
+                    if (members[student]) {
+                        members[student].practice += hours;
+                        members[student].totalStudy += hours;
+                    }
                 } else if (isRevision) {
                     totalRevision += hours;
-                    if (members[student]) members[student].revision += hours;
+                    if (members[student]) {
+                        members[student].revision += hours;
+                        members[student].totalStudy += hours;
+                    }
                 } else if (isLecture) {
                     totalLectures += hours;
-                    if (members[student]) members[student].lectures += hours;
+                    if (members[student]) {
+                        members[student].lectures += hours;
+                    }
                 }
 
-                // Subject-wise tracking
-                if (subject === 'Physics') {
-                    totalPhysics += hours;
-                    if (members[student]) members[student].physics += hours;
-                } else if (subject === 'Chemistry') {
-                    totalChemistry += hours;
-                    if (members[student]) members[student].chemistry += hours;
-                } else if (subject === 'Math' || subject === 'Mathematics') {
-                    totalMath += hours;
-                    if (members[student]) members[student].math += hours;
+                // SUBJECT-WISE CALCULATION: STRICTLY EXCLUDE LECTURES
+                // Only practice or revision counts towards Subject-Wise totals
+                if (!isLecture && (isPractice || isRevision)) {
+                    if (subject === 'Physics') {
+                        totalPhysics += hours;
+                        if (members[student]) members[student].physics += hours;
+                    } else if (subject === 'Chemistry') {
+                        totalChemistry += hours;
+                        if (members[student]) members[student].chemistry += hours;
+                    } else if (subject === 'Math' || subject === 'Mathematics') {
+                        totalMath += hours;
+                        if (members[student]) members[student].math += hours;
+                    }
                 }
             }
 
@@ -561,7 +565,7 @@
             logsBody.appendChild(row);
         });
 
-        // 1. Exact Activity Overview Numbers (100% matched with pop-up)
+        // 1. Overview Activity Cards
         document.getElementById("statTotalPractice").innerText = totalPractice.toFixed(1) + " hrs";
         document.getElementById("statPracticeBreakdown").innerHTML = 
             `Pranay: <b>${members['Pranay'].practice.toFixed(1)}h</b> | ` +
@@ -597,7 +601,7 @@
             `Pranjal: <b>${members['Pranjal'].mobile.toFixed(1)}h</b> | ` +
             `Aayush: <b>${members['Aayush'].mobile.toFixed(1)}h</b>`;
 
-        // 2. Subject-Wise Numbers
+        // 2. Subject-Wise Numbers (PURE SELF-STUDY)
         document.getElementById("statTotalPhysics").innerText = totalPhysics.toFixed(1) + " hrs";
         document.getElementById("statPhysicsBreakdown").innerHTML = 
             `Pranay: <b>${members['Pranay'].physics.toFixed(1)}h</b> | ` +
@@ -619,7 +623,7 @@
             `Pranjal: <b>${members['Pranjal'].math.toFixed(1)}h</b> | ` +
             `Aayush: <b>${members['Aayush'].math.toFixed(1)}h</b>`;
 
-        // 3. Subject Balance Table
+        // 3. Subject Balance Table (PURE SELF-STUDY)
         const subTableBody = document.getElementById("subjectBalanceTableBody");
         subTableBody.innerHTML = '';
         Object.keys(members).forEach(name => {
@@ -682,7 +686,7 @@
                     </div>
                     <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:#64748b;">
                         <span>📱 Screen: <b>${mobileH.toFixed(1)}h</b></span>
-                        <span>📚 Study: <b>${studyH.toFixed(1)}h</b></span>
+                        <span>📚 Self-Study: <b>${studyH.toFixed(1)}h</b></span>
                         <span style="color:#0f172a; font-weight:700;">${percentage}% Distracted</span>
                     </div>
                 `;
@@ -690,7 +694,7 @@
             });
         }
 
-        // 5. Activity Table (Practice column exactly matches pop-up)
+        // 5. Activity Table (Total Study = Practice + Revision)
         const tbody = document.getElementById("memberTableBody");
         tbody.innerHTML = '';
         Object.keys(members).forEach(name => {
@@ -703,7 +707,7 @@
                 <td>${m.lectures.toFixed(1)} hrs</td>
                 <td class="td-screentime" style="${isMobileVisible ? '' : 'display:none;'} color:#dc2626; font-weight:700;">${m.mobile.toFixed(1)} hrs</td>
                 <td><span style="color:#ca8a04; font-weight:700;">${m.questions} Qs</span></td>
-                <td><strong>${m.totalStudy.toFixed(1)} hrs</strong></td>
+                <td><strong style="color:#16a34a; font-size:0.95rem;">${m.totalStudy.toFixed(1)} hrs</strong></td>
             `;
             tbody.appendChild(row);
         });
@@ -838,7 +842,7 @@
                 await db.collection("jee_mock_scores").doc(docId).delete();
                 alert("🗑️ Test score deleted!");
             } catch (error) {
-                alert("❌ Failed to delete score: " + error.message);
+                alert("❌ Delete failed: " + error.message);
             }
         }
     };
