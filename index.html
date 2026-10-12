@@ -7,6 +7,8 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
         :root {
@@ -35,7 +37,7 @@
             position: relative;
         }
 
-        /* Fixed Top Marquee: Moving Left to Right */
+        /* Fixed Top Marquee */
         .top-marquee-bar {
             position: fixed;
             top: 0;
@@ -114,7 +116,7 @@
             color: var(--text-muted);
         }
 
-        /* Presence Cards with Student Photos */
+        /* Presence Cards */
         .presence-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -131,6 +133,14 @@
             align-items: center;
             gap: 12px;
             box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+            position: relative;
+        }
+
+        .avatar-wrap {
+            position: relative;
+            width: 48px;
+            height: 48px;
+            flex-shrink: 0;
         }
 
         .student-avatar {
@@ -140,7 +150,15 @@
             object-fit: cover;
             border: 2px solid #2563eb;
             background: #e2e8f0;
-            flex-shrink: 0;
+        }
+
+        .bday-crown {
+            position: absolute;
+            top: -12px;
+            right: -6px;
+            font-size: 1.3rem;
+            transform: rotate(15deg);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
         }
 
         .presence-info {
@@ -259,11 +277,8 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
         }
 
-        .card.feed-card-dark h2 {
-            color: #f8fafc;
-        }
+        .card.feed-card-dark h2 { color: #f8fafc; }
 
-        /* Filter Controls */
         .filter-bar {
             display: flex;
             gap: 8px;
@@ -457,7 +472,6 @@
             font-weight: bold;
         }
 
-        /* Scoreboard styling */
         .score-table {
             width: 100%;
             border-collapse: collapse;
@@ -476,20 +490,196 @@
             color: var(--text-muted);
             font-weight: 700;
         }
+
+        /* ========================================================
+           PREMIUM CUSTOM AUTH LOCK-SCREEN MODAL (REPLACES PROMPT)
+        ======================================================== */
+        #authLockOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(10, 15, 29, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: linear-gradient(145deg, #111827 0%, #1e293b 100%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            padding: 32px 28px;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 25px rgba(37, 99, 235, 0.2);
+            position: relative;
+            overflow: hidden;
+            animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 200%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #38bdf8, #818cf8, transparent);
+            animation: topGlow 3s linear infinite;
+        }
+
+        @keyframes topGlow {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(50%); }
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.92) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .auth-icon-wrap {
+            width: 68px;
+            height: 68px;
+            margin: 0 auto 16px auto;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(234, 88, 12, 0.2) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-card h3 {
+            color: #f8fafc;
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .auth-card p {
+            color: #94a3b8;
+            font-size: 0.88rem;
+            margin-bottom: 24px;
+        }
+
+        .auth-input-container {
+            margin-bottom: 20px;
+        }
+
+        .auth-pin-input {
+            width: 100%;
+            letter-spacing: 14px;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 800;
+            padding: 14px 10px;
+            border-radius: 14px;
+            border: 2px solid #334155;
+            background: #090d16;
+            color: #38bdf8;
+            outline: none;
+            transition: all 0.25s ease;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        .auth-pin-input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3), inset 0 2px 8px rgba(0, 0, 0, 0.6);
+            background: #0d1322;
+        }
+
+        .auth-error-msg {
+            color: #f87171;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-top: 8px;
+            min-height: 20px;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(90deg, #ea580c, #2563eb);
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+            transition: all 0.2s;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.5);
+            opacity: 0.95;
+        }
+
+        .shake-animation {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
     </style>
 </head>
 <body>
 
-<!-- Fixed Top Marquee: Moving Left to Right -->
+<!-- ==========================================
+     CUSTOM AUTH LOCK-SCREEN MODAL
+=========================================== -->
+<div id="authLockOverlay">
+    <div class="auth-card" id="authCardBox">
+        <div class="auth-icon-wrap">🔐</div>
+        <h3>JEE Trio Authentication</h3>
+        <p>Enter your personalized 4-digit PIN to access tracker</p>
+        
+        <form id="customAuthForm" onsubmit="handleCustomPinSubmit(event)">
+            <div class="auth-input-container">
+                <input 
+                    type="password" 
+                    id="customPinInput" 
+                    class="auth-pin-input" 
+                    maxlength="4" 
+                    placeholder="••••" 
+                    inputmode="numeric" 
+                    autocomplete="off"
+                    required
+                    autofocus
+                >
+                <div id="authErrorDisplay" class="auth-error-msg"></div>
+            </div>
+            <button type="submit" class="auth-btn">Unlock Tracker ⚡</button>
+        </form>
+    </div>
+</div>
+
+<!-- Fixed Top Marquee -->
 <div class="top-marquee-bar">
     <div class="marquee-track">
-        <div class="marquee-content">
+        <div class="marquee-content" id="marqueeTextContent">
             <span>✨ WELCOME TO JEE TARGET TRACKER</span>
             <span>⚡ MISSION JEE 2028</span>
             <span>🎯 COMPLETE 11th & 12th SYLLABUS TRACKER</span>
             <span>🔥 CONSISTENCY BEATS TALENT</span>
         </div>
-        <div class="marquee-content">
+        <div class="marquee-content" id="marqueeTextContentDup">
             <span>✨ WELCOME TO JEE TARGET TRACKER</span>
             <span>⚡ MISSION JEE 2028</span>
             <span>🎯 COMPLETE 11th & 12th SYLLABUS TRACKER</span>
@@ -504,7 +694,7 @@
     </div>
 
     <header>
-        <h1>🎯 JEE Target Tracker</h1>
+        <h1 id="mainTitleHeader">🎯 JEE Target Tracker</h1>
         <p style="color: var(--text-muted); margin-top: 0.35rem; font-weight: 500;">Class 11 & 12 Complete Syllabus, Practice Log, Screen Time & Scoreboard</p>
     </header>
 
@@ -512,31 +702,40 @@
         Logged in as: <strong id="currentIdentifiedUser" style="color: #2563eb;">Authenticating...</strong>
     </div>
 
-    <!-- Active Presence Cards With Student Photos -->
+    <!-- Active Presence Cards -->
     <div class="presence-container">
         <div class="presence-card">
-            <img class="student-avatar" id="avatar-Pranay" src="./pranay.jpeg" alt="Pranay">
+            <div class="avatar-wrap">
+                <img class="student-avatar" id="avatar-Pranay" src="./pranay.jpeg" alt="Pranay">
+            </div>
             <div class="presence-info">
                 <span class="presence-name"><span class="pulse-dot"></span> Pranay</span>
                 <span class="presence-time" id="status-Pranay">Checking...</span>
             </div>
         </div>
         <div class="presence-card">
-            <img class="student-avatar" id="avatar-Abhigyan" src="./abhigyan.jpeg" alt="Abhigyan">
+            <div class="avatar-wrap">
+                <img class="student-avatar" id="avatar-Abhigyan" src="./abhigyan.jpeg" alt="Abhigyan">
+            </div>
             <div class="presence-info">
                 <span class="presence-name"><span class="pulse-dot"></span> Abhigyan</span>
                 <span class="presence-time" id="status-Abhigyan">Checking...</span>
             </div>
         </div>
         <div class="presence-card">
-            <img class="student-avatar" id="avatar-Pranjal" src="./pranjal.jpeg" alt="Pranjal">
+            <div class="avatar-wrap">
+                <img class="student-avatar" id="avatar-Pranjal" src="./pranjal.jpeg" alt="Pranjal">
+                <span id="pranjalCrown" class="bday-crown" style="display:none;">👑</span>
+            </div>
             <div class="presence-info">
                 <span class="presence-name"><span class="pulse-dot"></span> Pranjal</span>
                 <span class="presence-time" id="status-Pranjal">Checking...</span>
             </div>
         </div>
         <div class="presence-card">
-            <img class="student-avatar" id="avatar-Aayush" src="./aayush.jpeg" alt="Aayush">
+            <div class="avatar-wrap">
+                <img class="student-avatar" id="avatar-Aayush" src="./aayush.jpeg" alt="Aayush">
+            </div>
             <div class="presence-info">
                 <span class="presence-name"><span class="pulse-dot"></span> Aayush</span>
                 <span class="presence-time" id="status-Aayush">Checking...</span>
@@ -641,7 +840,7 @@
             </form>
         </div>
 
-        <!-- Custom Dark Section for Logs with Time Filter -->
+        <!-- Group Update Feed -->
         <div class="card feed-card-dark">
             <h2>Group Update Feed</h2>
             
@@ -833,7 +1032,7 @@
 </div>
 
 <script>
-    // 1. PIN & User Configuration
+    // 1. PIN & User Config
     const pinToUser = {
         "4440": "Pranay",
         "5670": "Abhigyan",
@@ -848,25 +1047,103 @@
         "Aayush": "2340"
     };
 
-    // 2. Authentication Handling
     let loggedInUser = sessionStorage.getItem("jee_authenticated_user");
 
-    if (!loggedInUser || !userToPin[loggedInUser]) {
-        let enteredPin = prompt("🔐 Enter your personal 4-digit PIN to login:");
-        if (enteredPin && pinToUser[enteredPin]) {
-            loggedInUser = pinToUser[enteredPin];
-            sessionStorage.setItem("jee_authenticated_user", loggedInUser);
+    // Initialize custom lock screen
+    function checkAuthLock() {
+        const overlay = document.getElementById("authLockOverlay");
+        if (loggedInUser && userToPin[loggedInUser]) {
+            overlay.style.display = "none";
+            document.getElementById("currentIdentifiedUser").innerText = loggedInUser;
+            document.getElementById("student").value = loggedInUser;
+            initAppAfterAuth();
         } else {
-            alert("❌ Incorrect PIN! Access Denied.");
-            document.body.innerHTML = "<div style='color:#0f172a; text-align:center; margin-top:20vh; font-family:sans-serif;'><h1>🔒 Access Denied</h1><p>Invalid PIN. Refresh the page to try again.</p></div>";
-            throw new Error("Unauthorized access stopped.");
+            overlay.style.display = "flex";
+            setTimeout(() => {
+                const inp = document.getElementById("customPinInput");
+                if (inp) inp.focus();
+            }, 100);
         }
     }
 
-    document.getElementById("currentIdentifiedUser").innerText = loggedInUser;
-    document.getElementById("student").value = loggedInUser;
+    // Handle Custom Pin Submission
+    window.handleCustomPinSubmit = function(e) {
+        e.preventDefault();
+        const pinInp = document.getElementById("customPinInput");
+        const errDisp = document.getElementById("authErrorDisplay");
+        const cardBox = document.getElementById("authCardBox");
+        const enteredPin = pinInp.value.trim();
 
-    // 3. Avatars
+        if (pinToUser[enteredPin]) {
+            loggedInUser = pinToUser[enteredPin];
+            sessionStorage.setItem("jee_authenticated_user", loggedInUser);
+            errDisp.innerText = "";
+            
+            // Fade out modal smoothly
+            const overlay = document.getElementById("authLockOverlay");
+            overlay.style.transition = "opacity 0.25s ease";
+            overlay.style.opacity = "0";
+            setTimeout(() => {
+                overlay.style.display = "none";
+            }, 250);
+
+            document.getElementById("currentIdentifiedUser").innerText = loggedInUser;
+            document.getElementById("student").value = loggedInUser;
+            initAppAfterAuth();
+        } else {
+            errDisp.innerText = "❌ Incorrect PIN! Try again.";
+            cardBox.classList.add("shake-animation");
+            pinInp.value = "";
+            pinInp.focus();
+            setTimeout(() => {
+                cardBox.classList.remove("shake-animation");
+            }, 400);
+        }
+    };
+
+    // Run auth check on page load
+    window.addEventListener("DOMContentLoaded", checkAuthLock);
+
+    // Function to run after successful login
+    function initAppAfterAuth() {
+        // 2. Birthday Trigger
+        const todayDate = new Date();
+        const isPranjalBirthday = (todayDate.getDate() === 22 && todayDate.getMonth() === 9);
+
+        if (isPranjalBirthday) {
+            const crownEl = document.getElementById("pranjalCrown");
+            if (crownEl) crownEl.style.display = "inline-block";
+
+            const bdayMarqueeHTML = `
+                <span>🎂 HAPPY BIRTHDAY PRANJAL! 🎂</span>
+                <span>👑 LEAD BUG HUNTER & FUTURE IITIAN 🔥</span>
+                <span>⚡ TARGET JEE 2028: UNSTOPPABLE! 🚀</span>
+                <span>✨ WISHING YOU THE BEST YEAR AHEAD! ✨</span>
+            `;
+            document.getElementById("marqueeTextContent").innerHTML = bdayMarqueeHTML;
+            document.getElementById("marqueeTextContentDup").innerHTML = bdayMarqueeHTML;
+
+            if (loggedInUser === "Pranjal") {
+                setTimeout(() => {
+                    if (typeof confetti === 'function') {
+                        confetti({
+                            particleCount: 120,
+                            spread: 80,
+                            origin: { y: 0.6 }
+                        });
+                    }
+                    alert("🎉 HAPPY BIRTHDAY PRANJAL! 🎂\nFrom Pranay, Abhigyan & Aayush!\nOfficial JEE Tracker Chief Bug Hunter & Future IITian!");
+                }, 500);
+            }
+        }
+
+        // 3. Update Presence
+        db.collection("user_presence").doc(loggedInUser).set({
+            lastActive: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+    }
+
+    // 4. Avatars
     const studentAvatars = {
         "Pranay": "./pranay.jpeg",
         "Abhigyan": "./abhigyan.jpeg",
@@ -884,7 +1161,7 @@
         }
     });
 
-    // 4. Firebase Initialization
+    // 5. Firebase Initialization
     const firebaseConfig = {
         apiKey: "AIzaSyAB6FbsDLh4xq6ikvsSFFrDLYFVDaYB978",
         authDomain: "jee-tracker-6b67d.firebaseapp.com",
@@ -898,11 +1175,6 @@
         firebase.initializeApp(firebaseConfig);
     }
     const db = firebase.firestore();
-
-    // 5. Update Presence
-    db.collection("user_presence").doc(loggedInUser).set({
-        lastActive: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
 
     db.collection("user_presence").onSnapshot(snapshot => {
         snapshot.forEach(doc => {
@@ -918,6 +1190,22 @@
 
     // 6. Pass Evaluation Logic
     async function evaluateMemberPasses(user) {
+        const todayDate = new Date();
+        const isPranjalBirthday = (todayDate.getDate() === 22 && todayDate.getMonth() === 9);
+
+        if (user === "Pranjal" && isPranjalBirthday) {
+            return {
+                qualifiedTier: "🎂 Birthday VIP Pass",
+                badgeText: "🎉 Birthday King (Unlocked All Day)",
+                accessDuration: "24 Hours (Full Birthday Privileges)",
+                practiceToday: 0,
+                practiceThisWeek: 0,
+                lectureThisWeek: 0,
+                practiceAllTime: 110.5,
+                streakCount: 7
+            };
+        }
+
         const now = new Date();
         const startOfToday = new Date();
         startOfToday.setHours(0, 0, 0, 0);
@@ -940,7 +1228,7 @@
         logsSnap.forEach(doc => {
             const d = doc.data();
             const hours = parseFloat(d.studyHours || d.hours || 0);
-            const act = (d.activityType || '').toLowerCase();
+            const act = (d.activityType || d.activity || '').toLowerCase();
             const isPractice = (act.includes("practice") || act.includes("self study") || act.includes("self")) && !act.includes("mobile");
             const isLecture = act.includes("lecture");
             const logDate = d.timestamp ? d.timestamp.toDate() : new Date();
@@ -1061,7 +1349,7 @@
         document.getElementById("tierModal").style.display = "none";
     };
 
-    // 7. Feed Management & Filtering
+    // 7. Feed Management
     const feedContainer = document.getElementById('feedContainer');
     let currentFilter = 'all';
     let cachedLogs = [];
@@ -1162,13 +1450,15 @@
 
           renderLogs();
 
-          const passData = await evaluateMemberPasses(loggedInUser);
-          const statusBox = document.getElementById("userMembershipStatus");
-          if (statusBox) {
-              if (passData.qualifiedTier) {
-                  statusBox.innerHTML = `🎉 <b>${loggedInUser}'s Active Pass:</b> <span style="color:#16a34a; font-weight:bold;">${passData.qualifiedTier} — ${passData.badgeText} (${passData.accessDuration})</span>`;
-              } else {
-                  statusBox.innerHTML = `🔒 <b>${loggedInUser}:</b> No active pass. Log <b>3.0h practice today</b> (Current: <b>${passData.practiceToday.toFixed(1)}h</b>) to unlock Bronze!`;
+          if (loggedInUser) {
+              const passData = await evaluateMemberPasses(loggedInUser);
+              const statusBox = document.getElementById("userMembershipStatus");
+              if (statusBox) {
+                  if (passData.qualifiedTier) {
+                      statusBox.innerHTML = `🎉 <b>${loggedInUser}'s Active Pass:</b> <span style="color:#16a34a; font-weight:bold;">${passData.qualifiedTier} — ${passData.badgeText} (${passData.accessDuration})</span>`;
+                  } else {
+                      statusBox.innerHTML = `🔒 <b>${loggedInUser}:</b> No active pass. Log <b>3.0h practice today</b> (Current: <b>${passData.practiceToday.toFixed(1)}h</b>) to unlock Bronze!`;
+                  }
               }
           }
       });
@@ -1178,7 +1468,7 @@
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const student = loggedInUser;
+       const student = loggedInUser;
         const subject = document.getElementById('subject').value;
         const activityType = document.getElementById('activityType').value;
         const studyHours = parseFloat(document.getElementById('studyHours').value);
@@ -1274,7 +1564,7 @@
         }
     };
 
-    // 9. Safe Checklist Toggle Function
+    // 9. Safe Chapter Toggle
     window.toggleChapter = async function(chkId) {
         const el = document.getElementById(chkId);
         if (!el) return;
@@ -1285,7 +1575,6 @@
         }, { merge: true });
     };
 
-    // Safe live sync for checklists (Ignores deleted or mismatched chapter IDs)
     db.collection("jee_chapters").onSnapshot(snapshot => {
         snapshot.forEach(doc => {
             const chk = document.getElementById(doc.id);
@@ -1295,7 +1584,7 @@
         });
     });
 
-    // 10. Mock Test Scores Handling
+    // 10. Mock Test Score Submission
     const scoreForm = document.getElementById('scoreForm');
     scoreForm.addEventListener('submit', async (e) => {
         e.preventDefault();
