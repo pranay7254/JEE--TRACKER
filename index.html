@@ -7,8 +7,6 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <!-- Canvas Confetti CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
         :root {
@@ -37,7 +35,6 @@
             position: relative;
         }
 
-        /* Fixed Top Marquee */
         .top-marquee-bar {
             position: fixed;
             top: 0;
@@ -152,15 +149,6 @@
             background: #e2e8f0;
         }
 
-        .bday-crown {
-            position: absolute;
-            top: -12px;
-            right: -6px;
-            font-size: 1.3rem;
-            transform: rotate(15deg);
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-        }
-
         .presence-info {
             display: flex;
             flex-direction: column;
@@ -173,7 +161,17 @@
             color: var(--text-main);
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: space-between;
+        }
+
+        .streak-pill {
+            font-size: 0.72rem;
+            padding: 2px 7px;
+            border-radius: 12px;
+            background: #fff7ed;
+            color: #ea580c;
+            border: 1px solid #ffedd5;
+            font-weight: 800;
         }
 
         .pulse-dot {
@@ -183,6 +181,7 @@
             border-radius: 50%;
             display: inline-block;
             box-shadow: 0 0 6px #16a34a;
+            margin-right: 4px;
         }
 
         .presence-time {
@@ -233,6 +232,92 @@
             font-size: 1.3rem;
             color: #ef4444;
         }
+
+        /* Weekly Spotlight Leaderboard */
+        .weekly-board-card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 1.25rem;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 1.75rem;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
+        }
+
+        .weekly-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .weekly-col {
+            background: #f8fafc;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .weekly-col h4 {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .weekly-col .lead-name {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .weekly-col .lead-stat {
+            font-size: 0.8rem;
+            color: #16a34a;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        /* Built-in Study Stopwatch */
+        .stopwatch-box {
+            background: #0f172a;
+            color: #f8fafc;
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            border: 1px solid #1e293b;
+        }
+
+        .stopwatch-time {
+            font-family: monospace;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #38bdf8;
+            letter-spacing: 2px;
+        }
+
+        .stopwatch-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .sw-btn {
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .sw-btn-start { background: #16a34a; color: white; }
+        .sw-btn-stop { background: #dc2626; color: white; }
+        .sw-btn-fill { background: #2563eb; color: white; }
+        .sw-btn-reset { background: #475569; color: white; }
 
         .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 1.75rem; }
         @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
@@ -333,10 +418,7 @@
             color: #f8fafc;
         }
 
-        .log-item p.details-text {
-            color: #94a3b8; 
-            font-size: 0.92rem;
-        }
+        .log-item p.details-text { color: #94a3b8; font-size: 0.92rem; }
 
         .log-meta { 
             display: flex; 
@@ -354,48 +436,12 @@
         .tag-c { background: #dcfce7; color: #16a34a; border: 1px solid #86efac; }
         .tag-m { background: #e0f2fe; color: #0284c7; border: 1px solid #7dd3fc; }
 
-        .tag-activity {
-            background: #f3e8ff;
-            color: #7e22ce;
-            border: 1px solid #d8b4fe;
-            margin-left: 6px;
-        }
+        .tag-activity { background: #f3e8ff; color: #7e22ce; border: 1px solid #d8b4fe; margin-left: 6px; }
+        .tag-mobile { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; margin-left: 6px; }
+        .tag-questions { background: #fef08a; color: #854d0e; border: 1px solid #facc15; margin-left: 6px; }
 
-        .tag-mobile {
-            background: #fee2e2;
-            color: #b91c1c;
-            border: 1px solid #fca5a5;
-            margin-left: 6px;
-        }
-
-        .tag-questions {
-            background: #fef08a;
-            color: #854d0e;
-            border: 1px solid #facc15;
-            margin-left: 6px;
-        }
-
-        .btn-edit {
-            background-color: #fef3c7;
-            color: #b45309;
-            border: 1px solid #fde68a;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        
-        .btn-delete {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            border: 1px solid #fca5a5;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
+        .btn-edit { background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+        .btn-delete { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
 
         /* 11th & 12th Syllabus Checklist */
         .chapter-section-header {
@@ -454,232 +500,78 @@
             accent-color: #2563eb;
         }
 
-        .chapter-badge-11 {
-            background: #e0e7ff;
-            color: #3730a3;
-            font-size: 0.68rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
+        .chapter-badge-11 { background: #e0e7ff; color: #3730a3; font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .chapter-badge-12 { background: #fce7f3; color: #9d174d; font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
 
-        .chapter-badge-12 {
-            background: #fce7f3;
-            color: #9d174d;
-            font-size: 0.68rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
+        .score-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.88rem; }
+        .score-table th, .score-table td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
+        .score-table th { background: #f8fafc; color: var(--text-muted); font-weight: 700; }
 
-        .score-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            font-size: 0.88rem;
-        }
-
-        .score-table th, .score-table td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .score-table th {
-            background: #f8fafc;
-            color: var(--text-muted);
-            font-weight: 700;
-        }
-
-        /* ========================================================
-           PREMIUM CUSTOM AUTH LOCK-SCREEN MODAL (REPLACES PROMPT)
-        ======================================================== */
+        /* Sleek Modern PIN Modal */
         #authLockOverlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(10, 15, 29, 0.85);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             z-index: 999999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             padding: 20px;
         }
 
         .auth-card {
-            background: linear-gradient(145deg, #111827 0%, #1e293b 100%);
+            background: #111827;
             border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 24px;
-            padding: 32px 28px;
-            width: 100%;
-            max-width: 380px;
-            text-align: center;
-            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 25px rgba(37, 99, 235, 0.2);
-            position: relative;
-            overflow: hidden;
-            animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .auth-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -50%;
-            width: 200%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #38bdf8, #818cf8, transparent);
-            animation: topGlow 3s linear infinite;
-        }
-
-        @keyframes topGlow {
-            0% { transform: translateX(-50%); }
-            100% { transform: translateX(50%); }
-        }
-
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.92) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        .auth-icon-wrap {
-            width: 68px;
-            height: 68px;
-            margin: 0 auto 16px auto;
             border-radius: 20px;
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(234, 88, 12, 0.2) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .auth-card h3 {
-            color: #f8fafc;
-            font-size: 1.35rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            margin-bottom: 6px;
-        }
-
-        .auth-card p {
-            color: #94a3b8;
-            font-size: 0.88rem;
-            margin-bottom: 24px;
-        }
-
-        .auth-input-container {
-            margin-bottom: 20px;
+            padding: 30px;
+            width: 100%; max-width: 360px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
         }
 
         .auth-pin-input {
-            width: 100%;
-            letter-spacing: 14px;
-            text-align: center;
-            font-size: 2rem;
-            font-weight: 800;
-            padding: 14px 10px;
-            border-radius: 14px;
-            border: 2px solid #334155;
-            background: #090d16;
-            color: #38bdf8;
-            outline: none;
-            transition: all 0.25s ease;
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+            width: 100%; letter-spacing: 12px; text-align: center;
+            font-size: 2rem; font-weight: 800; padding: 12px;
+            border-radius: 12px; border: 2px solid #334155;
+            background: #090d16; color: #38bdf8; outline: none;
+            margin: 15px 0;
         }
 
-        .auth-pin-input:focus {
-            border-color: #38bdf8;
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3), inset 0 2px 8px rgba(0, 0, 0, 0.6);
-            background: #0d1322;
-        }
-
-        .auth-error-msg {
-            color: #f87171;
-            font-size: 0.82rem;
-            font-weight: 600;
-            margin-top: 8px;
-            min-height: 20px;
-        }
+        .auth-pin-input:focus { border-color: #38bdf8; }
 
         .auth-btn {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            background: linear-gradient(90deg, #ea580c, #2563eb);
-            color: #ffffff;
-            font-size: 1rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
-            transition: all 0.2s;
-        }
-
-        .auth-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.5);
-            opacity: 0.95;
-        }
-
-        .shake-animation {
-            animation: shake 0.4s ease-in-out;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-8px); }
-            40%, 80% { transform: translateX(8px); }
+            width: 100%; padding: 12px; border-radius: 10px;
+            border: none; background: linear-gradient(90deg, #ea580c, #2563eb); color: white;
+            font-weight: 700; cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-<!-- ==========================================
-     CUSTOM AUTH LOCK-SCREEN MODAL
-=========================================== -->
+<!-- Modern PIN Lock Screen Modal -->
 <div id="authLockOverlay">
     <div class="auth-card" id="authCardBox">
-        <div class="auth-icon-wrap">🔐</div>
-        <h3>JEE Trio Authentication</h3>
-        <p>Enter your personalized 4-digit PIN to access tracker</p>
+        <div style="font-size: 2rem; margin-bottom: 8px;">🔐</div>
+        <h3 style="color:#f8fafc;">JEE Trio Authentication</h3>
+        <p style="color:#94a3b8; font-size:0.85rem;">Enter your 4-digit PIN to access</p>
         
-        <form id="customAuthForm" onsubmit="handleCustomPinSubmit(event)">
-            <div class="auth-input-container">
-                <input 
-                    type="password" 
-                    id="customPinInput" 
-                    class="auth-pin-input" 
-                    maxlength="4" 
-                    placeholder="••••" 
-                    inputmode="numeric" 
-                    autocomplete="off"
-                    required
-                    autofocus
-                >
-                <div id="authErrorDisplay" class="auth-error-msg"></div>
-            </div>
+        <form onsubmit="handleCustomPinSubmit(event)">
+            <input type="password" id="customPinInput" class="auth-pin-input" maxlength="4" placeholder="••••" required autofocus>
+            <div id="authErrorDisplay" style="color:#f87171; font-size:0.8rem; margin-bottom:10px;"></div>
             <button type="submit" class="auth-btn">Unlock Tracker ⚡</button>
         </form>
     </div>
 </div>
 
-<!-- Fixed Top Marquee -->
+<!-- Top Marquee -->
 <div class="top-marquee-bar">
     <div class="marquee-track">
-        <div class="marquee-content" id="marqueeTextContent">
+        <div class="marquee-content">
             <span>✨ WELCOME TO JEE TARGET TRACKER</span>
             <span>⚡ MISSION JEE 2028</span>
             <span>🎯 COMPLETE 11th & 12th SYLLABUS TRACKER</span>
             <span>🔥 CONSISTENCY BEATS TALENT</span>
         </div>
-        <div class="marquee-content" id="marqueeTextContentDup">
+        <div class="marquee-content">
             <span>✨ WELCOME TO JEE TARGET TRACKER</span>
             <span>⚡ MISSION JEE 2028</span>
             <span>🎯 COMPLETE 11th & 12th SYLLABUS TRACKER</span>
@@ -694,7 +586,7 @@
     </div>
 
     <header>
-        <h1 id="mainTitleHeader">🎯 JEE Target Tracker</h1>
+        <h1>🎯 JEE Target Tracker</h1>
         <p style="color: var(--text-muted); margin-top: 0.35rem; font-weight: 500;">Class 11 & 12 Complete Syllabus, Practice Log, Screen Time & Scoreboard</p>
     </header>
 
@@ -702,14 +594,14 @@
         Logged in as: <strong id="currentIdentifiedUser" style="color: #2563eb;">Authenticating...</strong>
     </div>
 
-    <!-- Active Presence Cards -->
+    <!-- Active Presence Cards with Streak Badges -->
     <div class="presence-container">
         <div class="presence-card">
             <div class="avatar-wrap">
                 <img class="student-avatar" id="avatar-Pranay" src="./pranay.jpeg" alt="Pranay">
             </div>
             <div class="presence-info">
-                <span class="presence-name"><span class="pulse-dot"></span> Pranay</span>
+                <span class="presence-name"><span><span class="pulse-dot"></span>Pranay</span> <span class="streak-pill" id="streak-Pranay">🔥 0d</span></span>
                 <span class="presence-time" id="status-Pranay">Checking...</span>
             </div>
         </div>
@@ -718,17 +610,16 @@
                 <img class="student-avatar" id="avatar-Abhigyan" src="./abhigyan.jpeg" alt="Abhigyan">
             </div>
             <div class="presence-info">
-                <span class="presence-name"><span class="pulse-dot"></span> Abhigyan</span>
+                <span class="presence-name"><span><span class="pulse-dot"></span>Abhigyan</span> <span class="streak-pill" id="streak-Abhigyan">🔥 0d</span></span>
                 <span class="presence-time" id="status-Abhigyan">Checking...</span>
             </div>
         </div>
         <div class="presence-card">
             <div class="avatar-wrap">
                 <img class="student-avatar" id="avatar-Pranjal" src="./pranjal.jpeg" alt="Pranjal">
-                <span id="pranjalCrown" class="bday-crown" style="display:none;">👑</span>
             </div>
             <div class="presence-info">
-                <span class="presence-name"><span class="pulse-dot"></span> Pranjal</span>
+                <span class="presence-name"><span><span class="pulse-dot"></span>Pranjal</span> <span class="streak-pill" id="streak-Pranjal">🔥 0d</span></span>
                 <span class="presence-time" id="status-Pranjal">Checking...</span>
             </div>
         </div>
@@ -737,7 +628,7 @@
                 <img class="student-avatar" id="avatar-Aayush" src="./aayush.jpeg" alt="Aayush">
             </div>
             <div class="presence-info">
-                <span class="presence-name"><span class="pulse-dot"></span> Aayush</span>
+                <span class="presence-name"><span><span class="pulse-dot"></span>Aayush</span> <span class="streak-pill" id="streak-Aayush">🔥 0d</span></span>
                 <span class="presence-time" id="status-Aayush">Checking...</span>
             </div>
         </div>
@@ -756,39 +647,39 @@
         </div>
     </div>
 
-    <!-- Membership Rules Showcase -->
-    <div class="card" style="margin-bottom: 1.75rem;">
-        <h2>🏆 Study Membership Passes & Leaderboard Privileges</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 10px;">
-            
-            <div style="background: #f8fafc; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 12px; border: 1px solid var(--border-subtle); border-left-width: 4px;">
-                <div style="font-weight: bold; color: #d97706; font-size: 0.95rem;">🥉 Bronze Pass</div>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0;">≥3.0h Practice Today (Resets 12 AM)</p>
-                <div style="font-size: 0.75rem; color: #16a34a; font-weight: 700;">⚡ Validity: 2 Hours</div>
+    <!-- Weekly Spotlight Leaderboard -->
+    <div class="weekly-board-card">
+        <h2 style="font-size: 1.1rem; margin-bottom: 0.2rem;">⚡ Weekly Spotlight (Mon - Sun)</h2>
+        <div class="weekly-grid">
+            <div class="weekly-col">
+                <h4>🏆 Pure Self-Study Leader</h4>
+                <div class="lead-name" id="leadSelfStudy">-</div>
+                <div class="lead-stat" id="leadSelfStudyVal">0.0 hrs</div>
             </div>
-
-            <div style="background: #f8fafc; border-left: 4px solid #64748b; border-radius: 8px; padding: 12px; border: 1px solid var(--border-subtle); border-left-width: 4px;">
-                <div style="font-weight: bold; color: #475569; font-size: 0.95rem;">🥈 Silver Pass</div>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0;">15h Practice & 20h Lectures This Week</p>
-                <div style="font-size: 0.75rem; color: #16a34a; font-weight: 700;">⚡ Validity: 72 Hours (Resets Mon)</div>
+            <div class="weekly-col">
+                <h4>✍️ Top Question Solver</h4>
+                <div class="lead-name" id="leadQuestions">-</div>
+                <div class="lead-stat" id="leadQuestionsVal" style="color:#ca8a04;">0 Qs</div>
             </div>
-
-            <div style="background: #f8fafc; border-left: 4px solid #16a34a; border-radius: 8px; padding: 12px; border: 1px solid var(--border-subtle); border-left-width: 4px;">
-                <div style="font-weight: bold; color: #16a34a; font-size: 0.95rem;">🔥 Streak Pass</div>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0;">7 Days Unbroken (≥2h/day)</p>
-                <div style="font-size: 0.75rem; color: #16a34a; font-weight: 700;">⚡ Validity: 48 Hours</div>
+            <div class="weekly-col">
+                <h4>🛡️ Lowest Screen Time (Hero)</h4>
+                <div class="lead-name" id="leadLowestMobile">-</div>
+                <div class="lead-stat" id="leadLowestMobileVal" style="color:#2563eb;">0.0 hrs</div>
             </div>
-
-            <div style="background: #f8fafc; border-left: 4px solid #eab308; border-radius: 8px; padding: 12px; border: 1px solid var(--border-subtle); border-left-width: 4px;">
-                <div style="font-weight: bold; color: #ca8a04; font-size: 0.95rem;">🥇 Gold VIP Pass</div>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0;">#1 All-Time Rank (≥5.0h Practice)</p>
-                <div style="font-size: 0.75rem; color: #16a34a; font-weight: 700;">⚡ Validity: 24 Hours Daily Check</div>
-            </div>
-
         </div>
+    </div>
 
-        <div id="userMembershipStatus" style="margin-top: 14px; padding: 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; font-size: 0.85rem; color: #1e3a8a;">
-            Checking active unlocked passes...
+    <!-- Built-in Study Stopwatch Widget -->
+    <div class="stopwatch-box">
+        <div>
+            <div style="font-size: 0.8rem; color:#94a3b8; text-transform:uppercase;">⏱️ Study Session Timer</div>
+            <div class="stopwatch-time" id="stopwatchDisplay">00:00:00</div>
+        </div>
+        <div class="stopwatch-controls">
+            <button class="sw-btn sw-btn-start" onclick="startStopwatch()">▶ Start</button>
+            <button class="sw-btn sw-btn-stop" onclick="stopStopwatch()">⏸ Pause</button>
+            <button class="sw-btn sw-btn-fill" onclick="fillStopwatchToInput()">📥 Stop & Fill Hours</button>
+            <button class="sw-btn sw-btn-reset" onclick="resetStopwatch()">🔄 Reset</button>
         </div>
     </div>
 
@@ -814,15 +705,15 @@
                     <label for="activityType">Activity Type</label>
                     <select id="activityType" required>
                         <option value="Question Practice">✍️ Question Practice</option>
-                        <option value="Self Study">📚 Self Study</option>
+                        <option value="Self Study">📖 Pure Self Study (Theory/Reading)</option>
+                        <option value="Revision">🔄 Revision</option>
                         <option value="Lecture">🎥 Lecture</option>
-                        <option value="Revision">📖 Revision</option>
                         <option value="Watching Mobile">📱 Watching Mobile (Screen Time)</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="studyHours">Hours (Study or Screen Time)</label>
-                    <input type="number" id="studyHours" step="0.5" min="0.5" max="24" placeholder="e.g., 2.5" required>
+                    <input type="number" id="studyHours" step="0.1" min="0.1" max="24" placeholder="e.g., 2.5" required>
                 </div>
                 <div class="form-group">
                     <label for="questionsSolved">Questions Solved (Optional - For Practice)</label>
@@ -1018,21 +909,8 @@
     </div>
 </div>
 
-<!-- Modal Popup -->
-<div id="tierModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.6); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(6px);">
-  <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:16px; padding:24px; max-width:420px; width:90%; text-align:center; box-shadow:0 12px 30px rgba(0,0,0,0.15);">
-    <h2 id="tierModalTitle" style="color:#0f172a; font-size:1.25rem; margin-bottom:10px;">Membership Access Check</h2>
-    <div id="tierModalBadge" style="margin-bottom:12px;"></div>
-    <p id="tierModalMsg" style="color:#334155; font-size:0.9rem; margin-bottom:18px; line-height:1.5; text-align:left; background:#f8fafc; border: 1px solid #e2e8f0; padding:12px; border-radius:8px;"></p>
-    <div style="display:flex; gap:10px; justify-content:center;">
-      <button id="tierEnterBtn" style="display:none; padding:9px 18px; background:#16a34a; color:#ffffff; font-weight:700; border:none; border-radius:6px; cursor:pointer;" onclick="openAdminDashboard()">Enter Dashboard</button>
-      <button style="padding:9px 18px; background:#64748b; color:#fff; font-weight:600; border:none; border-radius:6px; cursor:pointer;" onclick="closeTierModal()">Close</button>
-    </div>
-  </div>
-</div>
-
 <script>
-    // 1. PIN & User Config
+    // PIN & User Config
     const pinToUser = {
         "4440": "Pranay",
         "5670": "Abhigyan",
@@ -1049,7 +927,6 @@
 
     let loggedInUser = sessionStorage.getItem("jee_authenticated_user");
 
-    // 2. Firebase Initialization
     const firebaseConfig = {
         apiKey: "AIzaSyAB6FbsDLh4xq6ikvsSFFrDLYFVDaYB978",
         authDomain: "jee-tracker-6b67d.firebaseapp.com",
@@ -1059,104 +936,84 @@
         appId: "1:14514591368:web:9e72203c576dfaa5e9713d"
     };
 
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Check Auth Status on Load
     function checkAuthLock() {
         const overlay = document.getElementById("authLockOverlay");
         if (loggedInUser && userToPin[loggedInUser]) {
             overlay.style.display = "none";
             document.getElementById("currentIdentifiedUser").innerText = loggedInUser;
             document.getElementById("student").value = loggedInUser;
-            initAppAfterAuth();
+            initPresence();
         } else {
             overlay.style.display = "flex";
-            setTimeout(() => {
-                const inp = document.getElementById("customPinInput");
-                if (inp) inp.focus();
-            }, 100);
         }
     }
 
-    // Handle Custom Pin Submission
     window.handleCustomPinSubmit = function(e) {
         e.preventDefault();
-        const pinInp = document.getElementById("customPinInput");
-        const errDisp = document.getElementById("authErrorDisplay");
-        const cardBox = document.getElementById("authCardBox");
-        const enteredPin = pinInp.value.trim();
-
-        if (pinToUser[enteredPin]) {
-            loggedInUser = pinToUser[enteredPin];
+        const pinInp = document.getElementById("customPinInput").value.trim();
+        if (pinToUser[pinInp]) {
+            loggedInUser = pinToUser[pinInp];
             sessionStorage.setItem("jee_authenticated_user", loggedInUser);
-            errDisp.innerText = "";
-            
-            const overlay = document.getElementById("authLockOverlay");
-            overlay.style.transition = "opacity 0.25s ease";
-            overlay.style.opacity = "0";
-            setTimeout(() => {
-                overlay.style.display = "none";
-            }, 250);
-
+            document.getElementById("authLockOverlay").style.display = "none";
             document.getElementById("currentIdentifiedUser").innerText = loggedInUser;
             document.getElementById("student").value = loggedInUser;
-            initAppAfterAuth();
-            updatePassBadgeUI(); // Immediate pass refresh
+            initPresence();
         } else {
-            errDisp.innerText = "❌ Incorrect PIN! Try again.";
-            cardBox.classList.add("shake-animation");
-            pinInp.value = "";
-            pinInp.focus();
-            setTimeout(() => {
-                cardBox.classList.remove("shake-animation");
-            }, 400);
+            document.getElementById("authErrorDisplay").innerText = "❌ Incorrect PIN! Try again.";
         }
     };
 
     window.addEventListener("DOMContentLoaded", checkAuthLock);
 
-    function initAppAfterAuth() {
-        const todayDate = new Date();
-        const isPranjalBirthday = (todayDate.getDate() === 22 && todayDate.getMonth() === 9);
-
-        if (isPranjalBirthday) {
-            const crownEl = document.getElementById("pranjalCrown");
-            if (crownEl) crownEl.style.display = "inline-block";
-
-            const bdayMarqueeHTML = `
-                <span>🎂 HAPPY BIRTHDAY PRANJAL! 🎂</span>
-                <span>👑 LEAD BUG HUNTER & FUTURE IITIAN 🔥</span>
-                <span>⚡ TARGET JEE 2028: UNSTOPPABLE! 🚀</span>
-                <span>✨ WISHING YOU THE BEST YEAR AHEAD! ✨</span>
-            `;
-            document.getElementById("marqueeTextContent").innerHTML = bdayMarqueeHTML;
-            document.getElementById("marqueeTextContentDup").innerHTML = bdayMarqueeHTML;
-
-            if (loggedInUser === "Pranjal") {
-                setTimeout(() => {
-                    if (typeof confetti === 'function') {
-                        confetti({
-                            particleCount: 120,
-                            spread: 80,
-                            origin: { y: 0.6 }
-                        });
-                    }
-                    alert("🎉 HAPPY BIRTHDAY PRANJAL! 🎂\nFrom Pranay, Abhigyan & Aayush!\nOfficial JEE Tracker Chief Bug Hunter & Future IITian!");
-                }, 500);
-            }
-        }
-
+    function initPresence() {
         db.collection("user_presence").doc(loggedInUser).set({
             lastActive: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
-
-        updatePassBadgeUI();
     }
 
-    // Avatars Setup
+    // Stopwatch Logic
+    let swInterval = null;
+    let swSeconds = 0;
+
+    function formatTime(s) {
+        const h = Math.floor(s / 3600);
+        const m = Math.floor((s % 3600) / 60);
+        const sec = s % 60;
+        return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+    }
+
+    window.startStopwatch = function() {
+        if (!swInterval) {
+            swInterval = setInterval(() => {
+                swSeconds++;
+                document.getElementById("stopwatchDisplay").innerText = formatTime(swSeconds);
+            }, 1000);
+        }
+    };
+
+    window.stopStopwatch = function() {
+        clearInterval(swInterval);
+        swInterval = null;
+    };
+
+    window.resetStopwatch = function() {
+        stopStopwatch();
+        swSeconds = 0;
+        document.getElementById("stopwatchDisplay").innerText = "00:00:00";
+    };
+
+    window.fillStopwatchToInput = function() {
+        stopStopwatch();
+        const hours = (swSeconds / 3600).toFixed(1);
+        if (parseFloat(hours) > 0) {
+            document.getElementById("studyHours").value = hours;
+        }
+    };
+
+    // Presence Listeners
     const studentAvatars = {
         "Pranay": "./pranay.jpeg",
         "Abhigyan": "./abhigyan.jpeg",
@@ -1168,18 +1025,14 @@
         const el = document.getElementById(`avatar-${name}`);
         if (el) {
             el.src = studentAvatars[name];
-            el.onerror = () => {
-                el.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${name}`;
-            };
+            el.onerror = () => { el.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${name}`; };
         }
     });
 
-    // User Presence Live
     db.collection("user_presence").onSnapshot(snapshot => {
         snapshot.forEach(doc => {
             const data = doc.data();
-            const memberId = doc.id;
-            const statusEl = document.getElementById(`status-${memberId}`);
+            const statusEl = document.getElementById(`status-${doc.id}`);
             if (statusEl && data.lastActive) {
                 const dateObj = data.lastActive.toDate();
                 statusEl.innerText = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " (" + dateObj.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ")";
@@ -1187,196 +1040,22 @@
         });
     });
 
-    // Solid & Reliable Pass Evaluator
-    async function evaluateMemberPasses(user) {
-        if (!user) return null;
-
-        const todayDate = new Date();
-        const isPranjalBirthday = (todayDate.getDate() === 22 && todayDate.getMonth() === 9);
-
-        if (user === "Pranjal" && isPranjalBirthday) {
-            return {
-                qualifiedTier: "🎂 Birthday VIP Pass",
-                badgeText: "🎉 Birthday King (Unlocked All Day)",
-                accessDuration: "24 Hours (Full Birthday Privileges)",
-                practiceToday: 0,
-                practiceThisWeek: 0,
-                lectureThisWeek: 0,
-                practiceAllTime: 110.5,
-                streakCount: 7
-            };
-        }
-
-        const now = new Date();
-        const startOfToday = new Date();
-        startOfToday.setHours(0, 0, 0, 0);
-
-        const startOfWeek = new Date();
-        const dayOfWeek = now.getDay();
-        const distanceToMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
-        startOfWeek.setDate(now.getDate() - distanceToMonday);
-        startOfWeek.setHours(0, 0, 0, 0);
-
-        let practiceAllTime = 0;
-        let practiceToday = 0;
-        let practiceThisWeek = 0;
-        let lectureThisWeek = 0;
-        let practiceAllTimeByStudent = { "Pranay": 0, "Abhigyan": 0, "Pranjal": 0, "Aayush": 0 };
-        let practiceDates = new Set();
-
-        try {
-            const logsSnap = await db.collection("jee_logs").get();
-
-            logsSnap.forEach(doc => {
-                const d = doc.data();
-                const hours = parseFloat(d.studyHours || d.hours || 0);
-                const rawAct = d.activityType || d.activity || '';
-                const act = rawAct.toLowerCase();
-
-                const isMobile = act.includes("mobile");
-                const isPractice = (act.includes("practice") || act.includes("self study") || act.includes("self")) && !isMobile;
-                const isLecture = act.includes("lecture");
-                const logDate = d.timestamp ? d.timestamp.toDate() : new Date();
-
-                if (isPractice && practiceAllTimeByStudent[d.student] !== undefined) {
-                    practiceAllTimeByStudent[d.student] += hours;
-                }
-
-                if (d.student === user) {
-                    if (isPractice) practiceAllTime += hours;
-                    if (isPractice && logDate >= startOfToday) practiceToday += hours;
-                    if (logDate >= startOfWeek) {
-                        if (isPractice) practiceThisWeek += hours;
-                        if (isLecture) lectureThisWeek += hours;
-                    }
-                    if (isPractice && hours >= 2.0) {
-                        practiceDates.add(logDate.toDateString());
-                    }
-                }
-            });
-        } catch (err) {
-            console.error("Pass evaluation fetch error:", err);
-        }
-
-        let streakCount = practiceDates.size;
-        let sortedRank = Object.keys(practiceAllTimeByStudent).sort((a, b) => practiceAllTimeByStudent[b] - practiceAllTimeByStudent[a]);
-        let isGold = sortedRank[0] === user && practiceAllTimeByStudent[user] >= 5.0;
-
-        let qualifiedTier = null;
-        let badgeText = "";
-        let accessDuration = "";
-
-        if (isGold) {
-            qualifiedTier = "🥇 Gold VIP Pass";
-            badgeText = "👑 Study King VIP (All-Time Leader)";
-            accessDuration = "24 Hours (Daily Leaderboard)";
-        } else if (practiceThisWeek >= 15.0 && lectureThisWeek >= 20.0) {
-            qualifiedTier = "🥈 Silver Pass";
-            badgeText = "🎖️ Weekly Continuity Achiever";
-            accessDuration = "72 Hours (3 Days)";
-        } else if (streakCount >= 7) {
-            qualifiedTier = "🔥 Streak Pass";
-            badgeText = "⚡ Streak Master (7+ Days)";
-            accessDuration = "48 Hours";
-        } else if (practiceToday >= 3.0) {
-            qualifiedTier = "🥉 Bronze Pass";
-            badgeText = "🎯 Daily Grinder";
-            accessDuration = "2 Hours";
-        }
-
-        return {
-            qualifiedTier,
-            badgeText,
-            accessDuration,
-            practiceToday,
-            practiceThisWeek,
-            lectureThisWeek,
-            practiceAllTime,
-            streakCount
-        };
-    }
-
-    // Real-Time Pass Box Updater
-    async function updatePassBadgeUI() {
-        const user = loggedInUser || sessionStorage.getItem("jee_authenticated_user");
-        const statusBox = document.getElementById("userMembershipStatus");
-        if (!user || !statusBox) return;
-
-        const passData = await evaluateMemberPasses(user);
-        if (!passData) return;
-
-        if (passData.qualifiedTier) {
-            statusBox.innerHTML = `🎉 <b>${user}'s Active Pass:</b> <span style="color:#16a34a; font-weight:bold;">${passData.qualifiedTier} — ${passData.badgeText} (${passData.accessDuration})</span>`;
-        } else {
-            statusBox.innerHTML = `🔒 <b>${user}:</b> No active pass. Log <b>3.0h practice today</b> (Current: <b>${passData.practiceToday.toFixed(1)}h</b>) to unlock Bronze!`;
-        }
-    }
-
-    function showPassModal(passData, user) {
-        const modal = document.getElementById("tierModal");
-        const title = document.getElementById("tierModalTitle");
-        const msg = document.getElementById("tierModalMsg");
-        const badge = document.getElementById("tierModalBadge");
-        const enterBtn = document.getElementById("tierEnterBtn");
-
-        if (passData.qualifiedTier) {
-            title.innerText = `🎉 Pass Unlocked!`;
-            badge.innerHTML = `<span style="padding:5px 12px; background:#dcfce7; color:#16a34a; border:1px solid #86efac; border-radius:20px; font-size:0.85rem; font-weight:700;">${passData.qualifiedTier} — ${passData.badgeText}</span>`;
-            msg.innerHTML = `Great work <b>${user}</b>!<br><br>
-            • Today's Practice (Since 12 AM): <b>${passData.practiceToday.toFixed(1)} hrs</b><br>
-            • This Week's Practice: <b>${passData.practiceThisWeek.toFixed(1)} / 15.0 hrs</b><br>
-            • This Week's Lectures: <b>${passData.lectureThisWeek.toFixed(1)} / 20.0 hrs</b><br>
-            • All-Time Total Practice: <b>${passData.practiceAllTime.toFixed(1)} hrs</b><br><br>
-            ✅ <b>Perk:</b> ${passData.accessDuration} Leaderboard Access.`;
-            enterBtn.style.display = "inline-block";
-
-            sessionStorage.setItem("admin_auth", "viewer");
-            sessionStorage.setItem("viewer_user", user);
-            sessionStorage.setItem("viewer_tier", passData.qualifiedTier);
-            sessionStorage.setItem("viewer_badge", passData.badgeText);
-        } else {
-            title.innerText = "🔒 Dashboard Locked";
-            badge.innerHTML = "";
-            msg.innerHTML = `You have not met any membership pass requirements yet:<br><br>
-            🥉 <b>Bronze (2h):</b> ≥3.0h practice today (You: <b>${passData.practiceToday.toFixed(1)}h</b>)<br>
-            🥈 <b>Silver (72h):</b> 15h practice & 20h lectures THIS week (You: <b>${passData.practiceThisWeek.toFixed(1)}h / ${passData.lectureThisWeek.toFixed(1)}h</b>)<br>
-            🔥 <b>Streak (48h):</b> 7 unbroken days (≥2h/day)<br>
-            🥇 <b>Gold VIP (24h):</b> #1 All-Time Rank & ≥5.0h Total Practice`;
-            enterBtn.style.display = "none";
-        }
-
-        modal.style.display = "flex";
-    }
-
-    window.goToAdmin = async function() {
+    window.goToAdmin = function() {
         if (loggedInUser === "Pranay") {
-            let choice = prompt("Enter Master Admin Password (or type 'VIEW' to see your earned Study Pass):");
-            if (choice === "Pran4444") {
+            let pass = prompt("🔐 Enter Master Admin Password:");
+            if (pass === "Pran4444") {
                 sessionStorage.setItem("admin_auth", "master");
-                sessionStorage.setItem("viewer_user", "Pranay");
                 window.location.href = "admin.html";
-                return;
-            } else if (choice === null) {
                 return;
             }
         }
-
-        const passData = await evaluateMemberPasses(loggedInUser);
-        if (passData) showPassModal(passData, loggedInUser);
-    };
-
-    window.openAdminDashboard = function() {
+        sessionStorage.setItem("admin_auth", "viewer");
         window.location.href = "admin.html";
     };
 
-    window.closeTierModal = function() {
-        document.getElementById("tierModal").style.display = "none";
-    };
-
-    // Feed Filter & Render
-    const feedContainer = document.getElementById('feedContainer');
-    let currentFilter = 'all';
+    // Feed, Streaks & Weekly Spotlight
     let cachedLogs = [];
+    let currentFilter = 'all';
 
     window.setFeedFilter = function(filterMode, btn) {
         currentFilter = filterMode;
@@ -1385,50 +1064,102 @@
         renderLogs();
     };
 
+    db.collection("jee_logs").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+        cachedLogs = [];
+        let memberDates = { "Pranay": new Set(), "Abhigyan": new Set(), "Pranjal": new Set(), "Aayush": new Set() };
+        
+        let startOfWeek = new Date();
+        let day = startOfWeek.getDay();
+        let diff = (day === 0 ? 6 : day - 1);
+        startOfWeek.setDate(startOfWeek.getDate() - diff);
+        startOfWeek.setHours(0,0,0,0);
+
+        let weeklyStats = {
+            "Pranay": { pureSelf: 0, qs: 0, mobile: 0 },
+            "Abhigyan": { pureSelf: 0, qs: 0, mobile: 0 },
+            "Pranjal": { pureSelf: 0, qs: 0, mobile: 0 },
+            "Aayush": { pureSelf: 0, qs: 0, mobile: 0 }
+        };
+
+        snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            const dateObj = data.timestamp ? data.timestamp.toDate() : new Date();
+            cachedLogs.push({ id: docSnap.id, data, dateObj });
+
+            const hours = parseFloat(data.studyHours || data.hours || 0);
+            const act = (data.activityType || '').toLowerCase();
+            const isPureSelf = act.includes("self study") && !act.includes("mobile");
+            const isMobile = act.includes("mobile");
+            const qs = parseInt(data.questionsSolved || 0, 10);
+
+            if (memberDates[data.student] && !isMobile && hours >= 1.0) {
+                memberDates[data.student].add(dateObj.toDateString());
+            }
+
+            if (dateObj >= startOfWeek && weeklyStats[data.student]) {
+                if (isPureSelf) weeklyStats[data.student].pureSelf += hours;
+                if (isMobile) weeklyStats[data.student].mobile += hours;
+                weeklyStats[data.student].qs += qs;
+            }
+        });
+
+        // Update Streaks
+        Object.keys(memberDates).forEach(name => {
+            const badge = document.getElementById(`streak-${name}`);
+            if (badge) badge.innerText = `🔥 ${memberDates[name].size}d`;
+        });
+
+        // Update Weekly Spotlight
+        let topSelf = Object.keys(weeklyStats).reduce((a, b) => weeklyStats[a].pureSelf > weeklyStats[b].pureSelf ? a : b);
+        let topQs = Object.keys(weeklyStats).reduce((a, b) => weeklyStats[a].qs > weeklyStats[b].qs ? a : b);
+        let lowestMob = Object.keys(weeklyStats).reduce((a, b) => weeklyStats[a].mobile < weeklyStats[b].mobile ? a : b);
+
+        document.getElementById("leadSelfStudy").innerText = topSelf;
+        document.getElementById("leadSelfStudyVal").innerText = `${weeklyStats[topSelf].pureSelf.toFixed(1)} hrs`;
+        document.getElementById("leadQuestions").innerText = topQs;
+        document.getElementById("leadQuestionsVal").innerText = `${weeklyStats[topQs].qs} Qs`;
+        document.getElementById("leadLowestMobile").innerText = lowestMob;
+        document.getElementById("leadLowestMobileVal").innerText = `${weeklyStats[lowestMob].mobile.toFixed(1)} hrs`;
+
+        renderLogs();
+    });
+
     function renderLogs() {
+        const feedContainer = document.getElementById("feedContainer");
         feedContainer.innerHTML = '';
 
         const now = new Date();
         const startOfToday = new Date();
         startOfToday.setHours(0,0,0,0);
-
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(now.getDate() - 7);
 
         let filtered = cachedLogs.filter(log => {
-            const d = log.dateObj;
-            if (currentFilter === 'today') return d >= startOfToday;
-            if (currentFilter === 'week') return d >= sevenDaysAgo;
+            if (currentFilter === 'today') return log.dateObj >= startOfToday;
+            if (currentFilter === 'week') return log.dateObj >= sevenDaysAgo;
             return true;
         });
 
-        if (filtered.length === 0) {
-            feedContainer.innerHTML = '<p style="color: #94a3b8;">No logs found for this filter range.</p>';
+        if (!filtered.length) {
+            feedContainer.innerHTML = '<p style="color: #94a3b8;">No logs found.</p>';
             return;
         }
 
         filtered.forEach(item => {
             const log = item.data;
             const logId = item.id;
-
             let tagClass = 'tag-p';
             if(log.subject === 'Chemistry') tagClass = 'tag-c';
             if(log.subject === 'Math') tagClass = 'tag-m';
-            if(log.subject === 'General') tagClass = 'tag-mobile';
 
             const activity = log.activityType || 'Self Study';
             let activityClass = 'tag-activity';
-            if (activity.toLowerCase().includes("mobile")) {
-                activityClass = 'tag-mobile';
-            }
+            if (activity.toLowerCase().includes("mobile")) activityClass = 'tag-mobile';
 
-            const formattedTime = item.dateObj ? item.dateObj.toLocaleString([], { 
-                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
-            }) : 'Just now';
-
+            const formattedTime = item.dateObj ? item.dateObj.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Just now';
             const hoursDisplay = log.studyHours ? ` — <strong>${log.studyHours} hrs</strong>` : '';
             const questionsDisplay = log.questionsSolved ? `<span class="tag tag-questions">🎯 ${log.questionsSolved} Qs</span>` : '';
-            const detailsDisplay = log.details || log.accomplishment || '';
+            const detailsDisplay = log.details || '';
 
             const logElement = document.createElement('div');
             logElement.className = 'log-item';
@@ -1446,12 +1177,8 @@
                 <div class="log-meta">
                     <span>🕒 ${formattedTime}</span>
                     <div class="action-btns">
-                        <button class="btn-edit" onclick="editLog('${logId}', '${log.student}', '${log.studyHours || 0}', '${(log.topic || '').replace(/'/g, "\\'")}', '${detailsDisplay.replace(/'/g, "\\'")}', '${log.questionsSolved || 0}')">
-                            ✏️ Edit
-                        </button>
-                        <button class="btn-delete" onclick="deleteLog('${logId}', '${log.student}')">
-                            🗑️ Delete
-                        </button>
+                        <button class="btn-edit" onclick="editLog('${logId}', '${log.student}', '${log.studyHours || 0}', '${(log.topic || '').replace(/'/g, "\\'")}', '${detailsDisplay.replace(/'/g, "\\'")}', '${log.questionsSolved || 0}')">✏️ Edit</button>
+                        <button class="btn-delete" onclick="deleteLog('${logId}', '${log.student}')">🗑️ Delete</button>
                     </div>
                 </div>
             `;
@@ -1459,63 +1186,24 @@
         });
     }
 
-    db.collection("jee_logs")
-      .orderBy("timestamp", "desc")
-      .onSnapshot((snapshot) => {
-          cachedLogs = [];
-          snapshot.forEach((docSnap) => {
-              const data = docSnap.data();
-              cachedLogs.push({
-                  id: docSnap.id,
-                  data: data,
-                  dateObj: data.timestamp ? data.timestamp.toDate() : new Date()
-              });
-          });
-
-          renderLogs();
-          updatePassBadgeUI(); // Auto refresh pass state on log changes
-      });
-
-    // Form Submit
-    const form = document.getElementById('trackerForm');
-    form.addEventListener('submit', async (e) => {
+    // Submit Log
+    document.getElementById('trackerForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-
-        const student = loggedInUser;
-        const subject = document.getElementById('subject').value;
-        const activityType = document.getElementById('activityType').value;
-        const studyHours = parseFloat(document.getElementById('studyHours').value);
-        const questionsVal = document.getElementById('questionsSolved').value;
-        const questionsSolved = questionsVal ? parseInt(questionsVal, 10) : 0;
-        const topic = document.getElementById('topic').value;
-        const details = document.getElementById('details').value;
-
-        try {
-            await db.collection("jee_logs").add({
-                student: student,
-                subject: subject,
-                activityType: activityType,
-                studyHours: studyHours,
-                questionsSolved: questionsSolved,
-                topic: topic,
-                details: details,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-
-            document.getElementById('studyHours').value = '';
-            document.getElementById('questionsSolved').value = '';
-            document.getElementById('topic').value = '';
-            document.getElementById('details').value = '';
-
-            setTimeout(async () => {
-                const passData = await evaluateMemberPasses(student);
-                if (passData) showPassModal(passData, student);
-                updatePassBadgeUI();
-            }, 600);
-
-        } catch (error) {
-            alert("Error uploading log: " + error.message);
-        }
+        await db.collection("jee_logs").add({
+            student: loggedInUser,
+            subject: document.getElementById('subject').value,
+            activityType: document.getElementById('activityType').value,
+            studyHours: parseFloat(document.getElementById('studyHours').value),
+            questionsSolved: parseInt(document.getElementById('questionsSolved').value || 0, 10),
+            topic: document.getElementById('topic').value,
+            details: document.getElementById('details').value,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        document.getElementById('studyHours').value = '';
+        document.getElementById('questionsSolved').value = '';
+        document.getElementById('topic').value = '';
+        document.getElementById('details').value = '';
+        alert("✅ Log added successfully!");
     });
 
     window.editLog = async function(docId, studentName, oldHours, oldTopic, oldDetails, oldQs) {
@@ -1523,7 +1211,6 @@
             alert(`❌ You cannot edit logs belonging to ${studentName}!`);
             return;
         }
-
         let enteredPin = prompt(`🔐 Enter your PIN (${studentName}) to confirm edit:`);
         if (userToPin[studentName] !== enteredPin) {
             alert("❌ Incorrect PIN! Access Denied.");
@@ -1532,28 +1219,21 @@
 
         let newHours = prompt("✏️ Enter updated hours:", oldHours);
         if (newHours === null) return;
-
         let newQs = prompt("🎯 Enter updated questions count:", oldQs);
         if (newQs === null) return;
-
         let newTopic = prompt("✏️ Enter updated Topic / App:", oldTopic);
         if (newTopic === null) return;
-
         let newDetails = prompt("✏️ Enter updated details:", oldDetails);
         if (newDetails === null) return;
 
-        try {
-            await db.collection("jee_logs").doc(docId).update({
-                studyHours: parseFloat(newHours),
-                questionsSolved: parseInt(newQs || 0, 10),
-                topic: newTopic,
-                details: newDetails,
-                editedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            alert("✅ Log updated successfully!");
-        } catch (error) {
-            alert("❌ Failed to update log: " + error.message);
-        }
+        await db.collection("jee_logs").doc(docId).update({
+            studyHours: parseFloat(newHours),
+            questionsSolved: parseInt(newQs || 0, 10),
+            topic: newTopic,
+            details: newDetails,
+            editedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert("✅ Log updated!");
     };
 
     window.deleteLog = async function(docId, studentName) {
@@ -1561,24 +1241,19 @@
             alert(`❌ You cannot delete logs belonging to ${studentName}!`);
             return;
         }
-
         let enteredPin = prompt(`🔐 Enter your PIN (${studentName}) to confirm deletion:`);
         if (userToPin[studentName] !== enteredPin) {
             alert("❌ Incorrect PIN! Access Denied.");
             return;
         }
 
-        if (confirm("⚠️ Are you sure you want to permanently delete this log?")) {
-            try {
-                await db.collection("jee_logs").doc(docId).delete();
-                alert("🗑️ Log deleted successfully!");
-            } catch (error) {
-                alert("❌ Failed to delete log: " + error.message);
-            }
+        if (confirm("⚠️ Are you sure you want to delete this log?")) {
+            await db.collection("jee_logs").doc(docId).delete();
+            alert("🗑️ Log deleted!");
         }
     };
 
-    // Safe Chapter Toggle
+    // Checklist Sync
     window.toggleChapter = async function(chkId) {
         const el = document.getElementById(chkId);
         if (!el) return;
@@ -1598,35 +1273,28 @@
         });
     });
 
-    // Mock Test Scores
-    const scoreForm = document.getElementById('scoreForm');
-    scoreForm.addEventListener('submit', async (e) => {
+    // Scoreboard
+    document.getElementById('scoreForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const title = document.getElementById('testTitle').value;
         const p = parseInt(document.getElementById('scoreP').value, 10);
         const c = parseInt(document.getElementById('scoreC').value, 10);
         const m = parseInt(document.getElementById('scoreM').value, 10);
-        const total = p + c + m;
 
-        try {
-            await db.collection("jee_mock_scores").add({
-                student: loggedInUser,
-                testTitle: title,
-                physics: p,
-                chemistry: c,
-                math: m,
-                total: total,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
+        await db.collection("jee_mock_scores").add({
+            student: loggedInUser,
+            testTitle: document.getElementById('testTitle').value,
+            physics: p,
+            chemistry: c,
+            math: m,
+            total: p + c + m,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
 
-            document.getElementById('testTitle').value = '';
-            document.getElementById('scoreP').value = '';
-            document.getElementById('scoreC').value = '';
-            document.getElementById('scoreM').value = '';
-            alert("✅ Mock Test score recorded!");
-        } catch (err) {
-            alert("Failed to save score: " + err.message);
-        }
+        document.getElementById('testTitle').value = '';
+        document.getElementById('scoreP').value = '';
+        document.getElementById('scoreC').value = '';
+        document.getElementById('scoreM').value = '';
+        alert("✅ Mock Test score saved!");
     });
 
     db.collection("jee_mock_scores").orderBy("timestamp", "desc").limit(10).onSnapshot(snapshot => {
@@ -1636,7 +1304,6 @@
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No mock scores posted yet.</td></tr>';
             return;
         }
-
         snapshot.forEach(doc => {
             const d = doc.data();
             const dateStr = d.timestamp ? d.timestamp.toDate().toLocaleDateString([], { month: 'short', day: 'numeric' }) : 'Today';
