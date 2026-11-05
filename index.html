@@ -443,66 +443,6 @@
         .btn-edit { background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
         .btn-delete { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
 
-        /* 11th & 12th Syllabus Checklist */
-        .chapter-section-header {
-            font-size: 1.05rem;
-            font-weight: 800;
-            color: var(--text-main);
-            margin: 1.2rem 0 0.6rem 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-bottom: 2px solid var(--border-subtle);
-            padding-bottom: 4px;
-        }
-
-        .chapter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 14px;
-            margin-top: 10px;
-        }
-
-        .chapter-col {
-            background: #f8fafc;
-            border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 14px 16px;
-            max-height: 480px;
-            overflow-y: auto;
-        }
-
-        .chapter-col h3 {
-            font-size: 0.95rem;
-            margin-bottom: 10px;
-            position: sticky;
-            top: 0;
-            background: #f8fafc;
-            padding: 4px 0;
-            z-index: 5;
-        }
-
-        .chapter-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.84rem;
-            color: #334155;
-            margin-bottom: 7px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .chapter-item input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-            accent-color: #2563eb;
-        }
-
-        .chapter-badge-11 { background: #e0e7ff; color: #3730a3; font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
-        .chapter-badge-12 { background: #fce7f3; color: #9d174d; font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
-
         .score-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.88rem; }
         .score-table th, .score-table td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
         .score-table th { background: #f8fafc; color: var(--text-muted); font-weight: 700; }
@@ -568,13 +508,13 @@
         <div class="marquee-content">
             <span>✨ WELCOME TO JEE TARGET TRACKER</span>
             <span>⚡ MISSION JEE 2028</span>
-            <span>🎯 COMPLETE 11th & 12th SYLLABUS TRACKER</span>
+            <span>🎯 FOCUS & REVISION HUB</span>
             <span>🔥 CONSISTENCY BEATS TALENT</span>
         </div>
         <div class="marquee-content">
             <span>✨ WELCOME TO JEE TARGET TRACKER</span>
             <span>⚡ MISSION JEE 2028</span>
-            <span>🎯 COMPLETE 11th & 12th SYLLABUS TRACKER</span>
+            <span>🎯 FOCUS & REVISION HUB</span>
             <span>🔥 CONSISTENCY BEATS TALENT</span>
         </div>
     </div>
@@ -587,7 +527,7 @@
 
     <header>
         <h1>🎯 JEE Target Tracker</h1>
-        <p style="color: var(--text-muted); margin-top: 0.35rem; font-weight: 500;">Class 11 & 12 Complete Syllabus, Practice Log, Screen Time & Scoreboard</p>
+        <p style="color: var(--text-muted); margin-top: 0.35rem; font-weight: 500;">Practice Log, Study Stopwatch, Screen Time & Mock Scoreboard</p>
     </header>
 
     <div class="user-status-bar">
@@ -743,136 +683,6 @@
 
             <div id="feedContainer" class="feed-box">
                 <p style="color: #94a3b8;">Connecting to database...</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Complete Class 11th + 12th JEE Chapter Checklist -->
-    <div class="card">
-        <h2>📚 Complete JEE Syllabus Checklist (Class 11 + 12)</h2>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Track team completion across all PCM chapters for JEE Main & Advanced.</p>
-
-        <!-- CLASS 11TH SECTION -->
-        <div class="chapter-section-header">
-            <span>⚡ Class 11th Syllabus</span>
-            <span class="chapter-badge-11">Foundation</span>
-        </div>
-        <div class="chapter-grid">
-            <div class="chapter-col">
-                <h3 style="color:#ea580c;">⚛️ Physics (11th)</h3>
-                <label class="chapter-item"><input type="checkbox" id="chk_p11_1" onchange="toggleChapter('chk_p11_1')"> Units, Dimensions & Measurement</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p11_2" onchange="toggleChapter('chk_p11_2')"> Vectors & Basic Mathematics</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p11_3" onchange="toggleChapter('chk_p11_3')"> Motion in 1D (Kinematics 1D)</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p11_4" onchange="toggleChapter('chk_p11_4')"> Motion in 2D (Projectile & Relative)</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p11_5" onchange="toggleChapter('chk_p11_5')"> Laws of Motion & Friction</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p11_6" onchange="toggleChapter('chk_p11_6')"> Work, Energy & Power</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p11_7" onchange="toggleChapter('chk_p11_7')"> Circular Motion</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p11_8" onchange="toggleChapter('chk_p11_8')"> Center of Mass & Momentum</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p11_9" onchange="toggleChapter('chk_p11_9')"> Rotational Motion & Dynamics</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p11_10" onchange="toggleChapter('chk_p11_10')"> Gravitation</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p11_11" onchange="toggleChapter('chk_p11_11')"> Mechanical Properties of Solids</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p11_12" onchange="toggleChapter('chk_p11_12')"> Fluid Mechanics</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p11_13" onchange="toggleChapter('chk_p11_13')"> Thermal Properties & Calorimetry</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p11_14" onchange="toggleChapter('chk_p11_14')"> Thermodynamics & Heat Transfer</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p11_15" onchange="toggleChapter('chk_p11_15')"> Kinetic Theory of Gases (KTG)</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p11_16" onchange="toggleChapter('chk_p11_16')"> Simple Harmonic Motion (SHM)</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p11_17" onchange="toggleChapter('chk_p11_17')"> Waves & Sound</label>
-            </div>
-
-            <div class="chapter-col">
-                <h3 style="color:#16a34a;">🧪 Chemistry (11th)</h3>
-                <label class="chapter-item"><input type="checkbox" id="chk_c11_1" onchange="toggleChapter('chk_c11_1')"> Some Basic Concepts (Mole Concept)</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c11_2" onchange="toggleChapter('chk_c11_2')"> Structure of Atom</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c11_3" onchange="toggleChapter('chk_c11_3')"> Periodic Classification</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c11_4" onchange="toggleChapter('chk_c11_4')"> Chemical Bonding</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c11_5" onchange="toggleChapter('chk_c11_5')"> States of Matter</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c11_6" onchange="toggleChapter('chk_c11_6')"> Chemical Thermodynamics</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c11_7" onchange="toggleChapter('chk_c11_7')"> Chemical Equilibrium</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c11_8" onchange="toggleChapter('chk_c11_8')"> Ionic Equilibrium</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c11_9" onchange="toggleChapter('chk_c11_9')"> Redox Reactions</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c11_10" onchange="toggleChapter('chk_c11_10')"> Hydrogen & s-Block</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c11_11" onchange="toggleChapter('chk_c11_11')"> p-Block (Group 13 & 14)</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c11_12" onchange="toggleChapter('chk_c11_12')"> General Organic Chemistry (GOC)</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c11_13" onchange="toggleChapter('chk_c11_13')"> Hydrocarbons</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c11_14" onchange="toggleChapter('chk_c11_14')"> Environmental Chemistry</label>
-            </div>
-
-            <div class="chapter-col">
-                <h3 style="color:#0284c7;">📐 Mathematics (11th)</h3>
-                <label class="chapter-item"><input type="checkbox" id="chk_m11_1" onchange="toggleChapter('chk_m11_1')"> Sets & Relations</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m11_2" onchange="toggleChapter('chk_m11_2')"> Functions (Basics & Graphs)</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m11_3" onchange="toggleChapter('chk_m11_3')"> Trigonometric Ratios & Identities</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m11_4" onchange="toggleChapter('chk_m11_4')"> Trigonometric Equations</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m11_5" onchange="toggleChapter('chk_m11_5')"> Quadratic Equations</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m11_6" onchange="toggleChapter('chk_m11_6')"> Complex Numbers</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m11_7" onchange="toggleChapter('chk_m11_7')"> Sequences & Series</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m11_8" onchange="toggleChapter('chk_m11_8')"> Permutations & Combinations (P&C)</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m11_9" onchange="toggleChapter('chk_m11_9')"> Binomial Theorem</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m11_10" onchange="toggleChapter('chk_m11_10')"> Straight Lines</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m11_11" onchange="toggleChapter('chk_m11_11')"> Circles</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m11_12" onchange="toggleChapter('chk_m11_12')"> Conic Sections</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m11_13" onchange="toggleChapter('chk_m11_13')"> Limits & Derivatives</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m11_14" onchange="toggleChapter('chk_m11_14')"> Statistics</label>
-            </div>
-        </div>
-
-        <!-- CLASS 12TH SECTION -->
-        <div class="chapter-section-header" style="margin-top: 2rem;">
-            <span>🚀 Class 12th Syllabus</span>
-            <span class="chapter-badge-12">Advanced</span>
-        </div>
-        <div class="chapter-grid">
-            <div class="chapter-col">
-                <h3 style="color:#ea580c;">⚛️ Physics (12th)</h3>
-                <label class="chapter-item"><input type="checkbox" id="chk_p12_1" onchange="toggleChapter('chk_p12_1')"> Electrostatics</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p12_2" onchange="toggleChapter('chk_p12_2')"> Capacitance</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p12_3" onchange="toggleChapter('chk_p12_3')"> Current Electricity</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p12_4" onchange="toggleChapter('chk_p12_4')"> Moving Charges & Magnetism</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p12_5" onchange="toggleChapter('chk_p12_5')"> Magnetism & Matter</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p12_6" onchange="toggleChapter('chk_p12_6')"> Electromagnetic Induction (EMI)</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p12_7" onchange="toggleChapter('chk_p12_7')"> Alternating Current (AC)</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p12_8" onchange="toggleChapter('chk_p12_8')"> EM Waves</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p12_9" onchange="toggleChapter('chk_p12_9')"> Ray Optics</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p12_10" onchange="toggleChapter('chk_p12_10')"> Wave Optics</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p12_11" onchange="toggleChapter('chk_p12_11')"> Dual Nature of Radiation</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p12_12" onchange="toggleChapter('chk_p12_12')"> Atoms & Nuclei</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p12_13" onchange="toggleChapter('chk_p12_13')"> Semiconductors</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_p12_14" onchange="toggleChapter('chk_p12_14')"> Communication Systems</label>
-            </div>
-
-            <div class="chapter-col">
-                <h3 style="color:#16a34a;">🧪 Chemistry (12th)</h3>
-                <label class="chapter-item"><input type="checkbox" id="chk_c12_1" onchange="toggleChapter('chk_c12_1')"> Solid State</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c12_2" onchange="toggleChapter('chk_c12_2')"> Solutions</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c12_3" onchange="toggleChapter('chk_c12_3')"> Electrochemistry</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c12_4" onchange="toggleChapter('chk_c12_4')"> Chemical Kinetics</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c12_5" onchange="toggleChapter('chk_c12_5')"> Surface Chemistry</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c12_6" onchange="toggleChapter('chk_c12_6')"> Metallurgy</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c12_7" onchange="toggleChapter('chk_c12_7')"> p-Block (15-18)</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c12_8" onchange="toggleChapter('chk_c12_8')"> d- and f-Block</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c12_9" onchange="toggleChapter('chk_c12_9')"> Coordination Compounds</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c12_10" onchange="toggleChapter('chk_c12_10')"> Haloalkanes & Haloarenes</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c12_11" onchange="toggleChapter('chk_c12_11')"> Alcohols, Phenols & Ethers</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c12_12" onchange="toggleChapter('chk_c12_12')"> Aldehydes, Ketones & Acids</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c12_13" onchange="toggleChapter('chk_c12_13')"> Amines & Diazonium</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_c12_14" onchange="toggleChapter('chk_c12_14')"> Biomolecules & Polymers</label>
-            </div>
-
-            <div class="chapter-col">
-                <h3 style="color:#0284c7;">📐 Mathematics (12th)</h3>
-                <label class="chapter-item"><input type="checkbox" id="chk_m12_1" onchange="toggleChapter('chk_m12_1')"> Relations & Functions</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m12_2" onchange="toggleChapter('chk_m12_2')"> Inverse Trigonometry (ITF)</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m12_3" onchange="toggleChapter('chk_m12_3')"> Matrices & Determinants</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m12_4" onchange="toggleChapter('chk_m12_4')"> Continuity & Differentiability</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m12_5" onchange="toggleChapter('chk_m12_5')"> Application of Derivatives (AOD)</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m12_6" onchange="toggleChapter('chk_m12_6')"> Indefinite Integration</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m12_7" onchange="toggleChapter('chk_m12_7')"> Definite Integration</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m12_8" onchange="toggleChapter('chk_m12_8')"> Differential Equations</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m12_9" onchange="toggleChapter('chk_m12_9')"> Area Under Curve (AUC)</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m12_10" onchange="toggleChapter('chk_m12_10')"> Vector Algebra</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m12_11" onchange="toggleChapter('chk_m12_11')"> 3D Geometry</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m12_12" onchange="toggleChapter('chk_m12_12')"> Probability</label>
-                <label class="chapter-item"><input type="checkbox" id="chk_m12_13" onchange="toggleChapter('chk_m12_13')"> Linear Programming</label>
             </div>
         </div>
     </div>
@@ -1252,26 +1062,6 @@
             alert("🗑️ Log deleted!");
         }
     };
-
-    // Checklist Sync
-    window.toggleChapter = async function(chkId) {
-        const el = document.getElementById(chkId);
-        if (!el) return;
-        await db.collection("jee_chapters").doc(chkId).set({
-            checked: el.checked,
-            updatedBy: loggedInUser,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
-    };
-
-    db.collection("jee_chapters").onSnapshot(snapshot => {
-        snapshot.forEach(doc => {
-            const chk = document.getElementById(doc.id);
-            if (chk && doc.data() && doc.data().checked !== undefined) {
-                chk.checked = doc.data().checked;
-            }
-        });
-    });
 
     // Scoreboard
     document.getElementById('scoreForm').addEventListener('submit', async (e) => {
