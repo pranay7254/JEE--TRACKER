@@ -1,91 +1,113 @@
-name: Combined 6 AM Inactivity Check
+name: Weekly Sunday Report Card
 
 on:
   schedule:
-    # 00:38 UTC = 6:08 AM IST
-    - cron: '38 0 * * *'
+    # 15:30 UTC = 9:00 PM IST (Every Sunday)
+    - cron: '30 15 * * 0'
   workflow_dispatch:
 
 jobs:
-  check-and-alert:
+  send-weekly-report:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - name: Install Firebase Admin
-        run: npm install firebase-admin
+      - name: Install Firebase Admin & Axios
+        run: npm install firebase-admin axios
 
-      - name: Trigger Combined Telegram + Web Push Alerts
+      - name: Generate & Send Weekly Digest
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: |
           node -e '
-          const https = require("https");
           const admin = require("firebase-admin");
+          const axios = require("axios");
 
-          async function checkAndAlert() {
-            const botToken = process.env.TELEGRAM_BOT_TOKEN;
-            const chatId = process.env.TELEGRAM_CHAT_ID;
-            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+          const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+          admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount)
+          });
+          const db = admin.firestore();
 
-            admin.initializeApp({
-              credential: admin.credential.cert(serviceAccount)
-            });
+          async function run() {
+            const now = new Date();
+            const startOfWeek = new Date();
+            const day = startOfWeek.getDay();
+            const diff = (day === 0 ? 6 : day - 1);
+            startOfWeek.setDate(startOfWeek.getDate() - diff);
+            startOfWeek.setHours(0, 0, 0, 0);
 
-            const db = admin.firestore();
-            const yesterday = new Date(Date.now() - 86400000);
-            const startOfYesterday = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 0, 0, 0);
+            const snapshot = await db.collection("jee_logs").get();
+            
+            // Chaaron students included hain
+            let weeklyStats = {
+              "Pranay": { theory: 0, practice: 0, revision: 0, qs: 0, lectures: 0, mobile: 0 },
+              "Abhigyan": { theory: 0, practice: 0, revision: 0, qs: 0, lectures: 0, mobile: 0 },
+              "Pranjal": { theory: 0, practice: 0, revision: 0, qs: 0, lectures: 0, mobile: 0 },
+              "Aayush": { theory: 0, practice: 0, revision: 0, lectures: 0, qs: 0, mobile: 0 }
+            };
 
-            const logsSnap = await db.collection("jee_logs").where("timestamp", ">=", startOfYesterday).get();
-            const activeMembers = new Set();
-            logsSnap.forEach(doc => {
-              const data = doc.data();
-              if (data.student) activeMembers.add(data.student);
-            });
+            snapshot.forEach(doc => {
+              const d = doc.data();
+              const student = d.student;
+              const logDate = d.timestamp ? d.timestamp.toDate() : new Date();
+              const hours = parseFloat(d.studyHours || d.hours || 0);
+              const qs = parseInt(d.questionsSolved || 0, 10);
+              const act = (d.activityType || d.activity || "").toLowerCase();
 
-            const members = ["Pranay", "Abhigyan", "Pranjal", "Aayush"];
-            const defaulters = members.filter(m => !activeMembers.has(m));
-
-            if (defaulters.length > 0) {
-              // 1. Telegram Group Notification
-              if (botToken && chatId) {
-                const message = encodeURIComponent(
-                  "🚨 *JEE Tracker 6:00 AM Alert*\n\n" +
-                  "The following members *FAILED* to post their study log yesterday:\n" +
-                  defaulters.map(d => "❌ @" + d).join("\n") +
-                  "\n\n⚠️ Daily rule: Every member must log at least 1 study task daily!"
-                );
-                const tgUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=Markdown`;
-                https.get(tgUrl, () => console.log("Telegram alert sent."));
-              }
-
-              // 2. Direct Device Web Push via Modern Admin SDK
-              for (const member of defaulters) {
-                const devDoc = await db.collection("user_devices").doc(member).get();
-                if (devDoc.exists && devDoc.data().token) {
-                  try {
-                    await admin.messaging().send({
-                      token: devDoc.data().token,
-                      notification: {
-                        title: "⚠️ Missing Study Log!",
-                        body: `Hey ${member}, you did not log your study hours yesterday. Update your log now!`
-                      }
-                    });
-                    console.log("Push sent to " + member);
-                  } catch (err) {
-                    console.error("Push error for " + member, err);
-                  }
+              if (logDate >= startOfWeek && weeklyStats[student]) {
+                if (act.includes("mobile")) {
+                  weeklyStats[student].mobile += hours;
+                } else if (act.includes("practice")) {
+                  weeklyStats[student].practice += hours;
+                  weeklyStats[student].qs += qs;
+                } else if (act.includes("revision")) {
+                  weeklyStats[student].revision += hours;
+                } else if (act.includes("lecture")) {
+                  weeklyStats[student].lectures += hours;
+                } else if (act.includes("self")) {
+                  weeklyStats[student].theory += hours;
                 }
               }
-            } else {
-              console.log("All members posted yesterday. No alert required.");
-            }
+            });
+
+            const rangeStr = `${startOfWeek.getDate()} ${startOfWeek.toLocaleString("default", { month: "short" })} - ${now.getDate()} ${now.toLocaleString("default", { month: "short" })}`;
+
+            let msg = "📊 *JEE TRIO - OFFICIAL WEEKLY REPORT CARD* 🎯\n";
+            msg += `🗓 *Week:* ${rangeStr}\n`;
+            msg += "─────────────────────────\n\n";
+
+            Object.keys(weeklyStats).forEach(name => {
+              const s = weeklyStats[name];
+              const pureStudy = (s.theory + s.practice + s.revision).toFixed(1);
+              msg += `👤 *${name}*\n`;
+              msg += `• 📖 Theory: \`${s.theory.toFixed(1)} hrs\`\n`;
+              msg += `• ✍️ Practice: \`${s.practice.toFixed(1)} hrs\` (${s.qs} Qs)\n`;
+              msg += `• 🔄 Revision: \`${s.revision.toFixed(1)} hrs\`\n`;
+              msg += `• 🎥 Lectures: \`${s.lectures.toFixed(1)} hrs\`\n`;
+              msg += `• 📱 Screen Time: \`${s.mobile.toFixed(1)} hrs\`\n`;
+              msg += `👉 *Total Pure Study:* *${pureStudy} hrs*\n\n`;
+            });
+
+            msg += "─────────────────────────\n";
+            msg += "🔥 _Consistency beats talent. Target JEE 2028!_";
+
+            const tgUrl = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`;
+            await axios.post(tgUrl, {
+              chat_id: process.env.TELEGRAM_CHAT_ID,
+              text: msg,
+              parse_mode: "Markdown"
+            });
+            console.log("Weekly scorecard sent successfully!");
           }
 
-          checkAndAlert();
+          run().catch(err => {
+            console.error(err);
+            process.exit(1);
+          });
           '
