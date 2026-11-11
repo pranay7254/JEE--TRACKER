@@ -67,6 +67,103 @@
             -webkit-text-fill-color: transparent;
             display: inline-block;
         }
+
+        /* Reflexya AI Feedback Section (View Mode Exclusive) */
+        #viewerFeedbackCard {
+            display: none;
+            background: #ffffff;
+            border: 2px solid #38bdf8;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.75rem;
+            box-shadow: 0 10px 25px rgba(56, 189, 248, 0.12);
+        }
+
+        .reflexya-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .reflexya-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #0369a1;
+        }
+
+        .reflexya-badge {
+            background: linear-gradient(135deg, #0284c7, #6366f1);
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .feedback-input-grid {
+            display: grid;
+            grid-template-columns: 180px 180px 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        @media(max-width: 768px) {
+            .feedback-input-grid { grid-template-columns: 1fr; }
+        }
+
+        .feedback-input-grid select, .feedback-input-grid input, .feedback-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 0.9rem;
+            background: #f8fafc;
+            color: var(--text-main);
+        }
+        .feedback-textarea {
+            resize: vertical;
+            min-height: 70px;
+            margin-bottom: 10px;
+        }
+
+        .btn-reflexya-send {
+            background: linear-gradient(90deg, #0284c7, #2563eb);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-reflexya-send:hover { opacity: 0.92; }
+
+        #reflexyaLiveReply {
+            display: none;
+            margin-top: 15px;
+            background: #f0fdf4;
+            border-left: 4px solid #16a34a;
+            border-radius: 8px;
+            padding: 12px 14px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Member Request Tracker Styles */
+        .status-badge {
+            display: inline-block;
+            padding: 3px 9px;
+            border-radius: 12px;
+            font-size: 0.74rem;
+            font-weight: 700;
+        }
+        .status-pending { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .status-progress { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
+        .status-resolved { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+
         .section-title {
             font-size: 1.15rem;
             font-weight: 800;
@@ -172,6 +269,17 @@
             font-weight: 700;
             cursor: pointer;
         }
+        .btn-status-toggle {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #7dd3fc;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-right: 4px;
+        }
 
         .secret-trigger {
             cursor: pointer;
@@ -197,23 +305,12 @@
         }
 
         @media print {
-            body {
-                background: #ffffff !important;
-                color: #000000 !important;
-                padding: 0 !important;
-            }
-            .container {
-                max-width: 100% !important;
-                margin: 0 !important;
-            }
-            .top-action-bar, .secret-trigger, .btn-edit, .btn-delete, #logsTableBody tr td:last-child, th:last-child {
+            body { background: #ffffff !important; color: #000000 !important; padding: 0 !important; }
+            .container { max-width: 100% !important; margin: 0 !important; }
+            .top-action-bar, .secret-trigger, .btn-edit, .btn-delete, #logsTableBody tr td:last-child, th:last-child, #viewerFeedbackCard, #adminFeedbackCard {
                 display: none !important;
             }
-            .card {
-                box-shadow: none !important;
-                border: 1px solid #cbd5e1 !important;
-                page-break-inside: avoid;
-            }
+            .card { box-shadow: none !important; border: 1px solid #cbd5e1 !important; page-break-inside: avoid; }
         }
     </style>
 </head>
@@ -230,9 +327,103 @@
         <span id="secretIconBtn" class="secret-trigger" onclick="toggleSecretMobile()" title="Secret Options">🤫</span>
     </div>
     
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
         <p style="color: var(--text-muted);">Exact study metrics, question practice, theory & revision subject-wise breakdown (PCM), mock scores & logs control.</p>
         <span id="roleBadge" style="font-size:0.8rem; font-weight:700; padding:4px 10px; border-radius:20px; background:#e2e8f0; color:#334155;">Checking role...</span>
+    </div>
+
+    <!-- 0. TOP SECTION: VIEW-MODE EXCLUSIVE FEEDBACK & REFLEXYA AI + REQUEST TRACKER -->
+    <div id="viewerFeedbackCard">
+        <div class="reflexya-header">
+            <div class="reflexya-title">
+                <span>💬 Group Feedback & Reflexya AI Desk</span>
+                <span class="reflexya-badge">⚡ Reflexya Active</span>
+            </div>
+            <span style="font-size:0.8rem; color:#64748b;">Instant AI Resolution & Live Status Tracking</span>
+        </div>
+        
+        <form onsubmit="handleFeedbackSubmission(event)">
+            <div class="feedback-input-grid">
+                <div>
+                    <select id="fbStudent" onchange="renderMemberFeedbackTracker()" required>
+                        <option value="Pranjal">Pranjal</option>
+                        <option value="Abhigyan">Abhigyan</option>
+                        <option value="Aayush">Aayush</option>
+                        <option value="Pranay">Pranay</option>
+                    </select>
+                </div>
+                <div>
+                    <select id="fbCategory" required>
+                        <option value="Feature / Table Request">💡 Feature / Table Request</option>
+                        <option value="Telegram / Bot Setting">🤖 Telegram / Bot Issue</option>
+                        <option value="UI & Data Bug">🐛 Bug / Calculation Error</option>
+                        <option value="Study Routine Suggestion">📚 Study Routine Advice</option>
+                        <option value="General Feedback">📝 General Suggestion</option>
+                    </select>
+                </div>
+                <div>
+                    <input type="text" id="fbSubject" placeholder="One-line topic (e.g. Questions table issue)" required>
+                </div>
+            </div>
+
+            <textarea id="fbMessage" class="feedback-textarea" placeholder="Describe your suggestion or feedback in detail. Reflexya will analyze and answer right away..." required></textarea>
+            
+            <button type="submit" class="btn-reflexya-send">🚀 Send & Ask Reflexya</button>
+        </form>
+
+        <div id="reflexyaLiveReply">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                <span style="font-size:1.1rem;">🤖</span>
+                <strong style="color:#0369a1; font-size:0.92rem;">Reflexya's Instant Response:</strong>
+            </div>
+            <p id="reflexyaReplyText" style="color:#1e293b; font-size:0.88rem; line-height:1.5;"></p>
+        </div>
+
+        <!-- NEW: LIVE REQUEST TRACKER TABLE FOR THE MEMBER -->
+        <div style="margin-top: 1.5rem; border-top: 1px dashed #cbd5e1; padding-top: 1rem;">
+            <h4 style="font-size: 0.95rem; color: #0f172a; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+                <span>📌 Track Your Submitted Requests:</span>
+                <span id="trackerUserLabel" style="font-size: 0.8rem; color: #0284c7; font-weight: bold;"></span>
+            </h4>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Topic & Note</th>
+                            <th>Reflexya AI Insight</th>
+                            <th>Current Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="memberRequestsTrackerBody">
+                        <tr><td colspan="4" style="text-align:center; color:var(--text-muted); font-size:0.82rem;">Loading your past requests...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 0.5. MASTER ADMIN REVIEW FOR FEEDBACKS (Visible only to Master Admin) -->
+    <div class="card" id="adminFeedbackCard" style="display:none; border-top: 4px solid #0284c7;">
+        <h2 style="font-size: 1.15rem; margin-bottom: 0.6rem; color: #0284c7;">📬 Received Member Feedback & Status Control</h2>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Student</th>
+                        <th>Category</th>
+                        <th>Query</th>
+                        <th>Reflexya Resolution</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="feedbackAdminTableBody">
+                    <tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No feedback logged yet.</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- 1. OVERALL ACTIVITY STATS -->
@@ -278,7 +469,7 @@
         </div>
     </div>
 
-    <!-- 2. QUESTION PRACTICE BREAKDOWN TABLE (Pranjal's Request) -->
+    <!-- 2. QUESTION PRACTICE BREAKDOWN TABLE -->
     <div class="card">
         <h2 style="font-size: 1.15rem; margin-bottom: 0.4rem; color: #ea580c;">✍️ Question Practice Breakdown (Subject-Wise)</h2>
         <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Student-wise problem practice hours & questions solved across Physics, Chemistry, and Math.</p>
@@ -437,6 +628,8 @@
     const roleBadge = document.getElementById("roleBadge");
     const secretIconBtn = document.getElementById("secretIconBtn");
     const repBtn = document.getElementById("btnDownloadReport");
+    const viewerFeedbackCard = document.getElementById("viewerFeedbackCard");
+    const adminFeedbackCard = document.getElementById("adminFeedbackCard");
 
     secretIconBtn.style.display = "inline-block";
 
@@ -445,11 +638,20 @@
         roleBadge.style.background = "#dcfce7";
         roleBadge.style.color = "#16a34a";
         if (repBtn) repBtn.style.display = "inline-block";
+        if (viewerFeedbackCard) viewerFeedbackCard.style.display = "none";
+        if (adminFeedbackCard) adminFeedbackCard.style.display = "block";
     } else {
         roleBadge.innerText = "👀 View Mode (Read-Only)";
         roleBadge.style.background = "#eff6ff";
         roleBadge.style.color = "#2563eb";
         if (repBtn) repBtn.style.display = "none";
+        if (viewerFeedbackCard) viewerFeedbackCard.style.display = "block";
+        if (adminFeedbackCard) adminFeedbackCard.style.display = "none";
+        
+        const storedUser = sessionStorage.getItem("jee_authenticated_user");
+        if (storedUser && document.getElementById("fbStudent")) {
+            document.getElementById("fbStudent").value = storedUser;
+        }
     }
 
     let isMobileVisible = false;
@@ -483,6 +685,164 @@
         firebase.initializeApp(firebaseConfig);
     }
     const db = firebase.firestore();
+
+    // Reflexya AI Engine
+    function generateReflexyaAnswer(student, category, subject, msg) {
+        const text = (subject + " " + msg).toLowerCase();
+
+        if (text.includes("reminder") || text.includes("telegram") || text.includes("bot")) {
+            return `Hello ${student}! Reflexya here. Daily automated inactivity reminders have been deactivated in favor of the Weekly Sunday Digest (9:00 PM IST) to prevent notification fatigue. I have logged your request directly to the Admin Hub.`;
+        } else if (text.includes("table") || text.includes("metric") || text.includes("practice") || text.includes("theory")) {
+            return `Noted, ${student}! Dedicated PCM breakdown tables for Question Practice, Revision, and Pure Theory are live on this dashboard. Your note about "${subject}" has been queued for Pranay's next code sync!`;
+        } else if (text.includes("bug") || text.includes("error") || text.includes("hour") || text.includes("stopwatch")) {
+            return `Thanks for catching this, ${student}! Reflexya recorded this technical glitch. Check that your browser cache is refreshed (Ctrl+Shift+R). Pranay has been notified in the Master log.`;
+        } else if (text.includes("math") || text.includes("physics") || text.includes("chemistry") || text.includes("score")) {
+            return `Good insight on ${subject}, ${student}! Keeping daily question velocity consistent beats last-minute burnout. Your recommendation has been saved to the study roadmap.`;
+        } else {
+            return `Hello ${student}, Reflexya has registered your feedback regarding "${subject}". The Master Admin panel has logged this request for review. Keep up the consistent preparation!`;
+        }
+    }
+
+    window.handleFeedbackSubmission = async function(e) {
+        e.preventDefault();
+        const student = document.getElementById("fbStudent").value;
+        const category = document.getElementById("fbCategory").value;
+        const subject = document.getElementById("fbSubject").value;
+        const message = document.getElementById("fbMessage").value;
+
+        const aiResponse = generateReflexyaAnswer(student, category, subject, message);
+
+        try {
+            await db.collection("jee_feedbacks").add({
+                student: student,
+                category: category,
+                subject: subject,
+                message: message,
+                status: "Pending Review", // Default Status
+                reflexyaReply: aiResponse,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            document.getElementById("reflexyaReplyText").innerText = aiResponse;
+            document.getElementById("reflexyaLiveReply").style.display = "block";
+
+            document.getElementById("fbSubject").value = "";
+            document.getElementById("fbMessage").value = "";
+        } catch (err) {
+            alert("Error sending feedback: " + err.message);
+        }
+    };
+
+    // Live Request Tracker Cache for Members
+    let allFeedbacksCache = [];
+
+    db.collection("jee_feedbacks").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+        allFeedbacksCache = [];
+        snapshot.forEach(doc => {
+            allFeedbacksCache.push({ id: doc.id, ...doc.data() });
+        });
+
+        if (!isMasterAdmin) {
+            renderMemberFeedbackTracker();
+        } else {
+            renderAdminFeedbackTable();
+        }
+    });
+
+    // Render Request Tracker for Viewing Member
+    window.renderMemberFeedbackTracker = function() {
+        const studentSelector = document.getElementById("fbStudent");
+        if (!studentSelector) return;
+        const currentStudent = studentSelector.value;
+        const trackerLabel = document.getElementById("trackerUserLabel");
+        if (trackerLabel) trackerLabel.innerText = `Showing requests for: ${currentStudent}`;
+
+        const trackerBody = document.getElementById("memberRequestsTrackerBody");
+        if (!trackerBody) return;
+        trackerBody.innerHTML = '';
+
+        const memberFeedbacks = allFeedbacksCache.filter(f => f.student === currentStudent);
+
+        if (memberFeedbacks.length === 0) {
+            trackerBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted); font-size:0.82rem;">No past requests found for ${currentStudent}. Submit one above!</td></tr>`;
+            return;
+        }
+
+        memberFeedbacks.forEach(f => {
+            const timeStr = f.timestamp ? f.timestamp.toDate().toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Just now';
+            const status = f.status || 'Pending Review';
+            
+            let statusClass = 'status-pending';
+            if (status === 'In Progress') statusClass = 'status-progress';
+            if (status === 'Resolved') statusClass = 'status-resolved';
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td style="font-size:0.78rem; color:#64748b; white-space:nowrap;">${timeStr}</td>
+                <td>
+                    <strong>${f.subject}</strong>
+                    <div style="font-size:0.75rem; color:#64748b;">${f.message}</div>
+                </td>
+                <td style="font-size:0.78rem; color:#0369a1;">${f.reflexyaReply || 'Under consideration'}</td>
+                <td><span class="status-badge ${statusClass}">${status}</span></td>
+            `;
+            trackerBody.appendChild(row);
+        });
+    };
+
+    // Render Master Admin Feedback Review & Status Controls
+    function renderAdminFeedbackTable() {
+        const tbody = document.getElementById("feedbackAdminTableBody");
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        if (allFeedbacksCache.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No feedback logged yet.</td></tr>';
+            return;
+        }
+
+        allFeedbacksCache.forEach(d => {
+            const fid = d.id;
+            const timeStr = d.timestamp ? d.timestamp.toDate().toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Just now';
+            const status = d.status || 'Pending Review';
+
+            let statusClass = 'status-pending';
+            if (status === 'In Progress') statusClass = 'status-progress';
+            if (status === 'Resolved') statusClass = 'status-resolved';
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td style="font-size:0.78rem; color:#64748b; white-space:nowrap;">${timeStr}</td>
+                <td><strong style="color:#2563eb;">${d.student}</strong></td>
+                <td><span class="tag" style="background:#f1f5f9; color:#0f172a;">${d.category}</span></td>
+                <td><b>${d.subject}:</b> <span style="color:#475569;">${d.message}</span></td>
+                <td style="font-size:0.8rem; color:#0284c7;">${d.reflexyaReply || 'Resolved'}</td>
+                <td><span class="status-badge ${statusClass}">${status}</span></td>
+                <td style="white-space:nowrap;">
+                    <button class="btn-status-toggle" onclick="cycleFeedbackStatus('${fid}', '${status}')">🔄 Update</button>
+                    <button class="btn-delete" onclick="deleteFeedback('${fid}')">🗑️</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    window.cycleFeedbackStatus = async function(id, currentStatus) {
+        let newStatus = 'In Progress';
+        if (currentStatus === 'Pending Review') newStatus = 'In Progress';
+        else if (currentStatus === 'In Progress') newStatus = 'Resolved';
+        else if (currentStatus === 'Resolved') newStatus = 'Pending Review';
+
+        await db.collection("jee_feedbacks").doc(id).update({
+            status: newStatus
+        });
+    };
+
+    window.deleteFeedback = async function(id) {
+        if (confirm("Delete this feedback entry?")) {
+            await db.collection("jee_feedbacks").doc(id).delete();
+        }
+    };
 
     let allLogsCache = [];
 
@@ -629,7 +989,7 @@
             logsBody.appendChild(row);
         });
 
-        // Overview Cards Numbers
+        // Overview Numbers
         document.getElementById("statTotalPractice").innerText = totalPractice.toFixed(1) + " hrs";
         document.getElementById("statPracticeBreakdown").innerHTML = 
             `Pranay: <b>${members['Pranay'].practice.toFixed(1)}h</b> | ` +
@@ -672,7 +1032,7 @@
             `Pranjal: <b>${members['Pranjal'].mobile.toFixed(1)}h</b> | ` +
             `Aayush: <b>${members['Aayush'].mobile.toFixed(1)}h</b>`;
 
-        // 2. Populate Practice Breakdown Table
+        // Populate Practice Breakdown Table
         const practiceTableBody = document.getElementById("practiceBreakdownTableBody");
         practiceTableBody.innerHTML = '';
         Object.keys(members).forEach(name => {
@@ -689,7 +1049,7 @@
             practiceTableBody.appendChild(row);
         });
 
-        // 3. Populate Revision Breakdown Table
+        // Populate Revision Breakdown Table
         const revTableBody = document.getElementById("revisionBreakdownTableBody");
         revTableBody.innerHTML = '';
         Object.keys(members).forEach(name => {
@@ -705,7 +1065,7 @@
             revTableBody.appendChild(row);
         });
 
-        // 4. Populate Pure Theory Breakdown Table
+        // Populate Pure Theory Breakdown Table
         const theoryTableBody = document.getElementById("theoryBreakdownTableBody");
         theoryTableBody.innerHTML = '';
         Object.keys(members).forEach(name => {
@@ -721,7 +1081,7 @@
             theoryTableBody.appendChild(row);
         });
 
-        // 5. Overall Activity Table
+        // Overall Activity Table
         const tbody = document.getElementById("memberTableBody");
         tbody.innerHTML = '';
         Object.keys(members).forEach(name => {
