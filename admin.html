@@ -222,7 +222,6 @@
 <div class="container">
     <div class="top-action-bar">
         <a href="index.html" class="nav-back">← Back to Dashboard</a>
-        <!-- Report button hidden by default, visible only to Master Admin -->
         <button id="btnDownloadReport" class="btn-report" style="display:none;" onclick="generateWeeklyPDFReport()">📄 Download Weekly Report Card (PDF)</button>
     </div>
     
@@ -232,23 +231,23 @@
     </div>
     
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-        <p style="color: var(--text-muted);">Exact study metrics, theory & revision subject-wise breakdown (PCM), mock scores & logs control.</p>
+        <p style="color: var(--text-muted);">Exact study metrics, question practice, theory & revision subject-wise breakdown (PCM), mock scores & logs control.</p>
         <span id="roleBadge" style="font-size:0.8rem; font-weight:700; padding:4px 10px; border-radius:20px; background:#e2e8f0; color:#334155;">Checking role...</span>
     </div>
 
     <!-- 1. OVERALL ACTIVITY STATS -->
     <div class="section-title">📊 Activity Overview</div>
     <div class="stats-grid">
-        <div class="stat-card" style="border-left: 5px solid #0284c7;">
-            <h3>📖 Pure Self-Study (Theory)</h3>
-            <div id="statPureSelf" class="stat-val" style="color: #0284c7;">0.0 hrs</div>
-            <div id="statPureSelfBreakdown" class="stat-breakdown">Calculating theory study...</div>
-        </div>
-
         <div class="stat-card" style="border-left: 5px solid #ea580c;">
             <h3>✍️ Question Practice</h3>
             <div id="statTotalPractice" class="stat-val" style="color: #ea580c;">0.0 hrs</div>
             <div id="statPracticeBreakdown" class="stat-breakdown">Calculating practice hours...</div>
+        </div>
+
+        <div class="stat-card" style="border-left: 5px solid #0284c7;">
+            <h3>📖 Pure Self-Study (Theory)</h3>
+            <div id="statPureSelf" class="stat-val" style="color: #0284c7;">0.0 hrs</div>
+            <div id="statPureSelfBreakdown" class="stat-breakdown">Calculating theory study...</div>
         </div>
 
         <div class="stat-card" style="border-left: 5px solid #7e22ce;">
@@ -269,7 +268,6 @@
             <div id="statQuestionsBreakdown" class="stat-breakdown">Calculating problem sets...</div>
         </div>
 
-        <!-- Secret Mobile Screen Time Card -->
         <div class="stat-card" id="secretMobileCard">
             <div style="display:flex; justify-content:space-between;">
                 <h3>📱 Mobile Screen Time</h3>
@@ -280,9 +278,31 @@
         </div>
     </div>
 
-    <!-- 2. REVISION & THEORY BREAKDOWN SECTIONS -->
+    <!-- 2. QUESTION PRACTICE BREAKDOWN TABLE (Pranjal's Request) -->
+    <div class="card">
+        <h2 style="font-size: 1.15rem; margin-bottom: 0.4rem; color: #ea580c;">✍️ Question Practice Breakdown (Subject-Wise)</h2>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Student-wise problem practice hours & questions solved across Physics, Chemistry, and Math.</p>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>⚛️ Physics (Practice)</th>
+                        <th>🧪 Chemistry (Practice)</th>
+                        <th>📐 Math (Practice)</th>
+                        <th>🎯 Total Qs Solved</th>
+                        <th style="color:#ea580c;">Total Practice Time</th>
+                    </tr>
+                </thead>
+                <tbody id="practiceBreakdownTableBody">
+                    <tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Calculating question practice stats...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 3. REVISION & THEORY BREAKDOWN SECTIONS -->
     <div class="tables-split-grid">
-        <!-- Section A: Revision Breakdown -->
         <div class="card" style="margin-bottom:0;">
             <h2 style="font-size: 1.15rem; margin-bottom: 0.4rem; color: #7e22ce;">🔄 Revision Breakdown (Subject-Wise)</h2>
             <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Student-wise revision hours in Physics, Chemistry & Math.</p>
@@ -304,7 +324,6 @@
             </div>
         </div>
 
-        <!-- Section B: Pure Theory Breakdown -->
         <div class="card" style="margin-bottom:0;">
             <h2 style="font-size: 1.15rem; margin-bottom: 0.4rem; color: #0284c7;">📖 Pure Theory Breakdown (Subject-Wise)</h2>
             <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Reading & concepts time (excludes practice and revision).</p>
@@ -327,7 +346,7 @@
         </div>
     </div>
 
-    <!-- 3. OVERALL ACTIVITY COMPARISON TABLE -->
+    <!-- 4. OVERALL ACTIVITY COMPARISON TABLE -->
     <div class="card">
         <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">👥 Individual Member Activity Metrics</h2>
         <div style="overflow-x:auto;">
@@ -351,7 +370,7 @@
         </div>
     </div>
 
-    <!-- 4. MOCK TEST SCORES MANAGEMENT -->
+    <!-- 5. MOCK TEST SCORES MANAGEMENT -->
     <div class="card">
         <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">📊 Mock Test & DPP Scores (Edit & Delete)</h2>
         <div style="overflow-x:auto;">
@@ -375,7 +394,7 @@
         </div>
     </div>
 
-    <!-- 5. MASTER LOGS TABLE -->
+    <!-- 6. MASTER LOGS TABLE -->
     <div class="card">
         <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">📋 All Group Logs (Master Control)</h2>
         <div style="overflow-x:auto;">
@@ -480,21 +499,25 @@
         let members = {
             "Pranay": { 
                 pureSelf: 0, practice: 0, revision: 0, lectures: 0, mobile: 0, questions: 0, totalStudy: 0,
+                practicePhysics: 0, practiceChemistry: 0, practiceMath: 0,
                 revPhysics: 0, revChemistry: 0, revMath: 0,
                 theoryPhysics: 0, theoryChemistry: 0, theoryMath: 0
             },
             "Abhigyan": { 
                 pureSelf: 0, practice: 0, revision: 0, lectures: 0, mobile: 0, questions: 0, totalStudy: 0,
+                practicePhysics: 0, practiceChemistry: 0, practiceMath: 0,
                 revPhysics: 0, revChemistry: 0, revMath: 0,
                 theoryPhysics: 0, theoryChemistry: 0, theoryMath: 0
             },
             "Pranjal": { 
                 pureSelf: 0, practice: 0, revision: 0, lectures: 0, mobile: 0, questions: 0, totalStudy: 0,
+                practicePhysics: 0, practiceChemistry: 0, practiceMath: 0,
                 revPhysics: 0, revChemistry: 0, revMath: 0,
                 theoryPhysics: 0, theoryChemistry: 0, theoryMath: 0
             },
             "Aayush": { 
                 pureSelf: 0, practice: 0, revision: 0, lectures: 0, mobile: 0, questions: 0, totalStudy: 0,
+                practicePhysics: 0, practiceChemistry: 0, practiceMath: 0,
                 revPhysics: 0, revChemistry: 0, revMath: 0,
                 theoryPhysics: 0, theoryChemistry: 0, theoryMath: 0
             }
@@ -541,7 +564,17 @@
                     members[student].questions += qs;
                 }
 
-                if (isPureSelf) {
+                if (isPractice) {
+                    totalPractice += hours;
+                    if (members[student]) {
+                        members[student].practice += hours;
+                        members[student].totalStudy += hours;
+
+                        if (subject === 'Physics') members[student].practicePhysics += hours;
+                        else if (subject === 'Chemistry') members[student].practiceChemistry += hours;
+                        else if (subject === 'Math' || subject === 'Mathematics') members[student].practiceMath += hours;
+                    }
+                } else if (isPureSelf) {
                     totalPureSelf += hours;
                     if (members[student]) {
                         members[student].pureSelf += hours;
@@ -550,12 +583,6 @@
                         if (subject === 'Physics') members[student].theoryPhysics += hours;
                         else if (subject === 'Chemistry') members[student].theoryChemistry += hours;
                         else if (subject === 'Math' || subject === 'Mathematics') members[student].theoryMath += hours;
-                    }
-                } else if (isPractice) {
-                    totalPractice += hours;
-                    if (members[student]) {
-                        members[student].practice += hours;
-                        members[student].totalStudy += hours;
                     }
                 } else if (isRevision) {
                     totalRevision += hours;
@@ -603,19 +630,19 @@
         });
 
         // Overview Cards Numbers
-        document.getElementById("statPureSelf").innerText = totalPureSelf.toFixed(1) + " hrs";
-        document.getElementById("statPureSelfBreakdown").innerHTML = 
-            `Pranay: <b>${members['Pranay'].pureSelf.toFixed(1)}h</b> | ` +
-            `Abhigyan: <b>${members['Abhigyan'].pureSelf.toFixed(1)}h</b><br>` +
-            `Pranjal: <b>${members['Pranjal'].pureSelf.toFixed(1)}h</b> | ` +
-            `Aayush: <b>${members['Aayush'].pureSelf.toFixed(1)}h</b>`;
-
         document.getElementById("statTotalPractice").innerText = totalPractice.toFixed(1) + " hrs";
         document.getElementById("statPracticeBreakdown").innerHTML = 
             `Pranay: <b>${members['Pranay'].practice.toFixed(1)}h</b> | ` +
             `Abhigyan: <b>${members['Abhigyan'].practice.toFixed(1)}h</b><br>` +
             `Pranjal: <b>${members['Pranjal'].practice.toFixed(1)}h</b> | ` +
             `Aayush: <b>${members['Aayush'].practice.toFixed(1)}h</b>`;
+
+        document.getElementById("statPureSelf").innerText = totalPureSelf.toFixed(1) + " hrs";
+        document.getElementById("statPureSelfBreakdown").innerHTML = 
+            `Pranay: <b>${members['Pranay'].pureSelf.toFixed(1)}h</b> | ` +
+            `Abhigyan: <b>${members['Abhigyan'].pureSelf.toFixed(1)}h</b><br>` +
+            `Pranjal: <b>${members['Pranjal'].pureSelf.toFixed(1)}h</b> | ` +
+            `Aayush: <b>${members['Aayush'].pureSelf.toFixed(1)}h</b>`;
 
         document.getElementById("statTotalRevision").innerText = totalRevision.toFixed(1) + " hrs";
         document.getElementById("statRevisionBreakdown").innerHTML = 
@@ -645,7 +672,24 @@
             `Pranjal: <b>${members['Pranjal'].mobile.toFixed(1)}h</b> | ` +
             `Aayush: <b>${members['Aayush'].mobile.toFixed(1)}h</b>`;
 
-        // Populate Revision Breakdown Table
+        // 2. Populate Practice Breakdown Table
+        const practiceTableBody = document.getElementById("practiceBreakdownTableBody");
+        practiceTableBody.innerHTML = '';
+        Object.keys(members).forEach(name => {
+            const m = members[name];
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><strong style="color:#2563eb;">${name}</strong></td>
+                <td><span style="color:#ea580c; font-weight:700;">${m.practicePhysics.toFixed(1)}h</span></td>
+                <td><span style="color:#16a34a; font-weight:700;">${m.practiceChemistry.toFixed(1)}h</span></td>
+                <td><span style="color:#0284c7; font-weight:700;">${m.practiceMath.toFixed(1)}h</span></td>
+                <td><strong style="color:#ca8a04;">${m.questions} Qs</strong></td>
+                <td><strong style="color:#ea580c;">${m.practice.toFixed(1)}h</strong></td>
+            `;
+            practiceTableBody.appendChild(row);
+        });
+
+        // 3. Populate Revision Breakdown Table
         const revTableBody = document.getElementById("revisionBreakdownTableBody");
         revTableBody.innerHTML = '';
         Object.keys(members).forEach(name => {
@@ -661,7 +705,7 @@
             revTableBody.appendChild(row);
         });
 
-        // Populate Pure Theory Breakdown Table
+        // 4. Populate Pure Theory Breakdown Table
         const theoryTableBody = document.getElementById("theoryBreakdownTableBody");
         theoryTableBody.innerHTML = '';
         Object.keys(members).forEach(name => {
@@ -677,7 +721,7 @@
             theoryTableBody.appendChild(row);
         });
 
-        // Overall Activity Table
+        // 5. Overall Activity Table
         const tbody = document.getElementById("memberTableBody");
         tbody.innerHTML = '';
         Object.keys(members).forEach(name => {
