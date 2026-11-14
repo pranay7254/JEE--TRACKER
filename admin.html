@@ -328,7 +328,7 @@
         <span id="secretIconBtn" class="secret-trigger" onclick="toggleSecretMobile()" title="Secret Options">🤫</span>
     </div>
     
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap; gap:8px;">
         <p style="color: var(--text-muted);">Exact study metrics, question practice, theory & revision subject-wise breakdown (PCM), mock scores & logs control.</p>
         <span id="roleBadge" style="font-size:0.8rem; font-weight:700; padding:4px 10px; border-radius:20px; background:#e2e8f0; color:#334155;">Checking role...</span>
     </div>
@@ -340,7 +340,7 @@
                 <span>💬 Group Feedback & Reflexya AI Desk</span>
                 <span class="reflexya-badge">⚡ Reflexya Smart Calc</span>
             </div>
-            <span style="font-size:0.8rem; color:#64748b;">Ask for live subject tables, stats, or submit suggestions</span>
+            <span style="font-size:0.8rem; color:#64748b;">Ask for live subject stats, mock scores, comparisons, or submit feedback</span>
         </div>
         
         <form onsubmit="handleFeedbackSubmission(event)">
@@ -356,6 +356,7 @@
                 <div>
                     <select id="fbCategory" required>
                         <option value="Live Stats / Table Query">📊 Live Stats / Table Query</option>
+                        <option value="Mock Scores Query">🎯 Mock Test Scores Query</option>
                         <option value="Feature / Table Request">💡 Feature / Table Request</option>
                         <option value="Telegram / Bot Setting">🤖 Telegram / Bot Issue</option>
                         <option value="UI & Data Bug">🐛 Bug / Calculation Error</option>
@@ -363,11 +364,11 @@
                     </select>
                 </div>
                 <div>
-                    <input type="text" id="fbSubject" placeholder="Topic (e.g. Subject wise study hours table)" required>
+                    <input type="text" id="fbSubject" placeholder="Topic (e.g. Physics hours or Mock test numbers)" required>
                 </div>
             </div>
 
-            <textarea id="fbMessage" class="feedback-textarea" placeholder="Ask Reflexya to calculate your subject-wise hours, questions, or leave feedback for Pranay..." required></textarea>
+            <textarea id="fbMessage" class="feedback-textarea" placeholder="Ask Reflexya anything about your study hours, mock scores, screen time, or leave feedback for Pranay..." required></textarea>
             
             <button type="submit" class="btn-reflexya-send">🚀 Send & Ask Reflexya</button>
         </form>
@@ -382,8 +383,8 @@
 
         <!-- LIVE REQUEST TRACKER TABLE FOR THE MEMBER -->
         <div style="margin-top: 1.5rem; border-top: 1px dashed #cbd5e1; padding-top: 1rem;">
-            <h4 style="font-size: 0.95rem; color: #0f172a; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
-                <span>📌 Track Your Submitted Requests & AI Tables:</span>
+            <h4 style="font-size: 0.95rem; color: #0f172a; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap:wrap;">
+                <span>📌 Track Your Submitted Requests & AI Reports:</span>
                 <span id="trackerUserLabel" style="font-size: 0.8rem; color: #0284c7; font-weight: bold;"></span>
             </h4>
             <div style="overflow-x:auto;">
@@ -688,117 +689,274 @@
     const db = firebase.firestore();
 
     let allLogsCache = [];
+    let allScoresCache = [];
 
-    // Smart Data-Driven Reflexya AI Engine
+    // Universal Smart Reflexya Query Engine (Zero API, 100% Exact Math + Off-Topic Guard)
     function generateReflexyaAnswer(student, category, subject, msg) {
         const text = (subject + " " + msg).toLowerCase();
 
-        // Data calculation trigger keywords
-        if (
-            category === "Live Stats / Table Query" ||
-            text.includes("hour") || text.includes("subject") || text.includes("table") ||
-            text.includes("total") || text.includes("how many") || text.includes("breakdown") ||
-            text.includes("physics") || text.includes("chem") || text.includes("math")
-        ) {
-            let targetUser = student;
-            if (text.includes("pranay")) targetUser = "Pranay";
-            else if (text.includes("abhigyan")) targetUser = "Abhigyan";
-            else if (text.includes("pranjal")) targetUser = "Pranjal";
-            else if (text.includes("aayush")) targetUser = "Aayush";
-
-            let stats = {
-                Physics: { practice: 0, revision: 0, theory: 0, lectures: 0, totalStudy: 0 },
-                Chemistry: { practice: 0, revision: 0, theory: 0, lectures: 0, totalStudy: 0 },
-                Math: { practice: 0, revision: 0, theory: 0, lectures: 0, totalStudy: 0 }
+        // 0. Off-Topic / Fun Prompts Boundary Guard
+        if (text.includes("birthday") || text.includes("wish") || text.includes("shayari") || text.includes("joke") || text.includes("song") || text.includes("poem")) {
+            return {
+                isAutoResolved: true,
+                html: `🤖 Nice try, <b>${student}</b>! Reflexya is locked onto JEE Trio analytics, study metrics, and mock scores—creative greetings are outside my module. Back to solving DPPs! 🎯`
             };
-            let totalQs = 0;
+        }
 
-            allLogsCache.forEach(log => {
-                if (log.student === targetUser) {
-                    const act = (log.act || "").toLowerCase();
-                    let sub = log.subject;
-                    if (sub === "Mathematics") sub = "Math";
+        // 1. Detect Target Student(s)
+        let targetUser = student;
+        if (text.includes("pranay")) targetUser = "Pranay";
+        else if (text.includes("abhigyan")) targetUser = "Abhigyan";
+        else if (text.includes("pranjal")) targetUser = "Pranjal";
+        else if (text.includes("aayush")) targetUser = "Aayush";
+        const isGroupCompare = text.includes("all") || text.includes("everyone") || text.includes("sabka") || text.includes("compare") || text.includes("leaderboard");
 
-                    if (stats[sub]) {
-                        if (act.includes("practice")) {
-                            stats[sub].practice += log.hours;
-                            stats[sub].totalStudy += log.hours;
-                            totalQs += log.qs;
-                        } else if (act.includes("revision")) {
-                            stats[sub].revision += log.hours;
-                            stats[sub].totalStudy += log.hours;
-                        } else if (act.includes("self")) {
-                            stats[sub].theory += log.hours;
-                            stats[sub].totalStudy += log.hours;
-                        } else if (act.includes("lecture")) {
-                            stats[sub].lectures += log.hours;
-                        }
+        // 2. Detect Specific Subject (if mentioned)
+        let targetSub = null;
+        if (text.includes("physics") || text.includes("phy")) targetSub = "Physics";
+        else if (text.includes("chemistry") || text.includes("chem")) targetSub = "Chemistry";
+        else if (text.includes("math")) targetSub = "Math";
+
+        // 3. Detect Metric Intent
+        const asksScore = category === "Mock Scores Query" || text.includes("score") || text.includes("marks") || text.includes("number") || text.includes("mock") || text.includes("test") || text.includes("result");
+        const asksScreen = text.includes("screen") || text.includes("mobile") || text.includes("phone");
+        const asksLecture = text.includes("lecture") || text.includes("class") || text.includes("video");
+        const asksQuestions = text.includes("question") || text.includes("qs") || text.includes("problem");
+        const asksStudy = category === "Live Stats / Table Query" || text.includes("hour") || text.includes("time") || text.includes("study") || text.includes("practice") || text.includes("revision") || text.includes("theory") || text.includes("table") || text.includes("breakdown") || targetSub !== null;
+
+        // --- INTENT A: MOCK TEST SCORES / NUMBERS ---
+        if (asksScore) {
+            const userScores = allScoresCache.filter(s => s.student === targetUser);
+            if (userScores.length === 0) {
+                return { isAutoResolved: true, html: `📊 <b>${targetUser}</b> has no mock test scores logged yet.` };
+            }
+
+            if (targetSub) {
+                const subKey = targetSub.toLowerCase();
+                let totalSubMarks = 0;
+                let listHtml = userScores.map(s => {
+                    const m = parseInt(s[subKey] || 0, 10);
+                    totalSubMarks += m;
+                    return `<li><b>${s.testTitle}:</b> ${m} / 100</li>`;
+                }).join("");
+                const avg = (totalSubMarks / userScores.length).toFixed(1);
+
+                return {
+                    isAutoResolved: true,
+                    html: `
+                        <div>🎯 <b>${targetUser}'s ${targetSub} Mock Scores (${userScores.length} Tests):</b></div>
+                        <ul style="margin:6px 0 6px 18px; font-size:0.84rem;">${listHtml}</ul>
+                        <div style="color:#0284c7; font-size:0.84rem;">📈 Average ${targetSub} Score: <b>${avg} / 100</b></div>
+                    `
+                };
+            } else {
+                let rows = userScores.map(s => `
+                    <tr>
+                        <td style="padding:5px; border:1px solid #cbd5e1;"><b>${s.testTitle}</b></td>
+                        <td style="padding:5px; border:1px solid #cbd5e1;">${s.physics}</td>
+                        <td style="padding:5px; border:1px solid #cbd5e1;">${s.chemistry}</td>
+                        <td style="padding:5px; border:1px solid #cbd5e1;">${s.math}</td>
+                        <td style="padding:5px; border:1px solid #cbd5e1; color:#16a34a;"><b>${s.total}/300</b></td>
+                    </tr>
+                `).join("");
+
+                return {
+                    isAutoResolved: true,
+                    html: `
+                        <div style="margin-bottom:6px;">📊 <b>${targetUser}'s Mock Test Scorecard:</b></div>
+                        <table style="width:100%; border-collapse:collapse; background:#fff; font-size:0.8rem; border:1px solid #cbd5e1;">
+                            <thead>
+                                <tr style="background:#f1f5f9;">
+                                    <th style="padding:5px; border:1px solid #cbd5e1;">Test</th>
+                                    <th style="padding:5px; border:1px solid #cbd5e1;">Phy</th>
+                                    <th style="padding:5px; border:1px solid #cbd5e1;">Chem</th>
+                                    <th style="padding:5px; border:1px solid #cbd5e1;">Math</th>
+                                    <th style="padding:5px; border:1px solid #cbd5e1;">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    `
+                };
+            }
+        }
+
+        // --- INTENT B: SCREEN TIME ---
+        if (asksScreen) {
+            let totalMobile = 0;
+            let recentLogs = [];
+            allLogsCache.forEach(l => {
+                if (l.student === targetUser && (l.act || "").toLowerCase().includes("mobile")) {
+                    totalMobile += l.hours;
+                    if (recentLogs.length < 3) {
+                        const dStr = l.dateObj.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                        recentLogs.push(`${dStr}: <b>${l.hours}h</b>`);
                     }
                 }
             });
+            const recentHtml = recentLogs.length > 0 ? `<div style="margin-top:4px; font-size:0.78rem; color:#475569;">Recent entries: ${recentLogs.join(" | ")}</div>` : "";
+            return {
+                isAutoResolved: true,
+                html: `📱 <b>${targetUser}'s Total Mobile Screen Time:</b> <span style="color:#dc2626; font-weight:800;">${totalMobile.toFixed(1)} hrs</span>${recentHtml}`
+            };
+        }
 
-            const grandTotalStudy = stats.Physics.totalStudy + stats.Chemistry.totalStudy + stats.Math.totalStudy;
-            const grandTotalLectures = stats.Physics.lectures + stats.Chemistry.lectures + stats.Math.lectures;
+        // --- INTENT C: GROUP COMPARISON TABLE ---
+        if (isGroupCompare) {
+            let group = { "Pranay": 0, "Abhigyan": 0, "Pranjal": 0, "Aayush": 0 };
+            let groupQs = { "Pranay": 0, "Abhigyan": 0, "Pranjal": 0, "Aayush": 0 };
+
+            allLogsCache.forEach(l => {
+                if (!group.hasOwnProperty(l.student)) return;
+                const act = (l.act || "").toLowerCase();
+                const sub = l.subject === "Mathematics" ? "Math" : l.subject;
+                if (targetSub && sub !== targetSub) return;
+
+                if (act.includes("practice") || act.includes("revision") || act.includes("self")) {
+                    group[l.student] += l.hours;
+                    if (act.includes("practice")) groupQs[l.student] += l.qs;
+                }
+            });
+
+            let rows = Object.keys(group).map(name => `
+                <tr>
+                    <td style="padding:5px; border:1px solid #cbd5e1;"><b>${name}</b></td>
+                    <td style="padding:5px; border:1px solid #cbd5e1; color:#16a34a;"><b>${group[name].toFixed(1)} hrs</b></td>
+                    <td style="padding:5px; border:1px solid #cbd5e1; color:#ca8a04;"><b>${groupQs[name]} Qs</b></td>
+                </tr>
+            `).join("");
 
             return {
                 isAutoResolved: true,
                 html: `
-                    <div style="margin-bottom:6px;">Here is the live subject-wise study breakdown for <b>${targetUser}</b> (combining Practice, Revision & Pure Theory):</div>
+                    <div style="margin-bottom:6px;">🏆 <b>Group Comparison ${targetSub ? `(${targetSub} Only)` : '(Overall PCM)'}:</b></div>
+                    <table style="width:100%; border-collapse:collapse; background:#fff; font-size:0.82rem; border:1px solid #cbd5e1;">
+                        <thead><tr style="background:#e0f2fe;"><th style="padding:5px; border:1px solid #cbd5e1;">Member</th><th style="padding:5px; border:1px solid #cbd5e1;">Pure Self-Study</th><th style="padding:5px; border:1px solid #cbd5e1;">Questions</th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                `
+            };
+        }
+
+        // --- INTENT D: SINGLE SUBJECT DEEP BREAKDOWN ---
+        if (targetSub && asksStudy) {
+            let p = 0, r = 0, t = 0, l = 0, qs = 0;
+            allLogsCache.forEach(log => {
+                if (log.student === targetUser) {
+                    const sub = log.subject === "Mathematics" ? "Math" : log.subject;
+                    if (sub === targetSub) {
+                        const act = (log.act || "").toLowerCase();
+                        if (act.includes("practice")) { p += log.hours; qs += log.qs; }
+                        else if (act.includes("revision")) { r += log.hours; }
+                        else if (act.includes("self")) { t += log.hours; }
+                        else if (act.includes("lecture")) { l += log.hours; }
+                    }
+                }
+            });
+            const totalSelf = p + r + t;
+
+            return {
+                isAutoResolved: true,
+                html: `
+                    <div style="margin-bottom:6px;">📌 <b>${targetUser}'s ${targetSub} Detailed Report:</b></div>
+                    <ul style="margin-left:18px; font-size:0.85rem; line-height:1.6;">
+                        <li>✍️ <b>Question Practice:</b> ${p.toFixed(1)} hrs (${qs} Qs solved)</li>
+                        <li>🔄 <b>Revision:</b> ${r.toFixed(1)} hrs</li>
+                        <li>📖 <b>Pure Theory:</b> ${t.toFixed(1)} hrs</li>
+                        <li>🎥 <b>Lectures Watched:</b> ${l.toFixed(1)} hrs</li>
+                    </ul>
+                    <div style="margin-top:6px; color:#15803d; font-size:0.88rem;">🔥 <b>Total ${targetSub} Self-Study: ${totalSelf.toFixed(1)} hrs</b></div>
+                `
+            };
+        }
+
+        // --- INTENT E: FULL PCM TABLE / GENERAL HOURS / QUESTIONS / LECTURES ---
+        if (asksStudy || asksLecture || asksQuestions) {
+            let stats = {
+                Physics: { p: 0, r: 0, t: 0, l: 0, total: 0 },
+                Chemistry: { p: 0, r: 0, t: 0, l: 0, total: 0 },
+                Math: { p: 0, r: 0, t: 0, l: 0, total: 0 }
+            };
+            let totalQs = 0, totalMobile = 0;
+
+            allLogsCache.forEach(log => {
+                if (log.student === targetUser) {
+                    const act = (log.act || "").toLowerCase();
+                    if (act.includes("mobile")) { totalMobile += log.hours; return; }
+                    const sub = log.subject === "Mathematics" ? "Math" : log.subject;
+                    if (stats[sub]) {
+                        if (act.includes("practice")) { stats[sub].p += log.hours; stats[sub].total += log.hours; totalQs += log.qs; }
+                        else if (act.includes("revision")) { stats[sub].r += log.hours; stats[sub].total += log.hours; }
+                        else if (act.includes("self")) { stats[sub].t += log.hours; stats[sub].total += log.hours; }
+                        else if (act.includes("lecture")) { stats[sub].l += log.hours; }
+                    }
+                }
+            });
+
+            const grandTotal = stats.Physics.total + stats.Chemistry.total + stats.Math.total;
+            const grandLec = stats.Physics.l + stats.Chemistry.l + stats.Math.l;
+
+            return {
+                isAutoResolved: true,
+                html: `
+                    <div style="margin-bottom:6px;">📊 Live PCM Study Summary for <b>${targetUser}</b>:</div>
                     <table style="width:100%; border-collapse:collapse; background:#ffffff; font-size:0.82rem; border:1px solid #cbd5e1;">
                         <thead>
                             <tr style="background:#e0f2fe; color:#0369a1;">
-                                <th style="padding:6px 8px; border:1px solid #cbd5e1;">Subject</th>
-                                <th style="padding:6px 8px; border:1px solid #cbd5e1;">✍️ Practice</th>
-                                <th style="padding:6px 8px; border:1px solid #cbd5e1;">🔄 Revision</th>
-                                <th style="padding:6px 8px; border:1px solid #cbd5e1;">📖 Pure Theory</th>
-                                <th style="padding:6px 8px; border:1px solid #cbd5e1;">🔥 Total Self-Study</th>
+                                <th style="padding:6px; border:1px solid #cbd5e1;">Subject</th>
+                                <th style="padding:6px; border:1px solid #cbd5e1;">✍️ Practice</th>
+                                <th style="padding:6px; border:1px solid #cbd5e1;">🔄 Revision</th>
+                                <th style="padding:6px; border:1px solid #cbd5e1;">📖 Theory</th>
+                                <th style="padding:6px; border:1px solid #cbd5e1;">🔥 Total Study</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td style="padding:6px 8px; border:1px solid #cbd5e1;"><b>⚛️ Physics</b></td>
-                                <td style="padding:6px 8px; border:1px solid #cbd5e1;">${stats.Physics.practice.toFixed(1)}h</td>
-                                <td style="padding:6px 8px; border:1px solid #cbd5e1;">${stats.Physics.revision.toFixed(1)}h</td>
-                                <td style="padding:6px 8px; border:1px solid #cbd5e1;">${stats.Physics.theory.toFixed(1)}h</td>
-                                <td style="padding:6px 8px; border:1px solid #cbd5e1; color:#ea580c;"><b>${stats.Physics.totalStudy.toFixed(1)} hrs</b></td>
+                                <td style="padding:6px; border:1px solid #cbd5e1;"><b>⚛️ Physics</b></td>
+                                <td style="padding:6px; border:1px solid #cbd5e1;">${stats.Physics.p.toFixed(1)}h</td>
+                                <td style="padding:6px; border:1px solid #cbd5e1;">${stats.Physics.r.toFixed(1)}h</td>
+                                <td style="padding:6px; border:1px solid #cbd5e1;">${stats.Physics.t.toFixed(1)}h</td>
+                                <td style="padding:6px; border:1px solid #cbd5e1; color:#ea580c;"><b>${stats.Physics.total.toFixed(1)}h</b></td>
                             </tr>
                             <tr>
-                                <td style="padding:6px 8px; border:1px solid #cbd5e1;"><b>🧪 Chemistry</b></td>
-                                <td style="padding:6px 8px; border:1px solid #cbd5e1;">${stats.Chemistry.practice.toFixed(1)}h</td>
-                                <td style="padding:6px 8px; border:1px solid #cbd5e1;">${stats.Chemistry.revision.toFixed(1)}h</td>
-                                <td style="padding:6px 8px; border:1px solid #cbd5e1;">${stats.Chemistry.theory.toFixed(1)}h</td>
-                                <td style="padding:6px 8px; border:1px solid #cbd5e1; color:#16a34a;"><b>${stats.Chemistry.totalStudy.toFixed(1)} hrs</b></td>
+                                <td style="padding:6px; border:1px solid #cbd5e1;"><b>🧪 Chemistry</b></td>
+                                <td style="padding:6px; border:1px solid #cbd5e1;">${stats.Chemistry.p.toFixed(1)}h</td>
+                                <td style="padding:6px; border:1px solid #cbd5e1;">${stats.Chemistry.r.toFixed(1)}h</td>
+                                <td style="padding:6px; border:1px solid #cbd5e1;">${stats.Chemistry.t.toFixed(1)}h</td>
+                                <td style="padding:6px; border:1px solid #cbd5e1; color:#16a34a;"><b>${stats.Chemistry.total.toFixed(1)}h</b></td>
                             </tr>
                             <tr>
-                                <td style="padding:6px 8px; border:1px solid #cbd5e1;"><b>📐 Math</b></td>
-                                <td style="padding:6px 8px; border:1px solid #cbd5e1;">${stats.Math.practice.toFixed(1)}h</td>
-                                <td style="padding:6px 8px; border:1px solid #cbd5e1;">${stats.Math.revision.toFixed(1)}h</td>
-                                <td style="padding:6px 8px; border:1px solid #cbd5e1;">${stats.Math.theory.toFixed(1)}h</td>
-                                <td style="padding:6px 8px; border:1px solid #cbd5e1; color:#0284c7;"><b>${stats.Math.totalStudy.toFixed(1)} hrs</b></td>
+                                <td style="padding:6px; border:1px solid #cbd5e1;"><b>📐 Math</b></td>
+                                <td style="padding:6px; border:1px solid #cbd5e1;">${stats.Math.p.toFixed(1)}h</td>
+                                <td style="padding:6px; border:1px solid #cbd5e1;">${stats.Math.r.toFixed(1)}h</td>
+                                <td style="padding:6px; border:1px solid #cbd5e1;">${stats.Math.t.toFixed(1)}h</td>
+                                <td style="padding:6px; border:1px solid #cbd5e1; color:#0284c7;"><b>${stats.Math.total.toFixed(1)}h</b></td>
                             </tr>
                             <tr style="background:#f8fafc;">
-                                <td colspan="4" style="padding:6px 8px; border:1px solid #cbd5e1; text-align:right;"><b>Grand Total Self-Study (Excl. Lectures):</b></td>
-                                <td style="padding:6px 8px; border:1px solid #cbd5e1; color:#15803d;"><b>${grandTotalStudy.toFixed(1)} hrs</b></td>
+                                <td colspan="4" style="padding:6px; border:1px solid #cbd5e1; text-align:right;"><b>Total Self-Study (Excl. Lectures):</b></td>
+                                <td style="padding:6px; border:1px solid #cbd5e1; color:#15803d;"><b>${grandTotal.toFixed(1)} hrs</b></td>
                             </tr>
                         </tbody>
                     </table>
                     <div style="margin-top:6px; font-size:0.78rem; color:#475569;">
-                        🎯 Total Questions Solved: <b>${totalQs} Qs</b> | 🎥 Lectures Watched: <b>${grandTotalLectures.toFixed(1)} hrs</b>
+                        🎯 Questions: <b>${totalQs} Qs</b> | 🎥 Lectures: <b>${grandLec.toFixed(1)} hrs</b> | 📱 Screen Time: <b style="color:#dc2626;">${totalMobile.toFixed(1)} hrs</b>
                     </div>
                 `
             };
         }
 
+        // --- INTENT F: BOT / REMINDER ---
         if (text.includes("reminder") || text.includes("telegram") || text.includes("bot")) {
             return {
                 isAutoResolved: true,
-                html: `Hello ${student}! Daily automated inactivity reminders are disabled. Only the Weekly Sunday Digest (9:00 PM IST) is active to keep things clean.`
+                html: `Hello ${student}! Daily automated inactivity reminders are disabled. Only the Weekly Sunday Digest (9:00 PM IST) is active.`
             };
         }
 
+        // --- FALLBACK: GENERAL FEEDBACK ---
         return {
             isAutoResolved: false,
-            html: `Hello ${student}, Reflexya has registered your feedback regarding "<b>${subject}</b>". Pranay will review this in the Master Admin Hub soon!`
+            html: `Hello ${student}, Reflexya has logged your feedback regarding "<b>${subject}</b>" for Pranay to review in the Master Admin Hub!`
         };
     }
 
@@ -1197,10 +1355,11 @@
         });
     });
 
-    // Mock Test Scores Listener
+    // Mock Test Scores Listener (Feeds allScoresCache for Reflexya)
     db.collection("jee_mock_scores").orderBy("timestamp", "desc").onSnapshot(snapshot => {
         const scoresBody = document.getElementById("adminScoresTableBody");
         scoresBody.innerHTML = '';
+        allScoresCache = [];
 
         if (snapshot.empty) {
             scoresBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--text-muted);">No mock scores found.</td></tr>';
@@ -1209,6 +1368,7 @@
 
         snapshot.forEach(doc => {
             const d = doc.data();
+            allScoresCache.push(d);
             const scoreId = doc.id;
             const dateStr = d.timestamp ? d.timestamp.toDate().toLocaleDateString([], { month: 'short', day: 'numeric' }) : 'Recent';
             
@@ -1220,7 +1380,7 @@
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td>${dateStr}</td>
-                <td><strong style="color:#2563eb;">${d.student}</strong></td>
+         <td><strong style="color:#2563eb;">${d.student}</strong></td>
                 <td>${d.testTitle}</td>
                 <td>${d.physics}</td>
                 <td>${d.chemistry}</td>
